@@ -1,4 +1,6 @@
 "use client";
+import { useLoading } from "@/context/LoadingContext";
+import { createUser } from "@/utils/users";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
@@ -11,13 +13,23 @@ export default function UserForm() {
     date_of_birth: "",
     gender: "",
   });
-
+  const { setLoading } = useLoading();
   const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(formData);
-    router.back();
+    setLoading(true);
+    const is_created = await createUser(formData.name, formData.email, formData.phone, formData.date_of_birth , formData.gender);
+    if (is_created) {
+      alert("User created successfully!");
+      setLoading(false);
+      router.back();
+    } else {
+      alert("Failed to create user. Please try again.");
+    }
+    setLoading(false);
+    
+    
   };
 
   return (

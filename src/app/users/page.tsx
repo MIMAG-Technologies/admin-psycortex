@@ -15,14 +15,12 @@ export default function Page() {
 
   const [users, setUsers] = useState<{
     users: Array<any>;
-    current_page: number;
-    total_pages: number;
-    success: boolean;
+    currentPage: number;
+    totalPages: number;
   }>({
     users: [],
-    current_page: 1,
-    total_pages: 0,
-    success: false,
+    currentPage: 1,
+    totalPages: 0,
   });
 
   useEffect(() => {
@@ -34,7 +32,7 @@ export default function Page() {
         setLoading(false);
       };
       fetchUser();
-    }, 300); // 300ms debounce
+    }, 300);
 
     return () => clearTimeout(handler);
   }, [search, page]);
@@ -87,7 +85,7 @@ export default function Page() {
       </div>
 
       {/* Pagination */}
-      {users.total_pages > 1 && (
+      {users.totalPages > 1 && (
         <div className="mt-6 flex justify-center gap-2">
           <button
             className="flex items-center gap-1 rounded-md border px-4 py-2 text-gray-700 transition hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -98,12 +96,12 @@ export default function Page() {
           </button>
 
           <span className="flex items-center rounded-md bg-slate-200 px-4 py-2 text-gray-800 font-medium">
-            Page {page} of {users.total_pages}
+            Page {page} of {users.totalPages}
           </span>
 
           <button
             className="flex items-center gap-1 rounded-md border px-4 py-2 text-gray-700 transition hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={page === users.total_pages}
+            disabled={page === users.totalPages}
             onClick={() => setPage(page + 1)}
           >
             Next <AiOutlineRight />
