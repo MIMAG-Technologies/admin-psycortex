@@ -37,7 +37,7 @@ export default function SideNavbar({
       {/* Sidebar for Large Screens */}
       <nav className="hidden lg:flex w-[250px] h-full bg-gray-100 text-gray-800 flex-col gap-2 p-4 border-r border-gray-300">
         {routes.map(({ name, icon, path }) => {
-          const isActive = pathname === path;
+          const isActive = pathname.includes(path);
           return (
             <Link
               key={name}
