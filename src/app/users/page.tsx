@@ -72,11 +72,14 @@ export default function Page() {
 
       {/* Users List */}
       <div className="flex flex-col gap-4">
+        {users.users.length === 0 && <h1 className="text-lg text-center mt-6">
+          No users found matching your search criteria. Please try again with different keywords.
+        </h1>}
         {users.users.map((user, index) => (
           <OneUserCard
             key={index}
             id={user.id}
-            profile_image={user.profile_image}
+            profile_image={user.profile_image || "/images/user-dummy-img.png"}
             name={user.name}
             date_of_birth={user.date_of_birth}
             gender={user.gender}

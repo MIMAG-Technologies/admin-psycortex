@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLoading } from "@/context/LoadingContext";
 import { sendOTP, verifyOTP } from "@/utils/auth";
+import { toast } from "react-toastify";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
@@ -26,15 +27,13 @@ export default function LoginPage() {
       if (response.success && response.hashOTP) {
         setHashOTP(response.hashOTP);
         setStep(2);
-      } else {
-        alert("Failed to send OTP");
       }
     }, 800);
   };
 
   const handleVerifyOTP = async () => {
     if (!otp.trim()) {
-      alert("Please enter OTP");
+      toast.info("Please enter OTP");
       return;
     }
 
@@ -46,8 +45,6 @@ export default function LoginPage() {
       if (response.success && response.token) {
         localStorage.setItem("psycortex-admin-token", response.token);
         router.push("/appointments");
-      } else {
-        alert("Invalid OTP");
       }
     }, 800);
   };

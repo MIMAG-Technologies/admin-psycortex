@@ -4,6 +4,7 @@ import { createUser } from "@/utils/users";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
+import { toast } from "react-toastify";
 
 export default function UserForm() {
   const [formData, setFormData] = useState({
@@ -23,9 +24,10 @@ export default function UserForm() {
     if (is_created) {
       alert("User created successfully!");
       setLoading(false);
+      toast.success("User created successfully!");
       router.back();
     } else {
-      alert("Failed to create user. Please try again.");
+      toast.error("Failed to create user. Please try again.");
     }
     setLoading(false);
     

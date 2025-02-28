@@ -6,6 +6,7 @@ import "./globals.css";
 import { BiExit, BiMenu } from "react-icons/bi";
 import Loading from "@/components/Loading";
 import { LoadingProvider } from "@/context/LoadingContext";
+import { ToastContainer, Bounce, toast } from "react-toastify";
 import AuthChecker from "@/components/AuthChecker";
 
 
@@ -21,6 +22,7 @@ export default function RootLayout({
 
   const handleLogout = () => {
     localStorage.removeItem("psycortex-admin-token");
+    toast.success("Logged out Successfully!")
     router.push("/login");
   };
 
@@ -36,6 +38,19 @@ export default function RootLayout({
         <link rel="icon" href="https://psycortex.in/favicon.ico" />
       </head>
       <body>
+          <ToastContainer
+            position="top-center"
+            autoClose={2000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover={false}
+            theme="light"
+            transition={Bounce}
+          />
         <LoadingProvider>
           {isLoginPage ? (
             <>

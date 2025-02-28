@@ -37,12 +37,17 @@ export default function OneUserCard(props: {
   };
 
   return (
-    <div className="flex flex-row items-center gap-4 rounded-lg bg-slate-100 p-4 border border-slate-300 w-full flex-nowrap">
+    <div className="flex flex-wrap items-center gap-4 rounded-lg bg-slate-100 p-4 border border-slate-300 w-full sm:flex-nowrap">
       {/* Profile Image */}
       <img
-        className="h-16 w-16 rounded-full object-cover border border-gray-400"
+        className="h-16 w-16 rounded-full object-cover border border-gray-400 sm:h-20 sm:w-20"
         src={props.profile_image}
         alt="User Profile"
+        onError={(e) => {
+          const target = e.target as HTMLImageElement;
+          target.onerror = null; 
+          target.src = "/images/user-dummy-img.png";
+        }}
       />
 
       {/* User Details */}
@@ -51,7 +56,7 @@ export default function OneUserCard(props: {
           {props.name}
         </h3>
 
-        <div className="flex gap-4">
+        <div className="flex flex-col sm:flex-row sm:gap-4">
           {/* Age */}
           <p className="text-sm text-gray-600 flex items-center gap-2">
             <FaRegCalendarAlt className="text-blue-500" />
@@ -66,17 +71,17 @@ export default function OneUserCard(props: {
         </div>
       </div>
 
-      {/* Action Buttons (Aligned to Right) */}
-      <div className="flex gap-2 sm:ml-auto">
+      {/* Action Buttons */}
+      <div className="flex w-full gap-2 sm:w-auto sm:ml-auto">
         <button
-          className="flex items-center justify-center gap-2 rounded-md border border-primary px-4 py-2 text-primary transition hover:bg-primary hover:text-white"
+          className="flex w-full items-center justify-center gap-2 rounded-md border border-primary px-4 py-2 text-primary transition hover:bg-primary hover:text-white sm:w-auto"
           onClick={() => console.log(props.id)}
         >
           <AiOutlineEye className="h-5 w-5" />
           View
         </button>
         <button
-          className="flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-white transition hover:bg-secondary"
+          className="flex w-full items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-white transition hover:bg-secondary sm:w-auto"
           onClick={() => console.log(props.id)}
         >
           <AiOutlineEdit className="h-5 w-5" />
