@@ -20,6 +20,12 @@ export type Education = {
   institution: string;
   year: number;
 };
+export type License = {
+  type: string;
+  number: string;
+  issuingAuthority: string;
+  validUntil: string;
+};
 
 export type CommunicationModes = {
   chat: boolean;

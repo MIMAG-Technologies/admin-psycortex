@@ -7,6 +7,7 @@ import {
   DayOfWeek,
   Education,
   Language,
+  License,
   PricingItem,
   ScheduleItem,
   SessionType,
@@ -98,6 +99,8 @@ export default function Page() {
 
   const [specialties, setSpecialties] = useState<Array<string>>([]);
 
+  const [lisences, setLicenses] = useState<Array<License>>([]);
+
   // 1. Function to update counsellorDetails
   const updateCounsellorDetails = (
     attribute: keyof CounsellorDetails,
@@ -125,6 +128,24 @@ export default function Page() {
     setEducation((prev) =>
       prev.map((edu, i) =>
         i === index ? { ...edu, ...updatedEducation } : edu
+      )
+    );
+  };
+
+  const addLicense = (newLicense: License) => {
+    setLicenses((prev) => [...prev, newLicense]);
+  };
+
+  // Delete a license at the specified index
+  const deleteLicense = (index: number) => {
+    setLicenses((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  // Update a license at the specified index with partial or complete new data
+  const updateLicense = (index: number, updatedLicense: Partial<License>) => {
+    setLicenses((prev) =>
+      prev.map((license, i) =>
+        i === index ? { ...license, ...updatedLicense } : license
       )
     );
   };
