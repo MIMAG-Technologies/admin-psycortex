@@ -1,5 +1,6 @@
 "use client";
 import BasicDetails from "@/components/Counsellors/BasicDetails";
+import ModeAndPricing from "@/components/Counsellors/ModeAndPricing";
 import ProfessionalInfo from "@/components/Counsellors/ProfessionalInfo";
 import {
   AvailabilityType,
@@ -216,7 +217,7 @@ export default function Page() {
           // Create new pricing item with default values
           newPricing.push({
             sessionType,
-            sessionTitle: `Standard ${mode} consultation`,
+            sessionTitle: "",
             price: 0, // Default price
             currency: "USD", // Default currency
             typeOfAvailability: availabilityType,
@@ -293,13 +294,11 @@ export default function Page() {
         </button>
 
         <h1 className="text-2xl font-semibold text-gray-800 mb-6">
-          {
-            step === 1
-             ? "Basic Counsellor Details"
-              : step === 2
-             ? "Professional Information"
-              : "Schedule & Availability"
-          }
+          {step === 1
+            ? "Basic Counsellor Details"
+            : step === 2
+            ? "Professional Information"
+            : "Communication Modes & Pricing"}
         </h1>
         {step === 1 && (
           <BasicDetails
@@ -319,6 +318,14 @@ export default function Page() {
             addLicense={addLicense}
             deleteLicense={deleteLicense}
             updateLicense={updateLicense}
+          />
+        )}
+        {step === 3 && (
+          <ModeAndPricing
+            communication_modes={communication_modes}
+            pricing={pricing}
+            updateCommunicationMode={updateCommunicationMode}
+            updatePricingItem={updatePricingItem}
           />
         )}
 
