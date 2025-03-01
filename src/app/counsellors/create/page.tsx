@@ -1,5 +1,6 @@
 "use client";
 import BasicDetails from "@/components/Counsellors/BasicDetails";
+import ProfessionalInfo from "@/components/Counsellors/ProfessionalInfo";
 import {
   AvailabilityType,
   CommunicationModes,
@@ -18,7 +19,7 @@ import { IoClose } from "react-icons/io5";
 
 export default function Page() {
   const [counsellorId, setCounsellorId] = useState("");
-  const [step, setStep] = useState<number>(1)
+  const [step, setStep] = useState<number>(1);
 
   const [counsellorDetails, setCounsellorDetails] = useState<CounsellorDetails>(
     {
@@ -39,6 +40,7 @@ export default function Page() {
   );
 
   const [education, setEducation] = useState<Array<Education>>([]);
+  const [lisences, setLicenses] = useState<Array<License>>([]);
 
   const [communication_modes, setCommunication_modes] =
     useState<CommunicationModes>({
@@ -98,8 +100,6 @@ export default function Page() {
   const [languages, setLanguages] = useState<Array<Language>>([]);
 
   const [specialties, setSpecialties] = useState<Array<string>>([]);
-
-  const [lisences, setLicenses] = useState<Array<License>>([]);
 
   // 1. Function to update counsellorDetails
   const updateCounsellorDetails = (
@@ -274,16 +274,15 @@ export default function Page() {
       prev.map((specialty, i) => (i === index ? updatedSpecialty : specialty))
     );
   };
-   const router = useRouter();
+  const router = useRouter();
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 z-50"
+      className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 z-50 "
       onClick={() => router.back()}
     >
-      
       <div
-        className="relative max-w-3xl w-full bg-white shadow-lg rounded-lg p-6 my-[5vh]"
+        className="relative max-w-3xl w-full bg-white shadow-lg rounded-lg p-6 my-[5vh] max-h-[90vh] overflow-y-scroll overflow-x-hidden "
         onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
       >
         <button
@@ -294,13 +293,34 @@ export default function Page() {
         </button>
 
         <h1 className="text-2xl font-semibold text-gray-800 mb-6">
-          Basic Counsellor Details
+          {
+            step === 1
+             ? "Basic Counsellor Details"
+              : step === 2
+             ? "Professional Information"
+              : "Schedule & Availability"
+          }
         </h1>
-
-        <BasicDetails
-          counsellorDetails={counsellorDetails}
-          updateCounsellorDetails={updateCounsellorDetails}
-        />
+        {step === 1 && (
+          <BasicDetails
+            counsellorDetails={counsellorDetails}
+            updateCounsellorDetails={updateCounsellorDetails}
+          />
+        )}
+        {step === 2 && (
+          <ProfessionalInfo
+            counsellorDetails={counsellorDetails}
+            education={education}
+            lisences={lisences}
+            updateCounsellorDetails={updateCounsellorDetails}
+            addEducation={addEducation}
+            deleteEducation={deleteEducation}
+            updateEducation={updateEducation}
+            addLicense={addLicense}
+            deleteLicense={deleteLicense}
+            updateLicense={updateLicense}
+          />
+        )}
 
         <div className="mt-6 flex items-center justify-between">
           <button

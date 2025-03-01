@@ -22,7 +22,7 @@ export type Education = {
 };
 export type License = {
   type: string;
-  number: string;
+  licenseNumber: string;
   issuingAuthority: string;
   validUntil: string;
 };
