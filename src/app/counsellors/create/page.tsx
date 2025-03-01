@@ -2,6 +2,7 @@
 import BasicDetails from "@/components/Counsellors/BasicDetails";
 import ModeAndPricing from "@/components/Counsellors/ModeAndPricing";
 import ProfessionalInfo from "@/components/Counsellors/ProfessionalInfo";
+import SpecialitiesAndLanguages from "@/components/Counsellors/SpecialitiesAndLanguages";
 import {
   AvailabilityType,
   CommunicationModes,
@@ -244,7 +245,7 @@ export default function Page() {
     setSchedule((prev) =>
       prev.map((item) => (item.day === day ? { ...item, ...updates } : item))
     );
-  };
+  }; 
 
   // 6. Languages functions
   const addLanguage = (newLanguage: Language) => {
@@ -294,11 +295,14 @@ export default function Page() {
         </button>
 
         <h1 className="text-2xl font-semibold text-gray-800 mb-6">
-          {step === 1
+
+            {step === 1
             ? "Basic Counsellor Details"
             : step === 2
             ? "Professional Information"
-            : "Communication Modes & Pricing"}
+            : step === 3
+            ? "Communication Modes & Pricing"
+            : "Languages & Specialties"}
         </h1>
         {step === 1 && (
           <BasicDetails
@@ -328,6 +332,18 @@ export default function Page() {
             updatePricingItem={updatePricingItem}
           />
         )}
+        {step === 4 && (
+          <SpecialitiesAndLanguages
+            languages={languages}
+            specialties={specialties}
+            addLanguage={addLanguage}
+            deleteLanguage={deleteLanguage}
+            updateLanguage={updateLanguage}
+            addSpecialty={addSpecialty}
+            deleteSpecialty={deleteSpecialty}
+            updateSpecialty={updateSpecialty}
+          />
+        )}
 
         <div className="mt-6 flex items-center justify-between">
           <button
@@ -342,13 +358,13 @@ export default function Page() {
             Previous
           </button>
 
-          <p className="text-gray-600 font-medium">Step {step} of 4</p>
+          <p className="text-gray-600 font-medium">Step {step} of 6</p>
 
           <button
-            disabled={step === 4}
-            onClick={() => setStep((prev) => Math.min(prev + 1, 4))}
+            disabled={step === 6}
+            onClick={() => setStep((prev) => Math.min(prev + 1, 6))}
             className={`px-4 py-2 rounded-md font-medium transition ${
-              step === 4
+              step === 6
                 ? "bg-gray-300 text-gray-600 cursor-not-allowed"
                 : "bg-indigo-600 text-white hover:bg-indigo-700"
             }`}
