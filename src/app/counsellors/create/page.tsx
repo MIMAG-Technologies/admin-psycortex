@@ -2,7 +2,9 @@
 import BasicDetails from "@/components/Counsellors/BasicDetails";
 import ModeAndPricing from "@/components/Counsellors/ModeAndPricing";
 import ProfessionalInfo from "@/components/Counsellors/ProfessionalInfo";
+import Schedule from "@/components/Counsellors/Schedule";
 import SpecialitiesAndLanguages from "@/components/Counsellors/SpecialitiesAndLanguages";
+import Verification from "@/components/Counsellors/Verification";
 import {
   AvailabilityType,
   CommunicationModes,
@@ -22,6 +24,16 @@ import { IoClose } from "react-icons/io5";
 export default function Page() {
   const [counsellorId, setCounsellorId] = useState("");
   const [step, setStep] = useState<number>(1);
+
+  // Step Titles
+  const stepTitles = [
+    "Basic Counsellor Information",
+    "Professional Credentials & Experience",
+    "Communication Preferences & Pricing",
+    "Languages & Areas of Expertise",
+    "Weekly Availability & Schedule",
+    "Final Verification & Submission",
+  ];
 
   const [counsellorDetails, setCounsellorDetails] = useState<CounsellorDetails>(
     {
@@ -54,50 +66,50 @@ export default function Page() {
 
   const [pricing, setPricing] = useState<Array<PricingItem>>([]);
 
-  const [schedule, setSchedule] = useState<Array<ScheduleItem>>([
-    {
-      day: "Monday",
-      startTime: null,
-      endTime: null,
-      isWorkingDay: true,
-    },
-    {
-      day: "Tuesday",
-      startTime: null,
-      endTime: null,
-      isWorkingDay: true,
-    },
-    {
-      day: "Wednesday",
-      startTime: null,
-      endTime: null,
-      isWorkingDay: true,
-    },
-    {
-      day: "Thursday",
-      startTime: null,
-      endTime: null,
-      isWorkingDay: false,
-    },
-    {
-      day: "Friday",
-      startTime: null,
-      endTime: null,
-      isWorkingDay: true,
-    },
-    {
-      day: "Saturday",
-      startTime: null,
-      endTime: null,
-      isWorkingDay: true,
-    },
-    {
-      day: "Sunday",
-      startTime: null,
-      endTime: null,
-      isWorkingDay: false,
-    },
-  ]);
+const [schedule, setSchedule] = useState<Array<ScheduleItem>>([
+  {
+    day: "Monday",
+    startTime: "09:00",
+    endTime: "17:00",
+    isWorkingDay: true,
+  },
+  {
+    day: "Tuesday",
+    startTime: "09:00",
+    endTime: "17:00",
+    isWorkingDay: true,
+  },
+  {
+    day: "Wednesday",
+    startTime: "09:00",
+    endTime: "17:00",
+    isWorkingDay: true,
+  },
+  {
+    day: "Thursday",
+    startTime: "09:00",
+    endTime: "17:00",
+    isWorkingDay: true,
+  },
+  {
+    day: "Friday",
+    startTime: "09:00",
+    endTime: "17:00",
+    isWorkingDay: true,
+  },
+  {
+    day: "Saturday",
+    startTime: null,
+    endTime: null,
+    isWorkingDay: false,
+  },
+  {
+    day: "Sunday",
+    startTime: null,
+    endTime: null,
+    isWorkingDay: false,
+  },
+]);
 
   const [languages, setLanguages] = useState<Array<Language>>([]);
 
@@ -277,16 +289,18 @@ export default function Page() {
     );
   };
   const router = useRouter();
+    const transitionClass = "transition-opacity duration-300 ease-in-out";
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 z-50 "
+      className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 z-50"
       onClick={() => router.back()}
     >
       <div
-        className="relative max-w-3xl w-full bg-white shadow-lg rounded-lg p-6 my-[5vh] max-h-[90vh] overflow-y-scroll overflow-x-hidden "
+        className="relative max-w-3xl w-full bg-white shadow-lg rounded-lg p-6 my-[5vh] max-h-[90vh] overflow-y-scroll overflow-x-hidden"
         onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
       >
+        {/* Close Button */}
         <button
           onClick={() => router.back()}
           className="absolute top-3 right-3 text-gray-600 hover:text-gray-900 transition"
@@ -294,23 +308,28 @@ export default function Page() {
           <IoClose size={24} />
         </button>
 
-        <h1 className="text-2xl font-semibold text-gray-800 mb-6">
-
-            {step === 1
-            ? "Basic Counsellor Details"
-            : step === 2
-            ? "Professional Information"
-            : step === 3
-            ? "Communication Modes & Pricing"
-            : "Languages & Specialties"}
+        {/* Step Title */}
+        <h1 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
+          {stepTitles[step - 1]}
         </h1>
-        {step === 1 && (
+
+        {/* Step Sections with Transitions */}
+        <div
+          className={`${transitionClass} ${
+            step === 1 ? "opacity-100" : "opacity-0 hidden"
+          }`}
+        >
           <BasicDetails
             counsellorDetails={counsellorDetails}
             updateCounsellorDetails={updateCounsellorDetails}
           />
-        )}
-        {step === 2 && (
+        </div>
+
+        <div
+          className={`${transitionClass} ${
+            step === 2 ? "opacity-100" : "opacity-0 hidden"
+          }`}
+        >
           <ProfessionalInfo
             counsellorDetails={counsellorDetails}
             education={education}
@@ -323,16 +342,26 @@ export default function Page() {
             deleteLicense={deleteLicense}
             updateLicense={updateLicense}
           />
-        )}
-        {step === 3 && (
+        </div>
+
+        <div
+          className={`${transitionClass} ${
+            step === 3 ? "opacity-100" : "opacity-0 hidden"
+          }`}
+        >
           <ModeAndPricing
             communication_modes={communication_modes}
             pricing={pricing}
             updateCommunicationMode={updateCommunicationMode}
             updatePricingItem={updatePricingItem}
           />
-        )}
-        {step === 4 && (
+        </div>
+
+        <div
+          className={`${transitionClass} ${
+            step === 4 ? "opacity-100" : "opacity-0 hidden"
+          }`}
+        >
           <SpecialitiesAndLanguages
             languages={languages}
             specialties={specialties}
@@ -343,8 +372,28 @@ export default function Page() {
             deleteSpecialty={deleteSpecialty}
             updateSpecialty={updateSpecialty}
           />
-        )}
+        </div>
 
+        <div
+          className={`${transitionClass} ${
+            step === 5 ? "opacity-100" : "opacity-0 hidden"
+          }`}
+        >
+          <Schedule
+            schedule={schedule}
+            updateScheduleItem={updateScheduleItem}
+          />
+        </div>
+
+        <div
+          className={`${transitionClass} ${
+            step === 6 ? "opacity-100" : "opacity-0 hidden"
+          }`}
+        >
+          <Verification counsellorEmail={counsellorDetails.email} />
+        </div>
+
+        {/* Navigation Buttons */}
         <div className="mt-6 flex items-center justify-between">
           <button
             disabled={step === 1}
@@ -363,11 +412,7 @@ export default function Page() {
           <button
             disabled={step === 6}
             onClick={() => setStep((prev) => Math.min(prev + 1, 6))}
-            className={`px-4 py-2 rounded-md font-medium transition ${
-              step === 6
-                ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                : "bg-indigo-600 text-white hover:bg-indigo-700"
-            }`}
+            className="px-4 py-2 rounded-md font-medium bg-indigo-600 text-white hover:bg-indigo-700 transition"
           >
             Next
           </button>
