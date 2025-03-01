@@ -23,17 +23,6 @@ import { IoClose } from "react-icons/io5";
 
 export default function Page() {
   const [counsellorId, setCounsellorId] = useState("");
-  const [step, setStep] = useState<number>(1);
-
-  // Step Titles
-  const stepTitles = [
-    "Basic Counsellor Information",
-    "Professional Credentials & Experience",
-    "Communication Preferences & Pricing",
-    "Languages & Areas of Expertise",
-    "Weekly Availability & Schedule",
-    "Final Verification & Submission",
-  ];
 
   const [counsellorDetails, setCounsellorDetails] = useState<CounsellorDetails>(
     {
@@ -66,50 +55,50 @@ export default function Page() {
 
   const [pricing, setPricing] = useState<Array<PricingItem>>([]);
 
-const [schedule, setSchedule] = useState<Array<ScheduleItem>>([
-  {
-    day: "Monday",
-    startTime: "09:00",
-    endTime: "17:00",
-    isWorkingDay: true,
-  },
-  {
-    day: "Tuesday",
-    startTime: "09:00",
-    endTime: "17:00",
-    isWorkingDay: true,
-  },
-  {
-    day: "Wednesday",
-    startTime: "09:00",
-    endTime: "17:00",
-    isWorkingDay: true,
-  },
-  {
-    day: "Thursday",
-    startTime: "09:00",
-    endTime: "17:00",
-    isWorkingDay: true,
-  },
-  {
-    day: "Friday",
-    startTime: "09:00",
-    endTime: "17:00",
-    isWorkingDay: true,
-  },
-  {
-    day: "Saturday",
-    startTime: null,
-    endTime: null,
-    isWorkingDay: false,
-  },
-  {
-    day: "Sunday",
-    startTime: null,
-    endTime: null,
-    isWorkingDay: false,
-  },
-]);
+  const [schedule, setSchedule] = useState<Array<ScheduleItem>>([
+    {
+      day: "Monday",
+      startTime: "09:00",
+      endTime: "17:00",
+      isWorkingDay: true,
+    },
+    {
+      day: "Tuesday",
+      startTime: "09:00",
+      endTime: "17:00",
+      isWorkingDay: true,
+    },
+    {
+      day: "Wednesday",
+      startTime: "09:00",
+      endTime: "17:00",
+      isWorkingDay: true,
+    },
+    {
+      day: "Thursday",
+      startTime: "09:00",
+      endTime: "17:00",
+      isWorkingDay: true,
+    },
+    {
+      day: "Friday",
+      startTime: "09:00",
+      endTime: "17:00",
+      isWorkingDay: true,
+    },
+    {
+      day: "Saturday",
+      startTime: null,
+      endTime: null,
+      isWorkingDay: false,
+    },
+    {
+      day: "Sunday",
+      startTime: null,
+      endTime: null,
+      isWorkingDay: false,
+    },
+  ]);
 
   const [languages, setLanguages] = useState<Array<Language>>([]);
 
@@ -257,7 +246,7 @@ const [schedule, setSchedule] = useState<Array<ScheduleItem>>([
     setSchedule((prev) =>
       prev.map((item) => (item.day === day ? { ...item, ...updates } : item))
     );
-  }; 
+  };
 
   // 6. Languages functions
   const addLanguage = (newLanguage: Language) => {
@@ -288,12 +277,28 @@ const [schedule, setSchedule] = useState<Array<ScheduleItem>>([
       prev.map((specialty, i) => (i === index ? updatedSpecialty : specialty))
     );
   };
+  const [step, setStep] = useState<number>(1);
+
+  // Step Titles
+  const stepTitles = [
+    "Basic Counsellor Information",
+    "Professional Credentials & Experience",
+    "Communication Preferences & Pricing",
+    "Languages & Areas of Expertise",
+    "Weekly Availability & Schedule",
+    "Final Verification & Submission",
+  ];
+  // Total Steps
+  const totalSteps = stepTitles.length;
+
+  // Progress Bar Width Calculation
+  const progressWidth = ((step - 1) / (totalSteps - 1)) * 100;
   const router = useRouter();
-    const transitionClass = "transition-opacity duration-300 ease-in-out";
+  const transitionClass = "transition-opacity duration-300 ease-in-out";
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 z-50"
+      className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 pt-5/4 z-50"
       onClick={() => router.back()}
     >
       <div
@@ -307,6 +312,13 @@ const [schedule, setSchedule] = useState<Array<ScheduleItem>>([
         >
           <IoClose size={24} />
         </button>
+
+        <div className="absolute w-[99%] h-[4px] bg-gray-200 rounded-full overflow-hidden top-0 left-[0.5%]">
+          <div
+            className="h-full bg-indigo-600 transition-all duration-300"
+            style={{ width: `${progressWidth}%` }}
+          ></div>
+        </div>
 
         {/* Step Title */}
         <h1 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
@@ -412,7 +424,11 @@ const [schedule, setSchedule] = useState<Array<ScheduleItem>>([
           <button
             disabled={step === 6}
             onClick={() => setStep((prev) => Math.min(prev + 1, 6))}
-            className="px-4 py-2 rounded-md font-medium bg-indigo-600 text-white hover:bg-indigo-700 transition"
+            className={`px-4 py-2 rounded-md font-medium transition ${
+              step === 6
+                ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                : "bg-indigo-600 text-white hover:bg-indigo-700"
+            }`}
           >
             Next
           </button>
