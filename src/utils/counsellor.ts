@@ -286,3 +286,28 @@ export const updateVerification = async (
     return false;
   }
 };
+
+
+export const getCounsellor = async (counsellorId: string) => {
+  try {
+    const response = await axios.post(
+      `${base_url}/counsellor/get_counsellor_details.php?counsellorId=${counsellorId}`
+    );
+    return response.data.data;
+  } catch (error) {
+    console.error("Error getting counsellor:", error);
+    return null;
+  }
+}
+
+export const getCounsellors = async () => {
+  try {
+    const response = await axios.get(
+      `${base_url}/counsellor/get_counsellors_all.php`
+    );
+    return response.data.counsellors;
+  } catch (error) {
+    console.error("Error getting counsellors:", error);
+    return [];
+  }
+}

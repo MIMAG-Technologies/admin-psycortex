@@ -1,18 +1,46 @@
+import { useState } from "react";
 import { CounsellorDetails } from "@/types/counsellors";
 
 export default function BasicDetails({
   counsellorDetails,
   updateCounsellorDetails,
+  mode,
+  id,
 }: {
   counsellorDetails: CounsellorDetails;
   updateCounsellorDetails: (
     attribute: keyof CounsellorDetails,
     value: any
   ) => void;
+  mode: string;
+  id?: string;
 }) {
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  const handleUpdate = async () => {
+    if (!id) return;
+    setIsUpdating(true);
+
+    try {
+      const response = await fetch(`/api/counsellors/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(counsellorDetails),
+      });
+
+      if (!response.ok) throw new Error("Failed to update");
+
+      alert("Counsellor details updated successfully!");
+    } catch (error) {
+      console.error("Update failed:", error);
+      alert("Error updating counsellor details.");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   return (
     <div className="mx-auto p-6 bg-white rounded-lg">
-
       {/* Form Fields */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {/* Name */}
@@ -83,8 +111,8 @@ export default function BasicDetails({
             className="mt-1 block w-full px-4 py-2 border rounded-lg shadow-sm focus:ring-primary focus:border-primary"
           >
             <option value="">Select gender</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
             <option value="Other">Other</option>
           </select>
         </div>
@@ -96,9 +124,7 @@ export default function BasicDetails({
           </label>
           <textarea
             value={counsellorDetails.biography}
-            style={{
-                resize:"none"
-            }}
+            style={{ resize: "none" }}
             onChange={(e) =>
               updateCounsellorDetails("biography", e.target.value)
             }
@@ -108,6 +134,16 @@ export default function BasicDetails({
           />
         </div>
       </div>
+
+      {mode === "edit" && id && (
+        <button
+          onClick={handleUpdate}
+          disabled={isUpdating}
+          className="mt-4 px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:opacity-50"
+        >
+          {isUpdating ? "Updating..." : "Update"}
+        </button>
+      )}
     </div>
   );
 }

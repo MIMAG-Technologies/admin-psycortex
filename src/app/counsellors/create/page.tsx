@@ -5,6 +5,7 @@ import ProfessionalInfo from "@/components/Counsellors/ProfessionalInfo";
 import Schedule from "@/components/Counsellors/Schedule";
 import SpecialitiesAndLanguages from "@/components/Counsellors/SpecialitiesAndLanguages";
 import Verification from "@/components/Counsellors/Verification";
+import { useLoading } from "@/context/LoadingContext";
 import {
   AvailabilityType,
   CommunicationModes,
@@ -17,12 +18,15 @@ import {
   ScheduleItem,
   SessionType,
 } from "@/types/counsellors";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { getCounsellor } from "@/utils/counsellor";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { IoClose } from "react-icons/io5";
+import { toast } from "react-toastify";
 
 export default function Page() {
   const [counsellorId, setCounsellorId] = useState("");
+  const [usermode, setmode] = useState<string>("")
 
   const [counsellorDetails, setCounsellorDetails] = useState<CounsellorDetails>(
     {
@@ -294,7 +298,191 @@ export default function Page() {
   // Progress Bar Width Calculation
   const progressWidth = ((step - 1) / (totalSteps - 1)) * 100;
   const router = useRouter();
+   const { setLoading } = useLoading();
   const transitionClass = "transition-opacity duration-300 ease-in-out";
+
+  const searchParams = useSearchParams();
+  const mode = searchParams.get("mode");
+  const id = searchParams.get("id");
+
+  useEffect(() => {
+    const fetchCounsellor = async (id: string) => {
+      setLoading(true);
+      try {
+        const res = await getCounsellor(id);
+
+        // Set basic counsellor details
+        setCounsellorDetails({
+          name: res.personalInfo.name,
+          email: res.personalInfo.email,
+          phone: res.personalInfo.phone,
+          timezone:
+            res.sessionInfo.availability.timeZone ||
+            Intl.DateTimeFormat().resolvedOptions().timeZone,
+          dateOfBirth: res.personalInfo.dateOfBirth,
+          profileImage: res.personalInfo.profileImage,
+          gender: res.personalInfo.gender,
+          biography: res.personalInfo.biography,
+          title: res.professionalInfo.title,
+          yearsOfExperience: res.professionalInfo.yearsOfExperience,
+          isVerified: res.verificationStatus.isVerified,
+          documentsVerified: res.verificationStatus.documentsVerified,
+          backgroundCheckDate: res.verificationStatus.backgroundCheckDate,
+        });
+
+        // Set education
+        if (
+          res.professionalInfo.education &&
+          Array.isArray(res.professionalInfo.education)
+        ) {
+          setEducation(
+            res.professionalInfo.education.map((edu: Education) => ({
+              degree: edu.degree,
+              field: edu.field,
+              institution: edu.institution,
+              year: edu.year,
+            }))
+          );
+        }
+
+        // Set licenses
+        if (
+          res.professionalInfo.licenses &&
+          Array.isArray(res.professionalInfo.licenses)
+        ) {
+          setLicenses(
+            res.professionalInfo.licenses.map((license: License) => ({
+              type: license.type,
+              licenseNumber: license.licenseNumber,
+              issuingAuthority: license.issuingAuthority,
+              validUntil: license.validUntil,
+            }))
+          );
+        }
+
+        // Set specialties
+        if (
+          res.practiceInfo.specialties &&
+          Array.isArray(res.practiceInfo.specialties)
+        ) {
+          setSpecialties(res.practiceInfo.specialties);
+        }
+
+        // Set languages
+        if (
+          res.practiceInfo.languages &&
+          Array.isArray(res.practiceInfo.languages)
+        ) {
+          setLanguages(
+            res.practiceInfo.languages.map((lang: Language) => ({
+              language: lang.language,
+              proficiencyLevel: lang.proficiencyLevel,
+            }))
+          );
+        }
+
+        // Set communication modes
+        const availableModes =
+          res.sessionInfo.availability.communicationModes || [];
+        setCommunication_modes({
+          chat: availableModes.includes("chat"),
+          call: availableModes.includes("call"),
+          video: availableModes.includes("video"),
+          in_person: availableModes.includes("in_person"),
+        });
+
+        // Set pricing
+        if (res.sessionInfo.pricing && res.sessionInfo.pricing.rates) {
+          setPricing(
+            res.sessionInfo.pricing.rates.map((rate: PricingItem) => {
+              let typeOfAvailability: AvailabilityType = "chat";
+
+              // Map session type to availability type
+              if (rate.sessionType.includes("Chat")) {
+                typeOfAvailability = "chat";
+              } else if (rate.sessionType.includes("Video")) {
+                typeOfAvailability = "video";
+              } else if (rate.sessionType.includes("In-Person")) {
+                typeOfAvailability = "in_person";
+              } else {
+                typeOfAvailability = "call";
+              }
+
+              return {
+                sessionType: rate.sessionType as SessionType,
+                sessionTitle: "",
+                price: rate.price,
+                currency: rate.currency || "INR",
+                typeOfAvailability,
+              };
+            })
+          );
+        }
+
+        // Set schedule
+        if (
+          res.sessionInfo.availability &&
+          res.sessionInfo.availability.weeklySchedule
+        ) {
+          // Create a day mapping
+          const dayMapping: Record<string, DayOfWeek> = {
+            Sunday: "Sunday",
+            Monday: "Monday",
+            Tuesday: "Tuesday",
+            Wednesday: "Wednesday",
+            Thursday: "Thursday",
+            Friday: "Friday",
+            Saturday: "Saturday",
+          };
+
+          // Convert API schedule to component schedule format
+          const updatedSchedule = [...schedule]; // Start with the default schedule
+
+          interface DayScheduleAPI {
+            day: string;
+            isWorkingDay: number;
+            working_hours: {
+              start: string | null;
+              end: string | null;
+            };
+          }
+          res.sessionInfo.availability.weeklySchedule.forEach(
+            (daySchedule: DayScheduleAPI) => {
+              const dayOfWeek: DayOfWeek = dayMapping[daySchedule.day];
+              if (dayOfWeek) {
+                const scheduleIndex: number = updatedSchedule.findIndex(
+                  (item: ScheduleItem) => item.day === dayOfWeek
+                );
+                if (scheduleIndex !== -1) {
+                  updatedSchedule[scheduleIndex] = {
+                    day: dayOfWeek,
+                    isWorkingDay: daySchedule.isWorkingDay === 1,
+                    startTime: daySchedule.working_hours.start
+                      ? daySchedule.working_hours.start.substring(0, 5)
+                      : null,
+                    endTime: daySchedule.working_hours.end
+                      ? daySchedule.working_hours.end.substring(0, 5)
+                      : null,
+                  };
+                }
+              }
+            }
+          );
+
+          setSchedule(updatedSchedule);
+        }
+      } catch (error) {
+        console.error("Error fetching counsellor data:", error);
+        toast.error("Error fetching counsellor data");
+      }
+      setLoading(false);
+    };
+    if (mode === "edit" && id) {
+      setCounsellorId(id);
+      setmode("edit");
+      fetchCounsellor(id);
+    }
+  }, [mode, id]);
 
   return (
     <div
@@ -334,6 +522,8 @@ export default function Page() {
           <BasicDetails
             counsellorDetails={counsellorDetails}
             updateCounsellorDetails={updateCounsellorDetails}
+            mode={usermode ? usermode : ""}
+            id={counsellorId ? counsellorId : ""}
           />
         </div>
 
