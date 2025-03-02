@@ -1,11 +1,12 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
+import { Suspense } from "react";
 import Link from "next/link";
 import { IoPeople, IoDocumentText, IoCalendar } from "react-icons/io5";
+import Loading from "@/components/Loading";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
   const pathname = usePathname();
 
   // Define tab structure
@@ -46,9 +47,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </Link>
         ))}
       </div>
-
-      {/* Content */}
-      {children}
+      <Suspense fallback={<Loading />}>{children}</Suspense>
     </div>
   );
 }
