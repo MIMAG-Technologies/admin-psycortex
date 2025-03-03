@@ -15,29 +15,6 @@ export default function BasicDetails({
   mode: string;
   id?: string;
 }) {
-  const [isUpdating, setIsUpdating] = useState(false);
-
-  const handleUpdate = async () => {
-    if (!id) return;
-    setIsUpdating(true);
-
-    try {
-      const response = await fetch(`/api/counsellors/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(counsellorDetails),
-      });
-
-      if (!response.ok) throw new Error("Failed to update");
-
-      alert("Counsellor details updated successfully!");
-    } catch (error) {
-      console.error("Update failed:", error);
-      alert("Error updating counsellor details.");
-    } finally {
-      setIsUpdating(false);
-    }
-  };
 
   return (
     <div className="mx-auto p-6 bg-white rounded-lg">
@@ -137,11 +114,10 @@ export default function BasicDetails({
 
       {mode === "edit" && id && (
         <button
-          onClick={handleUpdate}
-          disabled={isUpdating}
-          className="mt-4 px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:opacity-50"
+          onClick={()=>{}}
+          className="mt-4 px-6 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-secondary  w-full disabled:opacity-50"
         >
-          {isUpdating ? "Updating..." : "Update"}
+         Update
         </button>
       )}
     </div>

@@ -3,13 +3,16 @@ import { DayOfWeek, ScheduleItem } from "@/types/counsellors";
 export default function Schedule({
   schedule,
   updateScheduleItem,
+  mode,
+  id,
 }: {
   schedule: ScheduleItem[];
   updateScheduleItem: (day: DayOfWeek, updates: Partial<ScheduleItem>) => void;
+  mode: string;
+  id?: string;
 }) {
   return (
     <div className="mx-auto p-6 bg-white rounded-lg">
-
       {/* Schedule List */}
       <div className="space-y-4">
         {schedule.map((item) => (
@@ -73,6 +76,14 @@ export default function Schedule({
           </div>
         ))}
       </div>
+      {mode === "edit" && id && (
+        <button
+          onClick={() => {}}
+          className="mt-4 px-6 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-secondary  w-full disabled:opacity-50"
+        >
+          Update
+        </button>
+      )}
     </div>
   );
 }

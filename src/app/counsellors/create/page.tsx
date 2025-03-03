@@ -27,6 +27,7 @@ import { toast } from "react-toastify";
 export default function Page() {
   const [counsellorId, setCounsellorId] = useState("");
   const [usermode, setmode] = useState<string>("")
+  const [maxStep, setmaxStep] = useState<number>(6)
 
   const [counsellorDetails, setCounsellorDetails] = useState<CounsellorDetails>(
     {
@@ -292,11 +293,9 @@ export default function Page() {
     "Weekly Availability & Schedule",
     "Final Verification & Submission",
   ];
-  // Total Steps
-  const totalSteps = stepTitles.length;
 
   // Progress Bar Width Calculation
-  const progressWidth = ((step - 1) / (totalSteps - 1)) * 100;
+  const progressWidth = ((step - 1) / (maxStep - 1)) * 100;
   const router = useRouter();
    const { setLoading } = useLoading();
   const transitionClass = "transition-opacity duration-300 ease-in-out";
@@ -480,6 +479,7 @@ export default function Page() {
     if (mode === "edit" && id) {
       setCounsellorId(id);
       setmode("edit");
+      setmaxStep(5);
       fetchCounsellor(id);
     }
   }, [mode, id]);
@@ -543,6 +543,8 @@ export default function Page() {
             addLicense={addLicense}
             deleteLicense={deleteLicense}
             updateLicense={updateLicense}
+            mode={usermode ? usermode : ""}
+            id={counsellorId ? counsellorId : ""}
           />
         </div>
 
@@ -556,6 +558,8 @@ export default function Page() {
             pricing={pricing}
             updateCommunicationMode={updateCommunicationMode}
             updatePricingItem={updatePricingItem}
+            mode={usermode ? usermode : ""}
+            id={counsellorId ? counsellorId : ""}
           />
         </div>
 
@@ -573,6 +577,8 @@ export default function Page() {
             addSpecialty={addSpecialty}
             deleteSpecialty={deleteSpecialty}
             updateSpecialty={updateSpecialty}
+            mode={usermode ? usermode : ""}
+            id={counsellorId ? counsellorId : ""}
           />
         </div>
 
@@ -584,6 +590,8 @@ export default function Page() {
           <Schedule
             schedule={schedule}
             updateScheduleItem={updateScheduleItem}
+            mode={usermode ? usermode : ""}
+            id={counsellorId ? counsellorId : ""}
           />
         </div>
 
@@ -609,13 +617,15 @@ export default function Page() {
             Previous
           </button>
 
-          <p className="text-gray-600 font-medium">Step {step} of 6</p>
+          <p className="text-gray-600 font-medium">
+            Step {step} of {maxStep}
+          </p>
 
           <button
-            disabled={step === 6}
-            onClick={() => setStep((prev) => Math.min(prev + 1, 6))}
+            disabled={step === maxStep}
+            onClick={() => setStep((prev) => Math.min(prev + 1, maxStep))}
             className={`px-4 py-2 rounded-md font-medium transition ${
-              step === 6
+              step === maxStep
                 ? "bg-gray-300 text-gray-600 cursor-not-allowed"
                 : "bg-indigo-600 text-white hover:bg-indigo-700"
             }`}

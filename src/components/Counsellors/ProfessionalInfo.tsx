@@ -12,6 +12,8 @@ export default function ProfessionalInfo({
   addLicense,
   deleteLicense,
   updateLicense,
+  mode,
+  id,
 }: {
   counsellorDetails: CounsellorDetails;
   education: Array<Education>;
@@ -29,12 +31,13 @@ export default function ProfessionalInfo({
   addLicense: (newLicense: License) => void;
   deleteLicense: (index: number) => void;
   updateLicense: (index: number, updatedLicense: Partial<License>) => void;
+  mode: string;
+  id?: string;
 }) {
   const maxEntries = 5; // Define max educations & licenses
 
   return (
     <div className="mx-auto p-6 bg-white rounded-lg">
-
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {/* Title */}
         <div>
@@ -224,6 +227,14 @@ export default function ProfessionalInfo({
           </div>
         ))}
       </div>
+      {mode === "edit" && id && (
+        <button
+          onClick={() => {}}
+          className="mt-4 px-6 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-secondary  w-full disabled:opacity-50"
+        >
+          Update
+        </button>
+      )}
     </div>
   );
 }

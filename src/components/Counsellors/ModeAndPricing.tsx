@@ -6,6 +6,8 @@ export default function ModeAndPricing({
   pricing,
   updateCommunicationMode,
   updatePricingItem,
+  mode,
+  id
 }: {
   communication_modes: CommunicationModes;
   pricing: PricingItem[];
@@ -14,6 +16,8 @@ export default function ModeAndPricing({
     value: boolean
   ) => void;
   updatePricingItem: (index: number, updates: Partial<PricingItem>) => void;
+  mode: string;
+  id?: string;
 }) {
   // Handle mode toggle
   const handleModeToggle = (mode: keyof CommunicationModes) => {
@@ -31,7 +35,6 @@ export default function ModeAndPricing({
 
   return (
     <div className="mx-auto p-6 bg-white rounded-lg">
-
       {/* Communication Modes Toggle Buttons */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
         {/* Mode Buttons */}
@@ -128,6 +131,14 @@ export default function ModeAndPricing({
             </li>
           ))}
         </ul>
+      )}
+      {mode === "edit" && id && (
+        <button
+          onClick={() => {}}
+          className="mt-4 px-6 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-secondary  w-full disabled:opacity-50"
+        >
+          Update
+        </button>
       )}
     </div>
   );

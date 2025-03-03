@@ -10,6 +10,8 @@ export default function SpecialitiesAndLanguages({
   addSpecialty,
   deleteSpecialty,
   updateSpecialty,
+  mode,
+  id,
 }: {
   languages: Language[];
   specialties: string[];
@@ -19,6 +21,8 @@ export default function SpecialitiesAndLanguages({
   addSpecialty: (specialty: string) => void;
   deleteSpecialty: (index: number) => void;
   updateSpecialty: (index: number, updatedSpecialty: string) => void;
+  mode: string;
+  id?: string;
 }) {
   const maxEntries = 3; // Maximum number of languages & specialties
 
@@ -128,6 +132,14 @@ export default function SpecialitiesAndLanguages({
           </div>
         ))}
       </div>
+      {mode === "edit" && id && (
+        <button
+          onClick={() => {}}
+          className="mt-4 px-6 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-secondary  w-full disabled:opacity-50"
+        >
+          Update
+        </button>
+      )}
     </div>
   );
 }
