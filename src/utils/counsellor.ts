@@ -1,4 +1,10 @@
-import { Education, Language, License, PricingItem, ScheduleItem } from "@/types/counsellors";
+import {
+  Education,
+  Language,
+  License,
+  PricingItem,
+  ScheduleItem,
+} from "@/types/counsellors";
 import axios from "axios";
 
 const base_url = process.env.NEXT_PUBLIC_BASE_URL;
@@ -25,6 +31,9 @@ export const createCounsellor = async (
         email,
         phone,
         timezone,
+      },
+      {
+        headers: { "Content-Type": "application/json" },
       }
     );
     return response.data.counsellorId || "";
@@ -53,11 +62,16 @@ export const updatePersonalInfo = async (
   }
 ): Promise<boolean> => {
   try {
-    await axios.post(`${base_url}/counsellor/update_personal_info.php`, {
-      counsellorId,
-      ...personalInfo,
-    }
-  );
+    await axios.post(
+      `${base_url}/counsellor/update_personal_info.php`,
+      {
+        counsellorId,
+        ...personalInfo,
+      },
+      {
+        headers: { "Content-Type": "application/json" },
+      }
+    );
 
     return true;
   } catch (error) {
@@ -82,10 +96,16 @@ export const updateProfessionalInfo = async (
   }
 ): Promise<boolean> => {
   try {
-    await axios.post(`${base_url}/counsellor/update_professional_info.php`, {
-      counsellorId,
-      ...professionalInfo,
-    });
+    await axios.post(
+      `${base_url}/counsellor/update_professional_info.php`,
+      {
+        counsellorId,
+        ...professionalInfo,
+      },
+      {
+        headers: { "Content-Type": "application/json" },
+      }
+    );
 
     return true;
   } catch (error) {
@@ -105,10 +125,16 @@ export const updatePricing = async (
   rates: Array<PricingItem>
 ): Promise<boolean> => {
   try {
-    await axios.post(`${base_url}/counsellor/update_pricing.php`, {
-      counsellorId,
-      rates,
-    });
+    await axios.post(
+      `${base_url}/counsellor/update_pricing.php`,
+      {
+        counsellorId,
+        rates,
+      },
+      {
+        headers: { "Content-Type": "application/json" },
+      }
+    );
 
     return true;
   } catch (error) {
@@ -133,6 +159,9 @@ export const updateCommunicationModes = async (
       {
         counsellor_id: counsellorId,
         communication_modes: communicationModes,
+      },
+      {
+        headers: { "Content-Type": "application/json" },
       }
     );
 
@@ -154,10 +183,16 @@ export const updateSchedule = async (
   weeklySchedule: Array<ScheduleItem>
 ): Promise<boolean> => {
   try {
-    await axios.post(`${base_url}/counsellor/update_schedule.php`, {
-      counsellorId,
-      weeklySchedule,
-    });
+    await axios.post(
+      `${base_url}/counsellor/update_schedule.php`,
+      {
+        counsellorId,
+        weeklySchedule,
+      },
+      {
+        headers: { "Content-Type": "application/json" },
+      }
+    );
 
     return true;
   } catch (error) {
@@ -177,10 +212,16 @@ export const updateLanguages = async (
   languages: Array<Language>
 ): Promise<boolean> => {
   try {
-    await axios.post(`${base_url}/counsellor/update_languages.php`, {
-      counsellorId,
-      languages,
-    });
+    await axios.post(
+      `${base_url}/counsellor/update_languages.php`,
+      {
+        counsellorId,
+        languages,
+      },
+      {
+        headers: { "Content-Type": "application/json" },
+      }
+    );
 
     return true;
   } catch (error) {
@@ -200,10 +241,16 @@ export const updateSpecialties = async (
   specialties: string[]
 ): Promise<boolean> => {
   try {
-    await axios.post(`${base_url}/counsellor/update_specialties.php`, {
-      counsellorId,
-      specialties,
-    });
+    await axios.post(
+      `${base_url}/counsellor/update_specialties.php`,
+      {
+        counsellorId,
+        specialties,
+      },
+      {
+        headers: { "Content-Type": "application/json" },
+      }
+    );
 
     return true;
   } catch (error) {
@@ -259,10 +306,16 @@ export const updateVerification = async (
   }
 ): Promise<boolean> => {
   try {
-    await axios.post(`${base_url}/counsellor/update_verification.php`, {
-      counsellorId,
-      ...verificationData,
-    });
+    await axios.post(
+      `${base_url}/counsellor/update_verification.php`,
+      {
+        counsellorId,
+        ...verificationData,
+      },
+      {
+        headers: { "Content-Type": "application/json" },
+      }
+    );
 
     return true;
   } catch (error) {
