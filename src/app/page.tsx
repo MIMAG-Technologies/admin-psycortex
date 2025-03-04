@@ -1,7 +1,7 @@
+import AuthChecker from "@/components/AuthChecker";
+
 export default function Home() {
   return (
-    <div>
-      Home
-    </div>
+    <AuthChecker/>
   );
 }
