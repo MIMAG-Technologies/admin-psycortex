@@ -1,5 +1,8 @@
+import { useLoading } from "@/context/LoadingContext";
 import { Language } from "@/types/counsellors";
+import { updateLanguages, updateSpecialties } from "@/utils/counsellor";
 import { IoAddCircleOutline, IoTrash, IoCreate } from "react-icons/io5";
+import { toast } from "react-toastify";
 
 export default function SpecialitiesAndLanguages({
   languages,
@@ -25,6 +28,34 @@ export default function SpecialitiesAndLanguages({
   id?: string;
 }) {
   const maxEntries = 3; // Maximum number of languages & specialties
+const { setLoading } = useLoading();
+  const UpdateSpecialitiesandLanguages = async () => {
+    setLoading(true);
+    if (!id) {
+      toast.error("Counsellor ID not provided");
+      setLoading(false);
+      return;
+    }
+
+    if (languages.length < 2 || specialties.length < 2) {
+      toast.error(
+        "Please select at least two languages and two specialties.");
+        setLoading(false);
+        return;
+    }
+
+    const res1 =   await updateSpecialties(id, specialties); 
+    const res2 =    await updateLanguages(id, languages);
+    if (!res1 ||!res2) {
+      toast.error("Error updating specialties and languages");
+      setLoading(false);
+      return;
+    }
+    toast.success("Specialties and languages updated successfully");
+    setLoading(false);
+
+    
+  }
 
   return (
     <div className="mx-auto p-6 bg-white rounded-lg">
@@ -134,7 +165,7 @@ export default function SpecialitiesAndLanguages({
       </div>
       {mode === "edit" && id && (
         <button
-          onClick={() => {}}
+          onClick={UpdateSpecialitiesandLanguages}
           className="mt-4 px-6 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-secondary  w-full disabled:opacity-50"
         >
           Update

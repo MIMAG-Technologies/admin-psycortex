@@ -1,4 +1,7 @@
+import { useLoading } from "@/context/LoadingContext";
 import { DayOfWeek, ScheduleItem } from "@/types/counsellors";
+import { updateSchedule } from "@/utils/counsellor";
+import { toast } from "react-toastify";
 
 export default function Schedule({
   schedule,
@@ -11,6 +14,36 @@ export default function Schedule({
   mode: string;
   id?: string;
 }) {
+  const { setLoading } = useLoading();
+  const UpdateSchedule = async () => {
+    setLoading(true);
+
+    if (!id) {
+      toast.error("Counsellor ID not provided");
+      setLoading(false);
+      return;
+    }
+    const workingDays = schedule.filter((day) => day.isWorkingDay);
+    if (
+      workingDays.length < 3 ||
+      workingDays.some(
+        (day) => !day.startTime || !day.endTime || day.startTime >= day.endTime
+      )
+    ) {
+      toast.error(
+        "At least 3 working days must be selected with valid start and end times."
+      );
+      setLoading(false);
+      return;
+    }
+    const res = await updateSchedule(id, schedule);
+    if (res) {
+      toast.success("Schedule updated successfully");
+    } else {
+      toast.error("Failed to update schedule");
+    }
+    setLoading(false);
+  };
   return (
     <div className="mx-auto p-6 bg-white rounded-lg">
       {/* Schedule List */}
@@ -78,7 +111,7 @@ export default function Schedule({
       </div>
       {mode === "edit" && id && (
         <button
-          onClick={() => {}}
+          onClick={UpdateSchedule}
           className="mt-4 px-6 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-secondary  w-full disabled:opacity-50"
         >
           Update

@@ -2,8 +2,10 @@ import { useState } from "react";
 
 export default function Verification({
   counsellorEmail,
+  createUser,
 }: {
   counsellorEmail: string;
+  createUser: () => Promise<void>;
 }) {
   const [email, setEmail] = useState(counsellorEmail);
   const [agreements, setAgreements] = useState({
@@ -23,15 +25,8 @@ export default function Verification({
     }));
   };
 
-  const handleSubmit = () => {
-    console.log("Counsellor Created!");
-    console.log("Verified Email:", email);
-    console.log("Agreements:", agreements);
-  };
-
   return (
     <div className="mx-auto p-6 bg-white rounded-lg">
-
       {/* Checkboxes Section */}
       <div className="space-y-3">
         <label className="flex items-start space-x-2">
@@ -143,7 +138,7 @@ export default function Verification({
 
       {/* Submit Button */}
       <button
-        onClick={handleSubmit}
+        onClick={createUser}
         className={`mt-6 w-full px-4 py-2 rounded-md text-white font-medium transition ${
           Object.values(agreements).every(Boolean)
             ? "bg-indigo-600 hover:bg-indigo-700"

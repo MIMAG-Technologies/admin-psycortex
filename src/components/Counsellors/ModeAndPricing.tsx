@@ -1,5 +1,8 @@
+import { useLoading } from "@/context/LoadingContext";
 import { CommunicationModes, PricingItem } from "@/types/counsellors";
+import { updateCommunicationModes, updatePricing } from "@/utils/counsellor";
 import { IoChatbubble, IoCall, IoVideocam, IoPerson } from "react-icons/io5";
+import { toast } from "react-toastify";
 
 export default function ModeAndPricing({
   communication_modes,
@@ -7,7 +10,7 @@ export default function ModeAndPricing({
   updateCommunicationMode,
   updatePricingItem,
   mode,
-  id
+  id,
 }: {
   communication_modes: CommunicationModes;
   pricing: PricingItem[];
@@ -24,6 +27,12 @@ export default function ModeAndPricing({
     const newValue = !communication_modes[mode];
     updateCommunicationMode(mode, newValue);
   };
+  const buildCommunicationModesString = (modes: CommunicationModes): string => {
+    return Object.entries(modes)
+      .filter(([_, enabled]) => enabled)
+      .map(([mode]) => mode)
+      .join(",");
+  };
 
   // Map modes to their respective labels and icons
   const modeDetails = {
@@ -31,6 +40,42 @@ export default function ModeAndPricing({
     call: { label: "Call", icon: <IoCall size={20} /> },
     video: { label: "Video", icon: <IoVideocam size={20} /> },
     in_person: { label: "In-Person", icon: <IoPerson size={20} /> },
+  };
+
+  const { setLoading } = useLoading();
+  const UpdateModesAndPricing = async () => {
+    setLoading(true);
+
+    if (!id) {
+      toast.error("Counsellor ID not provided");
+      setLoading(false);
+      return;
+    }
+
+    const selectedModes =
+      Object.values(communication_modes).filter(Boolean).length;
+    if (
+      selectedModes < 2 ||
+      pricing.some((item) => item.price <= 0 || !item.sessionTitle.trim())
+    ) {
+      toast.error(
+        "Select at least two communication modes and ensure their pricing details are complete."
+      );
+      setLoading(false);
+      return;
+    }
+
+    const res = await updateCommunicationModes(
+      id,
+      buildCommunicationModesString(communication_modes)
+    );
+    const res1 = await updatePricing(id, pricing);
+    if (res && res1) {
+      toast.success("Communication modes updated successfully");
+    } else {
+      toast.error("Failed to update communication modes");
+    }
+    setLoading(false);
   };
 
   return (
@@ -134,7 +179,7 @@ export default function ModeAndPricing({
       )}
       {mode === "edit" && id && (
         <button
-          onClick={() => {}}
+          onClick={UpdateModesAndPricing}
           className="mt-4 px-6 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-secondary  w-full disabled:opacity-50"
         >
           Update

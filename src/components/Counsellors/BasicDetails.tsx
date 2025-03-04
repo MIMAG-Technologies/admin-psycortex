@@ -1,5 +1,7 @@
-import { useState } from "react";
 import { CounsellorDetails } from "@/types/counsellors";
+import { toast } from "react-toastify";
+import { updatePersonalInfo } from "@/utils/counsellor";
+import { useLoading } from "@/context/LoadingContext";
 
 export default function BasicDetails({
   counsellorDetails,
@@ -15,6 +17,46 @@ export default function BasicDetails({
   mode: string;
   id?: string;
 }) {
+
+   const { setLoading } = useLoading();
+  const UpdateBasicDetails = async() => {
+    setLoading(true);
+
+    if(!id){
+      toast.error("Counsellor ID not provided");
+      setLoading(false);
+      return;
+    }
+    if (
+      !counsellorDetails.name.trim() ||
+      !counsellorDetails.email.trim() ||
+      !counsellorDetails.phone.trim() ||
+      !counsellorDetails.dateOfBirth.trim() ||
+      !counsellorDetails.gender.trim() ||
+      !counsellorDetails.biography.trim()
+    ) {
+      toast.error("Please fill all the fields");
+    }
+
+    const res =  await updatePersonalInfo(id, {
+            name: counsellorDetails.name,
+            dateOfBirth: counsellorDetails.dateOfBirth,
+            gender: counsellorDetails.gender,
+            biography: counsellorDetails.biography,
+            email: counsellorDetails.email,
+            phone: counsellorDetails.phone,
+            profileImage: counsellorDetails.profileImage,
+          });
+
+    if(res){
+      toast.success("Counsellor details updated successfully");
+    }
+    else{
+      toast.error("Failed to update counsellor details");
+    }
+    setLoading(false);
+
+  }
 
   return (
     <div className="mx-auto p-6 bg-white rounded-lg">
@@ -114,7 +156,7 @@ export default function BasicDetails({
 
       {mode === "edit" && id && (
         <button
-          onClick={()=>{}}
+          onClick={UpdateBasicDetails}
           className="mt-4 px-6 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-secondary  w-full disabled:opacity-50"
         >
          Update

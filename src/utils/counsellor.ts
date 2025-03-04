@@ -1,3 +1,4 @@
+import { Education, Language, License, PricingItem, ScheduleItem } from "@/types/counsellors";
 import axios from "axios";
 
 const base_url = process.env.NEXT_PUBLIC_BASE_URL;
@@ -55,7 +56,8 @@ export const updatePersonalInfo = async (
     await axios.post(`${base_url}/counsellor/update_personal_info.php`, {
       counsellorId,
       ...personalInfo,
-    });
+    }
+  );
 
     return true;
   } catch (error) {
@@ -75,12 +77,8 @@ export const updateProfessionalInfo = async (
   professionalInfo: {
     title: string;
     yearsOfExperience: number;
-    education: Array<{
-      degree: string;
-      field: string;
-      institution: string;
-      year: number;
-    }>;
+    education: Array<Education>;
+    licenses: Array<License>;
   }
 ): Promise<boolean> => {
   try {
@@ -104,13 +102,7 @@ export const updateProfessionalInfo = async (
  */
 export const updatePricing = async (
   counsellorId: string,
-  rates: Array<{
-    sessionType: string;
-    sessionTitle: string;
-    typeOfAvailability: string;
-    price: number;
-    currency: string;
-  }>
+  rates: Array<PricingItem>
 ): Promise<boolean> => {
   try {
     await axios.post(`${base_url}/counsellor/update_pricing.php`, {
@@ -159,12 +151,7 @@ export const updateCommunicationModes = async (
  */
 export const updateSchedule = async (
   counsellorId: string,
-  weeklySchedule: Array<{
-    day: string;
-    startTime?: string;
-    endTime?: string;
-    isWorkingDay: boolean;
-  }>
+  weeklySchedule: Array<ScheduleItem>
 ): Promise<boolean> => {
   try {
     await axios.post(`${base_url}/counsellor/update_schedule.php`, {
@@ -187,10 +174,7 @@ export const updateSchedule = async (
  */
 export const updateLanguages = async (
   counsellorId: string,
-  languages: Array<{
-    language: string;
-    proficiencyLevel: string;
-  }>
+  languages: Array<Language>
 ): Promise<boolean> => {
   try {
     await axios.post(`${base_url}/counsellor/update_languages.php`, {
@@ -287,7 +271,6 @@ export const updateVerification = async (
   }
 };
 
-
 export const getCounsellor = async (counsellorId: string) => {
   try {
     const response = await axios.post(
@@ -298,7 +281,7 @@ export const getCounsellor = async (counsellorId: string) => {
     console.error("Error getting counsellor:", error);
     return null;
   }
-}
+};
 
 export const getCounsellors = async () => {
   try {
@@ -310,4 +293,4 @@ export const getCounsellors = async () => {
     console.error("Error getting counsellors:", error);
     return [];
   }
-}
+};

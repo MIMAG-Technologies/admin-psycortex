@@ -18,7 +18,18 @@ import {
   ScheduleItem,
   SessionType,
 } from "@/types/counsellors";
-import { getCounsellor } from "@/utils/counsellor";
+import {
+  createCounsellor,
+  getCounsellor,
+  updateCommunicationModes,
+  updateLanguages,
+  updatePersonalInfo,
+  updatePricing,
+  updateProfessionalInfo,
+  updateSchedule,
+  updateSpecialties,
+  updateVerification,
+} from "@/utils/counsellor";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { IoClose } from "react-icons/io5";
@@ -26,8 +37,8 @@ import { toast } from "react-toastify";
 
 export default function Page() {
   const [counsellorId, setCounsellorId] = useState("");
-  const [usermode, setmode] = useState<string>("")
-  const [maxStep, setmaxStep] = useState<number>(6)
+  const [usermode, setmode] = useState<string>("");
+  const [maxStep, setmaxStep] = useState<number>(6);
 
   const [counsellorDetails, setCounsellorDetails] = useState<CounsellorDetails>(
     {
@@ -297,7 +308,7 @@ export default function Page() {
   // Progress Bar Width Calculation
   const progressWidth = ((step - 1) / (maxStep - 1)) * 100;
   const router = useRouter();
-   const { setLoading } = useLoading();
+  const { setLoading } = useLoading();
   const transitionClass = "transition-opacity duration-300 ease-in-out";
 
   const searchParams = useSearchParams();
@@ -409,7 +420,7 @@ export default function Page() {
 
               return {
                 sessionType: rate.sessionType as SessionType,
-                sessionTitle: "",
+                sessionTitle: rate.sessionTitle,
                 price: rate.price,
                 currency: rate.currency || "INR",
                 typeOfAvailability,
@@ -483,6 +494,64 @@ export default function Page() {
       fetchCounsellor(id);
     }
   }, [mode, id]);
+
+  const buildCommunicationModesString = (modes: CommunicationModes): string => {
+    return Object.entries(modes)
+      .filter(([_, enabled]) => enabled)
+      .map(([mode]) => mode)
+      .join(",");
+  };
+  const createUser = async () => {
+    setLoading(true);
+    try {
+      const id = await createCounsellor(
+        counsellorDetails.name,
+        counsellorDetails.email,
+        counsellorDetails.phone,
+        counsellorDetails.timezone
+      );
+      if (!id) {
+        toast.error("Error creating counsellor");
+        setLoading(false);
+        return;
+      }
+      await updatePersonalInfo(id, {
+        name: counsellorDetails.name,
+        dateOfBirth: counsellorDetails.dateOfBirth,
+        gender: counsellorDetails.gender,
+        biography: counsellorDetails.biography,
+        email: counsellorDetails.email,
+        phone: counsellorDetails.phone,
+        profileImage: counsellorDetails.profileImage,
+      });
+
+      await updateProfessionalInfo(id, {
+        title: counsellorDetails.title,
+        yearsOfExperience: counsellorDetails.yearsOfExperience,
+        education: education,
+        licenses: lisences,
+      });
+      await updatePricing(id, pricing);
+      await updateCommunicationModes(
+        id,
+        buildCommunicationModesString(communication_modes)
+      );
+      await updateSchedule(id, schedule);
+      await updateLanguages(id, languages);
+      await updateSpecialties(id, specialties);
+      await updateVerification(id, {
+        isVerified: counsellorDetails.isVerified,
+        documentsVerified: counsellorDetails.documentsVerified,
+        backgroundCheckDate: counsellorDetails.backgroundCheckDate,
+      });
+      toast.success("Counsellor created successfully");
+      router.push(`/counsellors`);
+    } catch (error) {
+      console.error("Error creating counsellor:", error);
+      setLoading(false);
+    }
+    setLoading(false);
+  };
 
   return (
     <div
@@ -600,7 +669,10 @@ export default function Page() {
             step === 6 ? "opacity-100" : "opacity-0 hidden"
           }`}
         >
-          <Verification counsellorEmail={counsellorDetails.email} />
+          <Verification
+            counsellorEmail={counsellorDetails.email}
+            createUser={createUser}
+          />
         </div>
 
         {/* Navigation Buttons */}
@@ -623,7 +695,85 @@ export default function Page() {
 
           <button
             disabled={step === maxStep}
-            onClick={() => setStep((prev) => Math.min(prev + 1, maxStep))}
+            onClick={() => {
+              let isValid = true;
+              let errorMessage = "";
+
+              if (step === 1) {
+                if (
+                  !counsellorDetails.name.trim() ||
+                  !counsellorDetails.email.trim() ||
+                  !counsellorDetails.phone.trim() ||
+                  !counsellorDetails.dateOfBirth.trim() ||
+                  !counsellorDetails.gender.trim() ||
+                  !counsellorDetails.biography.trim()
+                ) {
+                  isValid = false;
+                  errorMessage =
+                    "Please complete all personal information fields.";
+                }
+              }
+
+              if (step === 2) {
+                if (
+                  !counsellorDetails.title.trim() ||
+                  counsellorDetails.yearsOfExperience <= 0 ||
+                  education.length === 0
+                ) {
+                  isValid = false;
+                  errorMessage =
+                    "Please provide a title, experience, and at least one education entry.";
+                }
+              }
+
+              if (step === 3) {
+                const selectedModes =
+                  Object.values(communication_modes).filter(Boolean).length;
+                if (
+                  selectedModes < 2 ||
+                  pricing.some(
+                    (item) => item.price <= 0 || !item.sessionTitle.trim()
+                  )
+                ) {
+                  isValid = false;
+                  errorMessage =
+                    "Select at least two communication modes and ensure their pricing details are complete.";
+                }
+              }
+
+              if (step === 4) {
+                if (languages.length < 2 || specialties.length < 2) {
+                  isValid = false;
+                  errorMessage =
+                    "Please select at least two languages and two specialties.";
+                }
+              }
+
+              if (step === 5) {
+                const workingDays = schedule.filter((day) => day.isWorkingDay);
+                if (
+                  workingDays.length < 3 ||
+                  workingDays.some(
+                    (day) =>
+                      !day.startTime ||
+                      !day.endTime ||
+                      day.startTime >= day.endTime
+                  )
+                ) {
+                  isValid = false;
+                  errorMessage =
+                    "At least 3 working days must be selected with valid start and end times.";
+                }
+              }
+
+              if (!isValid) {
+                toast.error(errorMessage);
+                return;
+              }
+
+              // Proceed to the next step if validation passes
+              setStep((prev) => Math.min(prev + 1, maxStep));
+            }}
             className={`px-4 py-2 rounded-md font-medium transition ${
               step === maxStep
                 ? "bg-gray-300 text-gray-600 cursor-not-allowed"

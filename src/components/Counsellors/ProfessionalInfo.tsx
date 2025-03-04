@@ -1,5 +1,8 @@
+import { useLoading } from "@/context/LoadingContext";
 import { CounsellorDetails, Education, License } from "@/types/counsellors";
+import { updateProfessionalInfo } from "@/utils/counsellor";
 import { IoTrash, IoAddCircleOutline } from "react-icons/io5";
+import { toast } from "react-toastify";
 
 export default function ProfessionalInfo({
   counsellorDetails,
@@ -35,6 +38,40 @@ export default function ProfessionalInfo({
   id?: string;
 }) {
   const maxEntries = 5; // Define max educations & licenses
+  const { setLoading } = useLoading();
+  const updateProfessionalInformation = async () => {
+    if (!id) {
+      toast.error("Counsellor ID not provided");
+      setLoading(false);
+      return;
+    }
+
+    if (
+      !counsellorDetails.title.trim() ||
+      counsellorDetails.yearsOfExperience <= 0 ||
+      education.length === 0
+    ) {
+      toast.error(
+        "Please provide a title, experience, and at least one education entry."
+      );
+      setLoading(false);
+      return;
+    }
+
+    const res = await updateProfessionalInfo(id, {
+      title: counsellorDetails.title,
+      yearsOfExperience: counsellorDetails.yearsOfExperience,
+      education: education,
+      licenses: lisences,
+    });
+
+    if (res) {
+      toast.success("Professional information updated successfully");
+    } else {
+      toast.error("Failed to update professional information");
+    }
+    setLoading(false);
+  };
 
   return (
     <div className="mx-auto p-6 bg-white rounded-lg">
@@ -229,7 +266,7 @@ export default function ProfessionalInfo({
       </div>
       {mode === "edit" && id && (
         <button
-          onClick={() => {}}
+          onClick={updateProfessionalInformation}
           className="mt-4 px-6 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-secondary  w-full disabled:opacity-50"
         >
           Update
