@@ -6,6 +6,7 @@ interface LeaveApplicationProps {
   title: string;
   profilePhoto: string;
   leaveTill: string;
+  leaveStart: string;
   message: string;
   onViewApplication: (id: string) => void;
   onVerify: (id: string) => void;
@@ -22,6 +23,7 @@ export default function LeaveApplication({
   title,
   profilePhoto,
   leaveTill,
+  leaveStart,
   message,
   onViewApplication,
   onVerify,
@@ -40,6 +42,9 @@ export default function LeaveApplication({
         <h2 className="text-lg font-semibold text-gray-800">
           {name} <span className="text-gray-500">({title})</span>
         </h2>
+        <p className="text-sm text-gray-600">
+          Leave From: <span className="font-medium">{leaveStart}</span>
+        </p>
         <p className="text-sm text-gray-600">
           Leave Till: <span className="font-medium">{leaveTill}</span>
         </p>

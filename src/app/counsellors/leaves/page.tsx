@@ -13,6 +13,7 @@ const fetchLeaveApplications = async () => {
       name: "Dr. Sarah Johnson",
       title: "Clinical Psychologist",
       profilePhoto: "https://randomuser.me/api/portraits/women/45.jpg",
+      leaveStart: "2024-04-15", // New Field
       leaveTill: "2024-05-10",
       message: "I need leave due to personal reasons and will be back soon.",
     },
@@ -21,15 +22,17 @@ const fetchLeaveApplications = async () => {
       name: "Dr. Ananya Iyer",
       title: "Clinical Psychologist",
       profilePhoto: "https://randomuser.me/api/portraits/women/68.jpg",
+      leaveStart: "2024-07-01",
       leaveTill: "2024-08-15",
       message:
-        "I am requesting leave from my duties due to a combination of personal and professional reasons. Over the past few months, I have been working extensively with clients suffering from anxiety and depression, which has been both fulfilling and emotionally demanding. To ensure I maintain my mental well-being and continue providing the best possible care to my patients, I believe a short break is necessary. Additionally, I have been invited to attend a prestigious international conference on trauma therapy techniques, which will not only enhance my skills but also allow me to bring back valuable insights for our practice. I sincerely request approval for my leave until August 15th, and I assure you that I will coordinate with my clients to ensure a smooth transition during my absence. Please let me know if any further details are required.",
+        "I am requesting leave due to both personal and professional reasons. Over the past few months, I have been working extensively with clients suffering from anxiety and depression, which has been both fulfilling and emotionally demanding...",
     },
     {
       id: "l124",
       name: "Dr. Aryan Sharma",
       title: "Mental Health Specialist",
       profilePhoto: "https://randomuser.me/api/portraits/men/30.jpg",
+      leaveStart: "2024-05-10",
       leaveTill: "2024-06-01",
       message:
         "Attending an international psychology seminar. Requesting leave for professional development.",
@@ -39,21 +42,24 @@ const fetchLeaveApplications = async () => {
       name: "Dr. Priya Kapoor",
       title: "Behavioral Therapist",
       profilePhoto: "https://randomuser.me/api/portraits/women/50.jpg",
+      leaveStart: "2024-04-18",
       leaveTill: "2024-04-25",
       message:
-        "I have a medical emergency and will be unavailable for the next few days.",
+        "I have a medical emergency and will be unavailable for a few days.",
     },
     {
       id: "l126",
       name: "Dr. Rahul Mehta",
       title: "Child Psychologist",
       profilePhoto: "https://randomuser.me/api/portraits/men/60.jpg",
+      leaveStart: "2024-07-01",
       leaveTill: "2024-07-15",
       message:
-        "Taking time off for family vacation. Will resume work as scheduled.",
+        "Taking time off for a family vacation. Will resume work as scheduled.",
     },
   ];
 };
+
 
 export default function LeavesPage() {
   const [leaveApplications, setLeaveApplications] = useState<any[]>([]);
@@ -104,6 +110,7 @@ export default function LeavesPage() {
             title={application.title}
             profilePhoto={application.profilePhoto}
             leaveTill={application.leaveTill}
+            leaveStart={application.leaveStart}
             message={application.message}
             onViewApplication={handleViewApplication}
             onVerify={handleVerify}

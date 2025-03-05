@@ -3,13 +3,13 @@ import Link from "next/link";
 import { BiPlus } from "react-icons/bi";
 import { useEffect, useState } from "react";
 import CounsellorCard from "@/components/Counsellors/CounsellorCard";
+import DeactivateModal from "@/components/Counsellors/DeactivateModal";
 import { LuSettings2 } from "react-icons/lu";
 import { getCounsellors } from "@/utils/counsellor";
 import { useRouter } from "next/navigation";
 import { useLoading } from "@/context/LoadingContext";
 
 export default function Page() {
-
   interface Language {
     language: string;
     proficiencyLevel: string;
@@ -52,35 +52,60 @@ export default function Page() {
   }
 
   const [counsellors, setCounsellors] = useState<Array<Counselor>>([]);
-  
-  const router  = useRouter();
+  const [selectedCounsellor, setSelectedCounsellor] =
+    useState<Counselor | null>(null);
+  const [isDeactivateModalOpen, setIsDeactivateModalOpen] = useState(false);
 
-  // Handlers for actions
+  const router = useRouter();
+  const { setLoading } = useLoading();
+
+  // Fetch Counsellors
+  useEffect(() => {
+    const fetchAllCounsellors = async () => {
+      setLoading(true);
+      const response = await getCounsellors();
+      setCounsellors(response);
+      setLoading(false);
+    };
+    fetchAllCounsellors();
+  }, []);
+
+  // Handlers
   const handleViewProfile = (id: string) => {
     router.push(`/counsellors/view?id=${id}`);
-    
   };
 
   const handleEdit = (id: string) => {
     router.push(`/counsellors/create?mode=edit&id=${id}`);
-    
   };
 
   const handleDeactivate = (id: string) => {
-    console.log("Deactivate Counsellor:", id);
+    const counsellor = counsellors.find((c) => c.id === id);
+    if (counsellor) {
+      setSelectedCounsellor(counsellor);
+      setIsDeactivateModalOpen(true);
+    }
   };
-    const { setLoading } = useLoading();
 
-    useEffect(() => {
-      const fetchAllCounsellors = async () => {
-        setLoading(true);
-        const response = await getCounsellors();
-        setCounsellors(response);
-        setLoading(false);
-      };
+  const handleConfirmDeactivation = (
+    startDate: string,
+    endDate: string,
+    message: string
+  ) => {
+    console.log("Deactivating Counsellor:", {
+      id: selectedCounsellor?.id,
+      name: selectedCounsellor?.personalInfo.name,
+      startDate,
+      endDate,
+      message,
+    });
 
-      fetchAllCounsellors();
-    }, []);
+    // Here you can call an API to deactivate the counsellor
+
+    // Close Modal
+    setIsDeactivateModalOpen(false);
+    setSelectedCounsellor(null);
+  };
 
   return (
     <div className="p-6">
@@ -115,6 +140,14 @@ export default function Page() {
           />
         ))}
       </div>
+
+      {/* Deactivation Modal */}
+      <DeactivateModal
+        isOpen={isDeactivateModalOpen}
+        onClose={() => setIsDeactivateModalOpen(false)}
+        onSubmit={handleConfirmDeactivation}
+        counsellorName={selectedCounsellor?.personalInfo.name || ""}
+      />
     </div>
   );
 }

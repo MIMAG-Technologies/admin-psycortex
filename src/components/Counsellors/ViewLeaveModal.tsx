@@ -34,6 +34,9 @@ export default function ViewLeaveModal({
           <b>Title:</b> {application.title}
         </p>
         <p className="text-gray-600 mb-2">
+          <b>Leave From:</b> {application.leaveStart}
+        </p>
+        <p className="text-gray-600 mb-2">
           <b>Leave Till:</b> {application.leaveTill}
         </p>
 
@@ -46,7 +49,7 @@ export default function ViewLeaveModal({
         <div className="flex justify-between">
           <button
             onClick={() => onVerify(application.id)}
-            className="flex items-center gap-2 px-4 py-2 border border-green-600 text-green-600 rounded-md hover:bg-green-100 transition"
+            className="flex items-center gap-2 w-[49%] px-4 py-2 border border-green-600 text-green-600 rounded-md hover:bg-green-100 transition"
           >
             <IoCheckmarkCircle size={18} />
             Verify
@@ -54,7 +57,7 @@ export default function ViewLeaveModal({
 
           <button
             onClick={onClose} // Close the modal on rejection
-            className="flex items-center gap-2 px-4 py-2 border border-red-600 text-red-600 rounded-md hover:bg-red-100 transition"
+            className="flex items-center gap-2 w-[49%] px-4 py-2 border border-red-600 text-red-600 rounded-md hover:bg-red-100 transition"
           >
             <IoTrash size={18} />
             Reject
