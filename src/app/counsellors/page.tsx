@@ -57,7 +57,8 @@ export default function Page() {
 
   // Handlers for actions
   const handleViewProfile = (id: string) => {
-    console.log("View Profile:", id);
+    router.push(`/counsellors/view?id=${id}`);
+    
   };
 
   const handleEdit = (id: string) => {
