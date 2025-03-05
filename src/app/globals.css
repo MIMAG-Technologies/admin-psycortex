@@ -3,6 +3,18 @@
 @tailwind utilities;
 
 
+
+/* Show scrollbar only for .application-leave-message-box */
 ::-webkit-scrollbar {
-  width: 0px;
+  width: 4px;
+  background-color: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #4f46e5;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #4f46e5;
 }
