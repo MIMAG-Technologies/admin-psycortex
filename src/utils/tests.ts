@@ -9,5 +9,5 @@ export const fetchTests = async () => {
     catch(error){
         console.log(error);
         return [];
-}
+    }
 }
