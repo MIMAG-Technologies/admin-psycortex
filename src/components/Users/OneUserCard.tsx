@@ -5,6 +5,7 @@ import {
   FaVenus,
   FaGenderless,
 } from "react-icons/fa";
+import { toast } from "react-toastify";
 
 export default function OneUserCard(props: {
   profile_image: string;
@@ -25,16 +26,19 @@ export default function OneUserCard(props: {
   };
 
   // Gender Icons Logic
-  const getGenderIcon = (gender: string) => {
-    switch (gender.toLowerCase()) {
-      case "male":
-        return <FaMars className="text-blue-500" />;
-      case "female":
-        return <FaVenus className="text-pink-500" />;
-      default:
-        return <FaGenderless className="text-gray-500" />;
-    }
-  };
+const getGenderIcon = (gender: string | null | undefined) => {
+  if (!gender) return <FaGenderless className="text-gray-500" />; // Handle missing values
+
+  switch (gender.toLowerCase()) {
+    case "male":
+      return <FaMars className="text-blue-500" />;
+    case "female":
+      return <FaVenus className="text-pink-500" />;
+    default:
+      return <FaGenderless className="text-gray-500" />;
+  }
+};
+
 
   return (
     <div className="flex flex-wrap items-center gap-4 rounded-lg bg-slate-100 p-4 border border-slate-300 w-full sm:flex-nowrap">
@@ -64,9 +68,9 @@ export default function OneUserCard(props: {
           </p>
 
           {/* Gender */}
-          <p className="text-sm text-gray-600 flex items-center gap-2">
+          <p className="text-sm text-gray-600 flex items-center gap-2 capitalize">
             {getGenderIcon(props.gender)}
-            {props.gender.charAt(0).toUpperCase() + props.gender.slice(1)}
+            {props.gender}
           </p>
         </div>
       </div>
@@ -75,14 +79,16 @@ export default function OneUserCard(props: {
       <div className="flex w-full gap-2 sm:w-auto sm:ml-auto">
         <button
           className="flex w-full items-center justify-center gap-2 rounded-md border border-primary px-4 py-2 text-primary transition hover:bg-primary hover:text-white sm:w-auto"
-          onClick={() => console.log(props.id)}
+          onClick={() => {
+            toast.info("This Feature is not Implemented");
+          }}
         >
           <AiOutlineEye className="h-5 w-5" />
           View
         </button>
         <button
           className="flex w-full items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-white transition hover:bg-secondary sm:w-auto"
-          onClick={() => console.log(props.id)}
+          onClick={() => toast.info("This Feature is not Implemented")}
         >
           <AiOutlineEdit className="h-5 w-5" />
           Edit

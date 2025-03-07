@@ -19,6 +19,10 @@ export default function UserForm() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if(!formData.name || !formData.email || !formData.phone || !formData.date_of_birth){
+      return toast.error("Please fill all the fields");
+    }
+    
     setLoading(true);
     const is_created = await createUser(formData.name, formData.email, formData.phone, formData.date_of_birth , formData.gender);
     if (is_created) {
