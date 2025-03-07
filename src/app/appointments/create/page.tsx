@@ -35,10 +35,19 @@ export default function CreateAppointment() {
     return true;
   };
 
-  const handleSubmit = (e) => {
+  interface AppointmentFormData {
+    user: string;
+    counsellor: string;
+    date: string;
+    time: string;
+    problem: string;
+  }
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
     if (validateForm()) {
-      console.log("Form Submitted", { user, counsellor, date, time, problem });
+      const formData: AppointmentFormData = { user, counsellor, date, time, problem };
+      console.log("Form Submitted", formData);
       toast.success("Appointment Created Successfully!");
       // Reset the form
       setUser("");

@@ -23,9 +23,10 @@ export default function EditTestPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const slug = searchParams.get("slug");
+  const slug = searchParams.get("slug");
 
   const [testData, setTestData] = useState<TestData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { setLoading } = useLoading();
   const [error, setError] = useState<string | null>(null);
   const [isNewTest, setIsNewTest] = useState(false);
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
@@ -41,15 +42,19 @@ export default function EditTestPage() {
 
   useEffect(() => {
     const fetchTestDetails = async () => {
-      setIsLoading(true);
+      setLoading(true);
       setError(null);
 
       try {
-        const response = await fetch("https://backend.psycortex.in/tests/get_all_tests.php");
+        const response = await fetch(
+          "https://backend.psycortex.in/tests/get_all_tests.php"
+        );
         const data = await response.json();
 
         if (data.success && Array.isArray(data.tests)) {
-          const selectedTest = data.tests.find((test: TestData) => test.slug === slug);
+          const selectedTest = data.tests.find(
+            (test: TestData) => test.slug === slug
+          );
 
           if (selectedTest) {
             setTestData(selectedTest);
@@ -76,7 +81,7 @@ export default function EditTestPage() {
         console.error("Error fetching test details:", fetchError);
         setError("An error occurred while fetching test details");
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
 
@@ -84,7 +89,7 @@ export default function EditTestPage() {
       fetchTestDetails();
     } else {
       setIsNewTest(true);
-      setIsLoading(false);
+      setLoading(false);
     }
   }, [slug]);
 
@@ -107,7 +112,7 @@ export default function EditTestPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
+    setLoading(true);
     setError(null);
 
     try {
@@ -140,7 +145,7 @@ export default function EditTestPage() {
       console.error("Error updating test:", submitError);
       setError("An error occurred while updating the test");
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 

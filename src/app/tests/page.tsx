@@ -3,8 +3,19 @@ import { useEffect, useState } from "react";
 import {fetchTests}from "@/utils/tests";
 import TestCard from "@/components/Tests/TestCard";
 
+interface Test {
+  name: string;
+  slug: string;
+  imageUrl?: string;
+  description: string;
+  details: {
+    durationMinutes: number;
+    totalQuestions: number;
+  };
+}
+
 const Tests = () => {
-  const [tests, setTests] = useState([]);
+  const [tests, setTests] = useState<Test[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
 
