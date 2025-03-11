@@ -10,6 +10,8 @@ import {
   FaMoneyBillWave,
   FaSlidersH,
   FaFileSignature,
+  FaBuilding,
+  FaUserShield,
 } from "react-icons/fa";
 import { BiX } from "react-icons/bi";
 
@@ -30,7 +32,10 @@ export default function SideNavbar({
     { name: "Filters", icon: <FaFilter />, path: "/filters" },
     { name: "Payments", icon: <FaMoneyBillWave />, path: "/payments" },
     { name: "Variables", icon: <FaSlidersH />, path: "/variables" },
+    { name: "Branches", icon: <FaBuilding />, path: "/branches" },
+    { name: "Admin", icon: <FaUserShield />, path: "/admin" },
   ];
+  
 
   return (
     <>

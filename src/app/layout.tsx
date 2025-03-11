@@ -8,7 +8,7 @@ import Loading from "@/components/Loading";
 import { LoadingProvider } from "@/context/LoadingContext";
 import { ToastContainer, Bounce, toast } from "react-toastify";
 import AuthChecker from "@/components/AuthChecker";
-
+import { AuthProvider } from "@/context/AuthContext";
 
 export default function RootLayout({
   children,
@@ -22,10 +22,9 @@ export default function RootLayout({
 
   const handleLogout = () => {
     localStorage.removeItem("psycortex-admin-token");
-    toast.success("Logged out Successfully!")
+    toast.success("Logged out Successfully!");
     router.push("/login");
   };
-
 
   return (
     <html lang="en">
@@ -38,68 +37,70 @@ export default function RootLayout({
         <link rel="icon" href="https://psycortex.in/favicon.ico" />
       </head>
       <body>
-          <ToastContainer
-            position="top-center"
-            autoClose={2000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover={false}
-            theme="light"
-            transition={Bounce}
-          />
-        <LoadingProvider>
-          {isLoginPage ? (
-            <>
-              {children}
-              <Loading />
-            </>
-          ) : (
-            <>
-              {/* Navbar */}
-              <nav className="flex justify-between items-center p-4 bg-slate-100 border-b border-slate-200">
-                {/* Sidebar Toggle Button (Visible on Small Screens) */}
-                <button
-                  onClick={() => setSidebarOpen(true)}
-                  className="lg:hidden text-2xl text-gray-700"
-                >
-                  <BiMenu />
-                </button>
-                <span className="font-bold text-lg">Admin Panel</span>
-                <button
-                  onClick={handleLogout}
-                  className="flex items-center gap-2 px-4 py-2 text-sm text-white font-bold bg-red-400 hover:bg-red-500 rounded-md transition-colors"
-                >
-                  <BiExit className="text-lg" />
-                  Logout
-                </button>
-              </nav>
+        <ToastContainer
+          position="top-center"
+          autoClose={2000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover={false}
+          theme="light"
+          transition={Bounce}
+        />
+        <AuthProvider>
+          <LoadingProvider>
+            {isLoginPage ? (
+              <>
+                {children}
+                <Loading />
+              </>
+            ) : (
+              <>
+                {/* Navbar */}
+                <nav className="flex justify-between items-center p-4 bg-slate-100 border-b border-slate-200">
+                  {/* Sidebar Toggle Button (Visible on Small Screens) */}
+                  <button
+                    onClick={() => setSidebarOpen(true)}
+                    className="lg:hidden text-2xl text-gray-700"
+                  >
+                    <BiMenu />
+                  </button>
+                  <span className="font-bold text-lg">Admin Panel</span>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-2 px-4 py-2 text-sm text-white font-bold bg-red-400 hover:bg-red-500 rounded-md transition-colors"
+                  >
+                    <BiExit className="text-lg" />
+                    Logout
+                  </button>
+                </nav>
 
-              {/* Sidebar + Main Content */}
-              <div className="flex h-[90vh]">
-                {/* Sidebar (Hidden on Small Screens, Slide-In Effect) */}
-                <SideNavbar
-                  isSidebarOpen={isSidebarOpen}
-                  setSidebarOpen={setSidebarOpen}
-                />
+                {/* Sidebar + Main Content */}
+                <div className="flex h-[90vh]">
+                  {/* Sidebar (Hidden on Small Screens, Slide-In Effect) */}
+                  <SideNavbar
+                    isSidebarOpen={isSidebarOpen}
+                    setSidebarOpen={setSidebarOpen}
+                  />
 
-                {/* Main Content (Full Width on Small Screens) */}
-                <main
-                  className={`h-full transition-all duration-300 ${
-                    isSidebarOpen ? "w-0" : "w-full lg:w-[calc(100vw-250px)]"
-                  } overflow-y-scroll overflow-x-hidden`}
-                >
-                  <AuthChecker />
-                  {children}
-                  <Loading />
-                </main>
-              </div>
-            </>
-          )}
-        </LoadingProvider>
+                  {/* Main Content (Full Width on Small Screens) */}
+                  <main
+                    className={`h-full transition-all duration-300 ${
+                      isSidebarOpen ? "w-0" : "w-full lg:w-[calc(100vw-250px)]"
+                    } overflow-y-scroll overflow-x-hidden`}
+                  >
+                    <AuthChecker />
+                    {children}
+                    <Loading />
+                  </main>
+                </div>
+              </>
+            )}
+          </LoadingProvider>
+        </AuthProvider>
       </body>
     </html>
   );
