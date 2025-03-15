@@ -7,6 +7,7 @@ interface AppointmentCardProps{
     mode:string,
     status:string,
     notes:string
+    
 }
 
 export default AppointmentCardProps;

@@ -29,6 +29,7 @@ export default function FilterManagement() {
   } | null>(null);
 
   const fetchFilters = async () => {
+    
     const filters = await getFilters();
     setLanguages(
       filters.languages?.sort((a:Filter, b:Filter) => b.priority - a.priority) || []
