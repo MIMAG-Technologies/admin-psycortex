@@ -27,6 +27,7 @@ export const getAppointments = async ({
 
     const params = new URLSearchParams();
     if (page) params.append("page", String(page));
+    
     if (from) params.append("from", from);
     if (to) params.append("to", to);
     if (mode) params.append("mode", mode);

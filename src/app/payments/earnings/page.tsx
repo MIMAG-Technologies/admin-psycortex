@@ -1,0 +1,157 @@
+"use client";
+
+import { useLoading } from "@/context/LoadingContext";
+import getAllCounsellorOverview from "@/utils/payments";
+import { useEffect, useState } from "react";
+import {
+  FaVideo,
+  FaCommentDots,
+  FaPhoneAlt,
+  FaUserCheck,
+  FaDollarSign,
+} from "react-icons/fa";
+import { MdOutlineLocalActivity } from "react-icons/md";
+import { IoPerson } from "react-icons/io5"; // Offline appointment icon
+
+type SimplifiedCounsellor = {
+  id: string;
+  personalInfo: {
+    name: string;
+    profileImage: string;
+  };
+  professionalInfo: {
+    title: string;
+    yearsOfExperience: number;
+  };
+  sessionCounts: {
+    video: number;
+    chat: number;
+    phone: number;
+    offline: number;
+    total: number;
+  };
+  testReferrals: number;
+  earnings: {
+    video: string;
+    chat: string;
+    phone: string;
+    offline: string;
+    testRecommendation: string;
+    total: string;
+  };
+};
+
+export default function CounsellorEarning() {
+  const { setLoading } = useLoading();
+  const [counsellors, setCounsellors] = useState<Array<SimplifiedCounsellor>>(
+    []
+  );
+
+  useEffect(() => {
+    const fetchCounsellorData = async () => {
+      setLoading(true);
+      const res = await getAllCounsellorOverview();
+      setCounsellors(res);
+      setLoading(false);
+    };
+    fetchCounsellorData();
+  }, [setLoading]);
+
+  return (
+    <div className="container mx-auto px-4 py-6">
+      <h1 className="text-2xl font-semibold mb-4 text-center text-indigo-600">
+        Counsellor Earnings
+      </h1>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {counsellors.map((counsellor) => (
+          <OneCounsellorCard key={counsellor.id} counsellor={counsellor} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function OneCounsellorCard({
+  counsellor,
+}: {
+  counsellor: SimplifiedCounsellor;
+}) {
+  return (
+    <div className="bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200 transition-transform hover:scale-105 p-5">
+      <div className="flex items-center gap-4">
+        <img
+          src={counsellor.personalInfo.profileImage}
+          alt={counsellor.personalInfo.name}
+          width={60}
+          height={60}
+          className="w-16 h-16 rounded-full object-cover border border-gray-300"
+        />
+        <div>
+          <h2 className="text-lg font-semibold">
+            {counsellor.personalInfo.name}
+          </h2>
+          <p className="text-gray-500 text-sm">
+            {counsellor.professionalInfo.title}
+          </p>
+        </div>
+      </div>
+
+      {/* Session Earnings Section */}
+      <div className="mt-4 p-4 bg-indigo-50 rounded-lg">
+        <h3 className="text-md font-medium text-indigo-700 mb-2 flex items-center gap-2">
+          <FaUserCheck className="text-indigo-600" /> Session Earnings
+        </h3>
+
+        <div className="grid grid-cols-2 gap-3 text-sm sm:flex sm:flex-col">
+          <span className="flex items-center gap-2">
+            <FaVideo className="text-indigo-500" />
+            {counsellor.sessionCounts.video} sessions - ₹
+            {counsellor.earnings.video}
+          </span>
+          <span className="flex items-center gap-2">
+            <FaCommentDots className="text-green-500" />
+            {counsellor.sessionCounts.chat} sessions - ₹
+            {counsellor.earnings.chat}
+          </span>
+          <span className="flex items-center gap-2">
+            <FaPhoneAlt className="text-yellow-500" />
+            {counsellor.sessionCounts.phone} sessions - ₹
+            {counsellor.earnings.phone}
+          </span>
+          <span className="flex items-center gap-2">
+            <IoPerson className="text-red-500" />
+            {counsellor.sessionCounts.offline} sessions - ₹
+            {counsellor.earnings.offline}
+          </span>
+          <span className="flex items-center gap-2 font-medium text-indigo-700 col-span-2 sm:col-span-1">
+            <FaDollarSign className="text-indigo-700" /> Total Earnings: ₹
+            {counsellor.earnings.total}
+          </span>
+        </div>
+      </div>
+
+      {/* Test Referral Earnings Section */}
+      <div className="mt-4 p-4 bg-gray-100 rounded-lg">
+        <h3 className="text-md font-medium text-gray-700 mb-2 flex items-center gap-2">
+          <MdOutlineLocalActivity className="text-gray-600" /> Test Referral
+          Earnings
+        </h3>
+        <p className="text-sm flex items-center gap-2">
+          <FaUserCheck className="text-gray-600" /> Referred Tests:{" "}
+          <strong>{counsellor.testReferrals}</strong>
+        </p>
+        <p className="text-sm flex items-center gap-2 mt-2">
+          <FaDollarSign className="text-gray-700" /> Earnings:{" "}
+          <strong>₹{counsellor.earnings.testRecommendation}</strong>
+        </p>
+      </div>
+
+      {/* View More Button */}
+      <div className="mt-5">
+        <button className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-medium py-2 px-4 rounded-lg transition">
+          View More
+        </button>
+      </div>
+    </div>
+  );
+}
