@@ -16,22 +16,18 @@ const cityIcons = [
   <PiCityFill />,
   <LiaCitySolid />,
 ];
+ type Branch = {
+   id: string;
+   city: string;
+   full_address: string;
+   onDelete: (id: string) => void;
+ };
 
-interface Branch {
-  id: string;
-  cityName: string;
-  fullAddress: string;
-  counsellorsAvailable: number;
-  onEdit: (id: string) => void;
-  onDelete: (id: string) => void;
-}
 
 export default function BranchCard({
   id,
-  cityName,
-  fullAddress,
-  counsellorsAvailable,
-  onEdit,
+  city,
+  full_address,
   onDelete,
 }: Branch) {
   const randomIcon = cityIcons[Math.floor(Math.random() * cityIcons.length)];
@@ -43,29 +39,17 @@ export default function BranchCard({
         <div className="w-12 h-12 flex items-center justify-center bg-indigo-100 text-indigo-600 rounded-full text-2xl">
           {randomIcon}
         </div>
-        <h2 className="text-lg font-semibold text-gray-800">{cityName}</h2>
+        <h2 className="text-lg font-semibold text-gray-800">{city}</h2>
       </div>
-
-      {/* Counsellor Count */}
-      <p className="text-gray-600 mt-3">
-        <b>Counsellors Available:</b> {counsellorsAvailable}
-      </p>
 
       {/* Full Address */}
       <p className="text-gray-500 text-sm mt-2 mb-auto">
-        <b>Address:</b> {fullAddress}
+        <b>Address:</b> {full_address}
       </p>
 
       {/* Action Buttons */}
       <div className="mt-4 flex gap-2">
-        <button
-          onClick={() => onEdit(id)}
-          className="flex items-center gap-2 px-4 py-2 border border-gray-400 text-gray-700 rounded-md hover:bg-gray-100 transition w-full"
-        >
-          <IoPencil size={18} />
-          Edit
-        </button>
-
+        
         <button
           onClick={() => onDelete(id)}
           className="flex items-center gap-2 px-4 py-2 border border-red-500 text-red-500 rounded-md hover:bg-red-100 transition w-full"

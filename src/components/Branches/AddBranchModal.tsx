@@ -2,27 +2,35 @@
 
 import { useState } from "react";
 import { IoClose } from "react-icons/io5";
+import { toast } from "react-toastify";
 
 export default function AddBranchModal({
   onClose,
   onAdd,
+  cityList,
 }: {
   onClose: () => void;
+  cityList: Array<string>;
   onAdd: (branch: {
-    id: string;
-    cityName: string;
-    fullAddress: string;
-  }) => void;
+    city: string;
+    street_address: string;
+    state: string;
+    pincode: string;
+  }) => Promise<void>;
 }) {
-  const [cityName, setCityName] = useState("");
-  const [fullAddress, setFullAddress] = useState("");
+  const [city, setcity] = useState<string>("");
+  const [street_address, setstreet_address] = useState<string>("");
+  const [state, setState] = useState<string>("");
+  const [pincode, setPincode] = useState<string>("");
 
   const handleSubmit = () => {
-    if (!cityName || !fullAddress) return alert("Both fields are required.");
+    if (!city || !street_address || !state || !pincode)
+      return toast.info("All fields are required.");
     onAdd({
-      id: Math.random().toString(36).substring(2, 9),
-      cityName,
-      fullAddress,
+      city,
+      street_address,
+      state,
+      pincode,
     });
     onClose();
   };
@@ -49,24 +57,54 @@ export default function AddBranchModal({
           </label>
           <input
             type="text"
-            value={cityName}
-            onChange={(e) => setCityName(e.target.value)}
+            value={city}
+            onChange={(e) => setcity(e.target.value)}
             className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-indigo-500 text-gray-800"
             placeholder="Enter city name"
+            list="cityOptions"
           />
+          <datalist id="cityOptions">
+            {cityList.map((city, index) => (
+              <option key={index} value={city} />
+            ))}
+          </datalist>
         </div>
 
         {/* Full Address Field */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700">
-            Full Address
+            Street Address
           </label>
           <textarea
-            value={fullAddress}
-            onChange={(e) => setFullAddress(e.target.value)}
+            value={street_address}
+            onChange={(e) => setstreet_address(e.target.value)}
             className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-indigo-500 text-gray-800"
-            placeholder="Enter full address"
+            placeholder="Enter street address"
             rows={3}
+          />
+        </div>
+        <div className="mb-3">
+          <label className="block text-sm font-medium text-gray-700">
+            State
+          </label>
+          <input
+            type="text"
+            value={state}
+            onChange={(e) => setState(e.target.value)}
+            className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-indigo-500 text-gray-800"
+            placeholder="Enter state name"
+          />
+        </div>
+        <div className="mb-3">
+          <label className="block text-sm font-medium text-gray-700">
+            Pincode
+          </label>
+          <input
+            type="text"
+            value={pincode}
+            onChange={(e) => setPincode(e.target.value)}
+            className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-indigo-500 text-gray-800"
+            placeholder="Enter pincode"
           />
         </div>
 

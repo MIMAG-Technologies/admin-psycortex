@@ -1,74 +1,79 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { IoSearch, IoAddCircle } from "react-icons/io5";
 import AddBranchModal from "@/components/Branches/AddBranchModal";
 import BranchCard from "@/components/Branches/BranchCard";
+import { addBranches, deleteBranches, getBranches } from "@/utils/branches";
+import { toast } from "react-toastify";
+import { useLoading } from "@/context/LoadingContext";
 
-// Dummy Data
-const initialBranches = [
-  {
-    id: "b101",
-    cityName: "Mumbai",
-    fullAddress: "123 Marine Drive, Mumbai, Maharashtra, India",
-    counsellorsAvailable: 12,
-  },
-  {
-    id: "b102",
-    cityName: "Delhi",
-    fullAddress: "56 Connaught Place, New Delhi, India",
-    counsellorsAvailable: 8,
-  },
-  {
-    id: "b103",
-    cityName: "Bangalore",
-    fullAddress: "78 MG Road, Bangalore, Karnataka, India",
-    counsellorsAvailable: 10,
-  },
-  {
-    id: "b104",
-    cityName: "Chennai",
-    fullAddress: "98 Mount Road, Chennai, Tamil Nadu, India",
-    counsellorsAvailable: 6,
-  },
-  {
-    id: "b105",
-    cityName: "Kolkata",
-    fullAddress: "45 Park Street, Kolkata, West Bengal, India",
-    counsellorsAvailable: 9,
-  },
-];
+type branch = {
+  id: string;
+  city: string;
+  full_address: string;
+  street_address: string;
+  state: string;
+  pincode: string;
+};
 
 export default function BranchesManagement() {
-  const [branches, setBranches] = useState(initialBranches);
+  const [branches, setBranches] = useState<Array<branch>>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setModalOpen] = useState(false);
+  const [cityList, setcityList] = useState<Array<string>>([])
+   const { setLoading } = useLoading();
 
   // Filter branches based on search query
   const filteredBranches = branches.filter((branch) =>
-    branch.cityName.toLowerCase().includes(searchQuery.toLowerCase())
+    branch.city.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Add New Branch Function
-  const handleAddBranch = (newBranch: {
-    id: string;
-    cityName: string;
-    fullAddress: string;
+  const fetchBranches = async () => {
+    setLoading(true);
+    const res = await getBranches();
+    setBranches(res);
+    setcityList(Array.from(new Set(res.map(branch => branch.city))))
+    setLoading(false);
+  };
+
+  const handleDeleteBranch = async (id: string) => {
+    setLoading(true);
+    const res: boolean = await deleteBranches(id);
+
+    if (res) {
+      toast.success("Branch deleted successfully");
+      fetchBranches();
+    } else {
+      toast.error("Failed to delete branch");
+    }
+    setLoading(false);
+  };
+  const handleAddBranch = async (branch: {
+    city: string;
+    street_address: string;
+    state: string;
+    pincode: string;
   }) => {
-    setBranches((prev) => [
-      ...prev,
-      { ...newBranch, counsellorsAvailable: Math.floor(Math.random() * 20) },
-    ]);
+    setLoading(true);
+    const res: boolean = await addBranches(
+      branch.city,
+      branch.street_address,
+      branch.state,
+      branch.pincode
+    );
+    if (res) {
+      toast.success("Branch added successfully");
+      fetchBranches();
+    } else {
+      toast.error("Failed to add branch");
+    }
+    setLoading(false);
   };
 
-  // Edit & Delete Functions (Dummy for now)
-  const handleEditBranch = (id: string) => {
-    alert(`Editing Branch: ${id}`);
-  };
-
-  const handleDeleteBranch = (id: string) => {
-    setBranches((prev) => prev.filter((branch) => branch.id !== id));
-  };
+  useEffect(() => {
+    fetchBranches();
+  }, []);
 
   return (
     <div className="p-6 mx-auto">
@@ -109,10 +114,8 @@ export default function BranchesManagement() {
           <BranchCard
             key={branch.id}
             id={branch.id}
-            cityName={branch.cityName}
-            fullAddress={branch.fullAddress}
-            counsellorsAvailable={branch.counsellorsAvailable}
-            onEdit={handleEditBranch}
+            city={branch.city}
+            full_address={branch.full_address}
             onDelete={handleDeleteBranch}
           />
         ))}
@@ -123,6 +126,7 @@ export default function BranchesManagement() {
         <AddBranchModal
           onClose={() => setModalOpen(false)}
           onAdd={handleAddBranch}
+          cityList={cityList}
         />
       )}
     </div>
