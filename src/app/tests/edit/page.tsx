@@ -6,6 +6,7 @@ import Loading from "@/components/Loading";
 import { useLoading } from "@/context/LoadingContext";
 import axios from "axios";
 import { toast } from "react-toastify"; // Using react-toastify as shown in your updated code
+import { updatetest } from "@/utils/tests";
 
 interface TestData {
   slug: string;
@@ -42,11 +43,11 @@ function EditTestPage() {
 
   const [formData, setFormData] = useState({
     name: "",
-    thumbnail: null as File | null,
     price: "",
     taxPercent: "",
     description: "",
   });
+  const [image, setImage] = useState<File | null>(null);
 
   useEffect(() => {
     const fetchTestDetails = async () => {
@@ -67,7 +68,6 @@ function EditTestPage() {
             setFormData({
               name: selectedTest.name || "",
               description: selectedTest.description || "",
-              thumbnail: null,
               price: selectedTest.pricing?.amount?.toString() || "",
               taxPercent: selectedTest.pricing?.taxPercent?.toString() || "",
             });
@@ -96,43 +96,31 @@ function EditTestPage() {
   const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     if (file) {
-      setFormData({ ...formData, thumbnail: file });
+      setImage(file);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
+    const res = await updatetest({
+      slug: slug || '',
+      name: formData.name,
+      description: formData.description,
+      price: parseFloat(formData.price),
+      taxPercent: parseFloat(formData.taxPercent),
+    })
     
     // Show the success notification immediately
-    if (!isNewTest) {
-      toast.success("Test updated successfully", {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
+    if (res) {
+      toast.success("Test updated successfully");
+      router.back();
     } else {
-      toast.success("Test created successfully", {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
+      toast.error("Error updating the test!");
     }
-    
-    // Simulate processing time
-    setTimeout(() => {
-      setLoading(false);
-      // Navigate back after a short delay
-      setTimeout(() => {
-        router.back();
-      }, 1000);
-    }, 500);
+    setLoading(false);
+  
   };
 
   return (

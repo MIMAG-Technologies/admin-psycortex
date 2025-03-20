@@ -33,7 +33,7 @@ export default function BranchesManagement() {
     setLoading(true);
     const res = await getBranches();
     setBranches(res);
-    setcityList(Array.from(new Set(res.map(branch => branch.city))))
+    setcityList(Array.from(new Set(res.map((branch: branch) => branch.city))))
     setLoading(false);
   };
 
