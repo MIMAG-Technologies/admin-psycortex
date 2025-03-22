@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import {fetchTests}from "@/utils/tests";
 import TestCard from "@/components/Tests/TestCard";
+import { useLoading } from "@/context/LoadingContext";
 
 interface Test {
   name: string;
@@ -17,7 +18,7 @@ interface Test {
 
 const Tests = () => {
   const [tests, setTests] = useState<Test[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { setLoading } = useLoading();
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
@@ -50,6 +51,7 @@ const Tests = () => {
     test.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4 py-6">
@@ -67,9 +69,7 @@ const Tests = () => {
         />
       </div>
 
-      {loading ? (
-        <p className="text-center text-gray-600">Loading tests...</p>
-      ) : filteredTests.length > 0 ? (
+      {filteredTests.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredTests.map((test) => (
             <TestCard key={test.slug} test={test} />

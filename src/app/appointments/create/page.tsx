@@ -1,10 +1,18 @@
-'use client';
+"use client";
 import { useState } from "react";
-import { FaUser, FaUserMd, FaCalendar, FaClock, FaMapMarkerAlt } from "react-icons/fa";
+import {
+  FaUser,
+  FaUserMd,
+  FaCalendar,
+  FaClock,
+  FaMapMarkerAlt,
+} from "react-icons/fa";
 import { FaNotesMedical } from "react-icons/fa6";
 import { AiOutlineClose } from "react-icons/ai";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { UserSelectionBar } from "@/components/ui/UserSelectionBar";
+
 
 export default function CreateAppointment() {
   const router = useRouter();
@@ -83,6 +91,10 @@ export default function CreateAppointment() {
     }
   };
 
+
+
+
+
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-70 z-50 p-4">
       <div
@@ -110,18 +122,12 @@ export default function CreateAppointment() {
                   <FaUser className="mr-2 text-primary" />
                   <span>User</span>
                 </label>
-                <select
-                  className="border border-gray-300 rounded-md w-full px-3 py-2.5 text-gray-700 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary bg-white shadow-sm"
+                <UserSelectionBar
+                 
                   value={user}
-                  onChange={(e) => setUser(e.target.value)}
-                >
-                  <option value="" disabled>
-                    Choose A User
-                  </option>
-                  <option value="User 1">User 1</option>
-                  <option value="User 2">User 2</option>
-                  <option value="User 3">User 3</option>
-                </select>
+                  setValue={setUser}
+  
+                />
               </div>
 
               <div className="col-span-1">
