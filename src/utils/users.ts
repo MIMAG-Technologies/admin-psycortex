@@ -1,12 +1,14 @@
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const base_url = process.env.NEXT_PUBLIC_BASE_URL;
 
 const fetchUsers = async (search: string, page: Number) => {
   try {
-    const res = await axios.get(base_url + "/offline/getUsers.php?search=" + search + "&page=" + page);
+    const res = await axios.get(
+      base_url + "/offline/getUsers.php?search=" + search + "&page=" + page
+    );
     return res.data;
-
   } catch (error) {
     console.log(error);
     return {
@@ -17,31 +19,52 @@ const fetchUsers = async (search: string, page: Number) => {
   }
 };
 
+export const getUserRecords = async (user_id: string) => {
+  try {
+    const token = localStorage.getItem("psycortex-admin-token");
+    if (!token) {
+      toast.error("Please login first!");
+      throw new Error("Please login first!");
+    }
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    };
+    const res = await axios.get(
+      base_url + "/admin/get_last_user_record.php?user_id=" + user_id,
+      { headers }
+    );
+    return res.data.data;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+
 export const returnAppointmentUsers = async (search: string) => {
-   try {
-     const res = await axios.get(
-       base_url + "/offline/getUsers.php?search=" + search 
-     );
-     const userList =  res.data.users;
-     let returnlist:Array<{
-       label: string,
-       value: string,
-       age: number,
-     }> = [];
-     userList.forEach((user:any) => {
+  try {
+    const res = await axios.get(
+      base_url + "/offline/getUsers.php?search=" + search
+    );
+    const userList = res.data.users;
+    let returnlist: Array<{
+      label: string;
+      value: string;
+      age: number;
+    }> = [];
+    userList.forEach((user: any) => {
       returnlist.push({
         label: user.name,
         value: user.id,
         age: calculateAge(user.date_of_birth),
       });
-     });
-     return returnlist;
-
-   } catch (error) {
-     console.log(error);
-     return [];
-   }
-}
+    });
+    return returnlist;
+  } catch (error) {
+    console.log(error);
+    return [];
+  }
+};
 
 const createUser = async (
   name: string,
@@ -62,7 +85,6 @@ const createUser = async (
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     });
     return true;
-   
   } catch (error) {
     console.log(error);
     return false;
@@ -76,11 +98,13 @@ function calculateAge(date_of_birth: string): number {
   const today = new Date();
   let age = today.getFullYear() - birthDate.getFullYear();
   const monthDiff = today.getMonth() - birthDate.getMonth();
-  
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+
+  if (
+    monthDiff < 0 ||
+    (monthDiff === 0 && today.getDate() < birthDate.getDate())
+  ) {
     age--;
   }
-  
+
   return age;
 }
-

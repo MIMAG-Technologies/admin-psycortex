@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   FaUser,
   FaUserMd,
@@ -14,7 +14,8 @@ import { useRouter } from "next/navigation";
 import { UserSelectionBar } from "@/components/ui/UserSelectionBar";
 import { CounsellorSelectionBar } from "@/components/ui/CounsellorSelectionBar";
 import { BranchesSelectionBar } from "@/components/ui/BranchesSelectionBar";
-
+import { getUserRecords } from "@/utils/users";
+import AppointmentModal from "@/components/Appointments/AppointmentModal";
 
 export default function CreateAppointment() {
   const router = useRouter();
@@ -23,58 +24,28 @@ export default function CreateAppointment() {
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [duration, setDuration] = useState("");
+  const [isOpen, setIsOpen] = useState<boolean>(false);
   const [location, setLocation] = useState<{
-    id:string,
-    full_address:string,
-    city: string,
+    id: string;
+    full_address: string;
+    city: string;
   }>({
-    id:"",
+    id: "",
     full_address: "",
     city: "",
   });
   const [description, setDescription] = useState("");
-
-  const validateForm = () => {
-    if (!user) {
-      toast.error("Please select a user");
-      return false;
-    }
-    if (!counsellor) {
-      toast.error("Please select a counsellor");
-      return false;
-    }
-    if (!date) {
-      toast.error("Please select a date");
-      return false;
-    }
-    if (!time) {
-      toast.error("Please select a time");
-      return false;
-    }
-    if (!duration) {
-      toast.error("Please set duration");
-      return false;
-    }
-    if (!location) {
-      toast.error("Please enter a location");
-      return false;
-    }
-    if (!description) {
-      toast.error("Please enter a description");
-      return false;
-    }
-    return true;
-  };
-
-  interface AppointmentFormData {
-    user: string;
-    counsellor: string;
-    date: string;
-    time: string;
-    duration: string;
-    location: string;
-    description: string;
-  }
+  const [prevousRecord, setprevousRecord] = useState<{
+    counsellor_id: string;
+    counsellor_name: string;
+    date_time: string;
+    duration: number;
+    location: {
+      id: string;
+      city: string;
+      full_address: string;
+    };
+  } | null>(null);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
@@ -101,8 +72,51 @@ export default function CreateAppointment() {
     // }
   };
 
+  useEffect(() => {
+    const fetchPrevousRecords = async () => {
+      const records = await getUserRecords(user);
+      if (records !== null) {
+        setprevousRecord({
+          counsellor_id: records.counsellor_id,
+          counsellor_name: records.counsellor_name,
+          date_time: records.date_time,
+          duration: records.duration,
+          location: {
+            id: records.location.location_id,
+            city: records.location.city,
+            full_address: records.location.full_address,
+          },
+        });
+        setIsOpen(true);
+      }
+    };
+    if (user !== "") {
+      fetchPrevousRecords();
+    }
+  }, [user]);
+
+  function handleYes(): void {
+    if (prevousRecord) {
+      setCounsellor(prevousRecord.counsellor_id);
+      setDuration(prevousRecord.duration.toString());
+      setLocation({
+        id: prevousRecord.location.id,
+        full_address: prevousRecord.location.full_address,
+        city: prevousRecord.location.city,
+      });
+      setIsOpen(false);
+      toast.success("Previous appointment details loaded");
+    }
+  }
+
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-70 z-50 p-4">
+      <AppointmentModal
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        record={prevousRecord}
+        onYes={handleYes}
+      />
       <div
         className="relative bg-white rounded-lg shadow-xl w-full max-w-3xl overflow-hidden"
         style={{ minHeight: "550px", width: "700px" }}
@@ -128,10 +142,7 @@ export default function CreateAppointment() {
                   <FaUser className="mr-2 text-primary" />
                   <span>User</span>
                 </label>
-                <UserSelectionBar
-                  value={user}
-                  setValue={setUser}
-                />
+                <UserSelectionBar value={user} setValue={setUser} />
               </div>
 
               <div className="col-span-1">
@@ -139,9 +150,9 @@ export default function CreateAppointment() {
                   <FaUserMd className="mr-2 text-secondary" />
                   <span>Counsellor</span>
                 </label>
-                <CounsellorSelectionBar 
-                value={counsellor}
-                setValue={setCounsellor}
+                <CounsellorSelectionBar
+                  value={counsellor}
+                  setValue={setCounsellor}
                 />
               </div>
 
@@ -176,13 +187,16 @@ export default function CreateAppointment() {
                   <FaClock className="mr-2 text-secondary" />
                   <span>Duration</span>
                 </label>
-                <input
-                  type="text"
-                  className="border border-gray-300 rounded-md w-full px-3 py-2.5 text-gray-700 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary bg-white shadow-sm"
+                <select
                   value={duration}
                   onChange={(e) => setDuration(e.target.value)}
-                  placeholder="Set Duration in Minutes"
-                />
+                  className="border border-gray-300 rounded-md w-full px-3 py-2.5 text-gray-700 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary bg-white shadow-sm"
+                >
+                  <option value="" disabled>
+                    Select Duration
+                  </option>
+                  <option value="45">45 Minutes</option>
+                </select>
               </div>
 
               <div className="col-span-1">
@@ -190,10 +204,7 @@ export default function CreateAppointment() {
                   <FaMapMarkerAlt className="mr-2 text-secondary" />
                   <span>Location</span>
                 </label>
-                <BranchesSelectionBar
-                value={location}
-                setValue={setLocation}
-                />
+                <BranchesSelectionBar value={location} setValue={setLocation} />
               </div>
             </div>
 
