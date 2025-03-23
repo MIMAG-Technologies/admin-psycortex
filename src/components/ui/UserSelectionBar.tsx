@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/popover";
 import { useLoading } from "@/context/LoadingContext";
 import { returnAppointmentUsers } from "@/utils/users";
+import { FaMagnifyingGlass } from "react-icons/fa6";
 
 export function UserSelectionBar(props: {
   value: string;
@@ -43,10 +44,7 @@ export function UserSelectionBar(props: {
           const response: Array<{ label: string; value: string; age: number }> =
             await returnAppointmentUsers(usersearchTerm);
 
-          console.log("Fetched Users:", response); // Debugging
-
           if (Array.isArray(response)) {
-            // Ensure no duplicate values exist
             const uniqueUsers = response.reduce((acc, user) => {
               if (!acc.some((u) => u.value === user.value)) acc.push(user);
               return acc;
@@ -55,11 +53,11 @@ export function UserSelectionBar(props: {
             setuserPreviewList(uniqueUsers);
           } else {
             console.error("Invalid API response format:", response);
-            setuserPreviewList([]); // Reset to prevent UI issues
+            setuserPreviewList([]); 
           }
         } catch (error) {
           console.error("Error fetching users:", error);
-          setuserPreviewList([]); // Handle API errors gracefully
+          setuserPreviewList([]); 
         }
         setLoading(false);
       };
@@ -68,8 +66,6 @@ export function UserSelectionBar(props: {
 
     return () => clearTimeout(handler);
   }, [usersearchTerm]);
-
-  console.log("Rendered userPreviewList:", userPreviewList); // Debugging
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -88,11 +84,16 @@ export function UserSelectionBar(props: {
       </PopoverTrigger>
       <PopoverContent className="p-0">
         <Command>
-          <CommandInput
-            placeholder="Search users..."
-            value={usersearchTerm}
-            onValueChange={setusersearchTerm}
-          />
+          <div className="px-3 py-2 flex gap-2 items-center border border-gray-300 rounded-md">
+            <FaMagnifyingGlass />
+            <input
+              type="text"
+              placeholder="Search users..."
+              value={usersearchTerm}
+              onChange={(e) => setusersearchTerm(e.target.value)}
+              className="w-full px-3 py-2 text-sm focus:outline-none"
+            />
+          </div>
           <CommandList>
             {userPreviewList.length === 0 ? (
               <CommandEmpty>No users found.</CommandEmpty>
@@ -101,7 +102,7 @@ export function UserSelectionBar(props: {
                 {userPreviewList.map((item) => {
                   return (
                     <CommandItem
-                      key={item.value} // Ensure key is unique
+                      key={item.value}
                       value={item.value}
                       onSelect={(currentValue: string) => {
                         console.log("Selected Value:", currentValue); // Debugging
