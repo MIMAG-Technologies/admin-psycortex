@@ -153,6 +153,7 @@ export default function CreateAppointment() {
                 <CounsellorSelectionBar
                   value={counsellor}
                   setValue={setCounsellor}
+                  isDisabled={user === ""}
                 />
               </div>
 
@@ -204,7 +205,11 @@ export default function CreateAppointment() {
                   <FaMapMarkerAlt className="mr-2 text-secondary" />
                   <span>Location</span>
                 </label>
-                <BranchesSelectionBar value={location} setValue={setLocation} />
+                <BranchesSelectionBar
+                  value={location}
+                  setValue={setLocation}
+                  isDisabled={counsellor === ""}
+                />
               </div>
             </div>
 

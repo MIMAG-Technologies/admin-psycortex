@@ -94,11 +94,11 @@ const AppointmentModal: React.FC<AppointmentModalProps> = ({
         </p>
 
         {/* Action Buttons */}
-        <div className="flex justify-center gap-4 mt-5">
-          <Button variant="outline" onClick={() => setIsOpen(false)}>
+        <div className="flex justify-center gap-4 mt-5 w-full">
+          <Button  className="w-[49%]" variant="outline" onClick={() => setIsOpen(false)}>
             No
           </Button>
-          <Button
+          <Button className="w-[49%]" 
             variant="default"
             onClick={() => {
               onYes();

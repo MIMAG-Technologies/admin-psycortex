@@ -20,15 +20,18 @@ import {
 import { useLoading } from "@/context/LoadingContext";
 import { FaMagnifyingGlass } from "react-icons/fa6";
 import { returnAppointmentCounsellors } from "@/utils/counsellor";
+import { toast } from "react-toastify";
 
 export function CounsellorSelectionBar(props: {
   value: string;
   setValue: React.Dispatch<React.SetStateAction<string>>;
+  isDisabled: boolean;
 }) {
   const [open, setOpen] = React.useState(false);
-  const { value, setValue } = props;
+  const { value, setValue, isDisabled } = props;
 
-  const [counsellotsearchTerm, setCounellorsearchTerm] = React.useState<string>("");
+  const [counsellotsearchTerm, setCounellorsearchTerm] =
+    React.useState<string>("");
   const [coounsellorPreviewList, setCounsellorPreviewList] = React.useState<
     Array<{ label: string; value: string; profilepic: string }>
   >([]);
@@ -36,35 +39,32 @@ export function CounsellorSelectionBar(props: {
     Array<{ label: string; value: string; profilepic: string }>
   >([]);
 
-
   const { setLoading } = useLoading();
 
-
   React.useEffect(() => {
-      const fetchUser = async () => {
-        setLoading(true);
-        try {
-          const response: Array<{
-            label: string;
-            value: string;
-            profilepic: string;
-          }> = await returnAppointmentCounsellors();
+    const fetchUser = async () => {
+      setLoading(true);
+      try {
+        const response: Array<{
+          label: string;
+          value: string;
+          profilepic: string;
+        }> = await returnAppointmentCounsellors();
 
-          if (Array.isArray(response)) {
-            setCounsellorPreviewList(response);
-            setCounsellorFilterList(response);
-            
-          } else {
-            console.error("Invalid API response format:", response);
-            setCounsellorPreviewList([]); 
-          }
-        } catch (error) {
-          console.error("Error fetching counsellors:", error);
-          setCounsellorPreviewList([]); 
+        if (Array.isArray(response)) {
+          setCounsellorPreviewList(response);
+          setCounsellorFilterList(response);
+        } else {
+          console.error("Invalid API response format:", response);
+          setCounsellorPreviewList([]);
         }
-        setLoading(false);
-      };
-      fetchUser();
+      } catch (error) {
+        console.error("Error fetching counsellors:", error);
+        setCounsellorPreviewList([]);
+      }
+      setLoading(false);
+    };
+    fetchUser();
   }, []);
 
   React.useEffect(() => {
@@ -73,14 +73,14 @@ export function CounsellorSelectionBar(props: {
         item.label.toLowerCase().includes(counsellotsearchTerm.toLowerCase())
       )
     );
-  }, [counsellotsearchTerm])
-  
+  }, [counsellotsearchTerm]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
+          disabled={isDisabled}
           role="combobox"
           aria-expanded={open}
           className="w-full justify-between py-6"
@@ -126,10 +126,10 @@ export function CounsellorSelectionBar(props: {
                           value === item.value ? "opacity-100" : "opacity-0"
                         )}
                       />
-                      <img 
+                      <img
                         src={item.profilepic}
-                        className="h-6 w-6 rounded-full object-cover" 
-                        alt={`${item.label}'s profile`} 
+                        className="h-6 w-6 rounded-full object-cover"
+                        alt={`${item.label}'s profile`}
                       />
                       {item.label}
                     </CommandItem>

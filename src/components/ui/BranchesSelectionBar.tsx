@@ -27,6 +27,7 @@ export function BranchesSelectionBar(props: {
     full_address: string;
     city: string;
   };
+  isDisabled:boolean;
   setValue: React.Dispatch<
     React.SetStateAction<{
       id: string;
@@ -36,7 +37,7 @@ export function BranchesSelectionBar(props: {
   >;
 }) {
   const [open, setOpen] = React.useState(false);
-  const { value, setValue } = props;
+  const { value, setValue, isDisabled } = props;
 
   const [branchSearchTerm, setBranchsearchTerm] = React.useState<string>("");
   const [branchPreviewList, setBranchPreviewList] = React.useState<
@@ -113,13 +114,13 @@ export function BranchesSelectionBar(props: {
   }, [branchSearchTerm, branchPreviewList]);
 
   // Handle branch selection
-  const handleBranchSelect = (branch:{
+  const handleBranchSelect = (branch: {
     id: string;
     full_address: string;
     city: string;
   }) => {
-      setSelectedBranch(branch);
-      setOpen(false);
+    setSelectedBranch(branch);
+    setOpen(false);
   };
 
   return (
@@ -127,6 +128,7 @@ export function BranchesSelectionBar(props: {
       <PopoverTrigger asChild>
         <Button
           variant="outline"
+          disabled={isDisabled}
           role="combobox"
           aria-expanded={open}
           className="w-full justify-between py-6"
@@ -156,7 +158,7 @@ export function BranchesSelectionBar(props: {
                   <CommandItem
                     key={item.id}
                     value={item.id}
-                    onSelect={()=>handleBranchSelect(item)}
+                    onSelect={() => handleBranchSelect(item)}
                     className="flex items-center gap-2"
                   >
                     <Check
