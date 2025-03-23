@@ -347,3 +347,25 @@ export const getCounsellors = async () => {
     return [];
   }
 };
+export const returnAppointmentCounsellors = async () => {
+  try {
+    const response = await axios.get(
+      `${base_url}/counsellor/get_counsellors_all.php`
+    );
+    const counsellorsList = response.data.counsellors;
+    let result: Array<{ label: string; value: string; profilepic: string }> =
+      [];
+    counsellorsList.forEach((counsellor: any) => {
+      result.push({
+        label: counsellor.personalInfo.name,
+        value: counsellor.id,
+        profilepic: counsellor.personalInfo.profileImage,
+      });
+    });
+
+    return result;
+  } catch (error) {
+    console.error("Error getting counsellors:", error);
+    return [];
+  }
+};

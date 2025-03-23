@@ -12,6 +12,7 @@ import { AiOutlineClose } from "react-icons/ai";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { UserSelectionBar } from "@/components/ui/UserSelectionBar";
+import { CounsellorSelectionBar } from "@/components/ui/CounsellorSelectionBar";
 
 
 export default function CreateAppointment() {
@@ -123,10 +124,8 @@ export default function CreateAppointment() {
                   <span>User</span>
                 </label>
                 <UserSelectionBar
-                 
                   value={user}
                   setValue={setUser}
-  
                 />
               </div>
 
@@ -135,18 +134,10 @@ export default function CreateAppointment() {
                   <FaUserMd className="mr-2 text-secondary" />
                   <span>Counsellor</span>
                 </label>
-                <select
-                  className="border border-gray-300 rounded-md w-full px-3 py-2.5 text-gray-700 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary bg-white shadow-sm"
-                  value={counsellor}
-                  onChange={(e) => setCounsellor(e.target.value)}
-                >
-                  <option value="" disabled>
-                    Choose A Counsellor
-                  </option>
-                  <option value="Counsellor 1">Counsellor 1</option>
-                  <option value="Counsellor 2">Counsellor 2</option>
-                  <option value="Counsellor 3">Counsellor 3</option>
-                </select>
+                <CounsellorSelectionBar 
+                value={counsellor}
+                setValue={setCounsellor}
+                />
               </div>
 
               <div className="col-span-1">
