@@ -13,6 +13,7 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { UserSelectionBar } from "@/components/ui/UserSelectionBar";
 import { CounsellorSelectionBar } from "@/components/ui/CounsellorSelectionBar";
+import { BranchesSelectionBar } from "@/components/ui/BranchesSelectionBar";
 
 
 export default function CreateAppointment() {
@@ -22,7 +23,15 @@ export default function CreateAppointment() {
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [duration, setDuration] = useState("");
-  const [location, setLocation] = useState("");
+  const [location, setLocation] = useState<{
+    id:string,
+    full_address:string,
+    city: string,
+  }>({
+    id:"",
+    full_address: "",
+    city: "",
+  });
   const [description, setDescription] = useState("");
 
   const validateForm = () => {
@@ -69,32 +78,28 @@ export default function CreateAppointment() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
-    if (validateForm()) {
-      const formData: AppointmentFormData = {
-        user,
-        counsellor,
-        date,
-        time,
-        duration,
-        location,
-        description,
-      };
-      console.log("Form Submitted", formData);
-      toast.success("Appointment Created Successfully!");
-      // Reset the form
-      setUser("");
-      setCounsellor("");
-      setDate("");
-      setTime("");
-      setDuration("");
-      setLocation("");
-      setDescription("");
-    }
+    // if (validateForm()) {
+    //   const formData: AppointmentFormData = {
+    //     user,
+    //     counsellor,
+    //     date,
+    //     time,
+    //     duration,
+    //     location,
+    //     description,
+    //   };
+    //   console.log("Form Submitted", formData);
+    //   toast.success("Appointment Created Successfully!");
+    //   // Reset the form
+    //   setUser("");
+    //   setCounsellor("");
+    //   setDate("");
+    //   setTime("");
+    //   setDuration("");
+    //   setLocation("");
+    //   setDescription("");
+    // }
   };
-
-
-
-
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-70 z-50 p-4">
@@ -185,12 +190,9 @@ export default function CreateAppointment() {
                   <FaMapMarkerAlt className="mr-2 text-secondary" />
                   <span>Location</span>
                 </label>
-                <input
-                  type="text"
-                  className="border border-gray-300 rounded-md w-full px-3 py-2.5 text-gray-700 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary bg-white shadow-sm"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  placeholder="Enter appointment location"
+                <BranchesSelectionBar
+                value={location}
+                setValue={setLocation}
                 />
               </div>
             </div>
