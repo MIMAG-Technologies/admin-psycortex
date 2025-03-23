@@ -170,18 +170,27 @@ export default function CreateAppointment() {
                 />
               </div>
 
-              <div className="col-span-1">
+                <div className="col-span-1">
                 <label className="text-sm font-semibold mb-1.5 text-gray-800 flex items-center">
                   <FaClock className="mr-2 text-secondary" />
                   <span>Time Slot</span>
                 </label>
-                <input
-                  type="time"
+                <select
                   className="border border-gray-300 rounded-md w-full px-3 py-2.5 text-gray-700 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary bg-white shadow-sm"
                   value={time}
                   onChange={(e) => setTime(e.target.value)}
-                />
-              </div>
+                >
+                  <option value="">Select Time</option>
+                  {Array.from({ length: 12 }, (_, i) => {
+                  const hour = i + 9; // Starting from 9 AM
+                  return (
+                    <option key={hour} value={`${hour}:00:00`}>
+                    {hour <= 12 ? `${hour}:00 AM` : `${hour-12}:00 PM`}
+                    </option>
+                  );
+                  })}
+                </select>
+                </div>
 
               <div className="col-span-1">
                 <label className="text-sm font-semibold mb-1.5 text-gray-800 flex items-center">
