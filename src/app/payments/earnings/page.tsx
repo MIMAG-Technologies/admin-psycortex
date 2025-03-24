@@ -12,6 +12,7 @@ import {
 } from "react-icons/fa";
 import { MdOutlineLocalActivity } from "react-icons/md";
 import { IoPerson } from "react-icons/io5"; // Offline appointment icon
+import { useRouter } from "next/navigation";
 
 type SimplifiedCounsellor = {
   id: string;
@@ -46,12 +47,15 @@ export default function CounsellorEarning() {
   const [counsellors, setCounsellors] = useState<Array<SimplifiedCounsellor>>(
     []
   );
+  const router = useRouter();
 
   useEffect(() => {
     const fetchCounsellorData = async () => {
       setLoading(true);
       const res = await getAllCounsellorOverview();
       setCounsellors(res);
+      console.log(res);
+      
       setLoading(false);
     };
     fetchCounsellorData();
@@ -64,7 +68,7 @@ export default function CounsellorEarning() {
       </h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {counsellors.map((counsellor) => (
-          <OneCounsellorCard key={counsellor.id} counsellor={counsellor} />
+          <OneCounsellorCard key={counsellor.id} counsellor={counsellor} router={router} />
         ))}
       </div>
     </div>
@@ -73,8 +77,10 @@ export default function CounsellorEarning() {
 
 function OneCounsellorCard({
   counsellor,
+  router,
 }: {
   counsellor: SimplifiedCounsellor;
+  router: ReturnType<typeof useRouter>;
 }) {
   return (
     <div className="bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200 transition-transform hover:scale-105 p-5">
@@ -148,7 +154,9 @@ function OneCounsellorCard({
 
       {/* View More Button */}
       <div className="mt-5">
-        <button className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-medium py-2 px-4 rounded-lg transition">
+        <button className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-medium py-2 px-4 rounded-lg transition" onClick={() => {
+          router.push(`/payments/counsellor?id=${counsellor.id}`);
+        }}>
           View More
         </button>
       </div>

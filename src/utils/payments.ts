@@ -44,8 +44,8 @@ const getAllCounsellorOverview = async () => {
 
 export const getAllPaymentRecords = async (
   payment_type: "appointment" | "test",
+  counsellorId: string,
   type?: string,
-  counsellorId?: string,
   from?: string,
   to?: string
 ) => {
