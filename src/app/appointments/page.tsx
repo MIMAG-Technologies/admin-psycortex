@@ -164,7 +164,7 @@ export default function AppointmentManagement() {
             >
               <option value="offline">Offline</option>
               <option value="chat">Chat</option>
-              <option value="counselling">Counselling</option>
+              <option value="counselling">Video</option>
             </select>
           </div>
 
