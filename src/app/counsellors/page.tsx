@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { BiPlus } from "react-icons/bi";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import CounsellorCard from "@/components/Counsellors/CounsellorCard";
 import DeactivateModal from "@/components/Counsellors/DeactivateModal";
 import { getCounsellors } from "@/utils/counsellor";
@@ -62,16 +62,27 @@ export default function Page() {
   const router = useRouter();
   const { setLoading } = useLoading();
 
-  useEffect(() => {
-    const fetchAllCounsellors = async () => {
-      setLoading(true);
+const isFetched = useRef(false);
+
+useEffect(() => {
+  if (isFetched.current) return;
+  isFetched.current = true;
+
+  const fetchAllCounsellors = async () => {
+    setLoading(true);
+    try {
       const response = await getCounsellors();
       setCounsellors(response);
       setFilteredCounsellors(response);
+    } finally {
       setLoading(false);
-    };
-    fetchAllCounsellors();
-  }, []);
+    }
+  };
+
+  fetchAllCounsellors();
+}, []);
+
+
 
   useEffect(() => {
     setFilteredCounsellors(

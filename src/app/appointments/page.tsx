@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import AppointmentCard from "@/components/Appointments/AppointmentCard";
 import { getAppointments } from "@/utils/appointments";
 import { useLoading } from "@/context/LoadingContext";
@@ -62,30 +62,31 @@ export default function AppointmentManagement() {
 
   const [showFilters, setShowFilters] = useState(false); // Toggle filter visibility
 
-  const fetchAppointments = async () => {
-    setLoading(true);
-    const res = await getAppointments({
-      page: pagination.current_page,
-      from: filters.from,
-      to: filters.to,
-      mode: filters.mode,
-      happened:
-        filters.happened === "all" ? undefined : filters.happened === "yes",
-    });
+const fetchAppointments = useCallback(async () => {
+  setLoading(true);
+  const res = await getAppointments({
+    page: pagination.current_page,
+    from: filters.from,
+    to: filters.to,
+    mode: filters.mode,
+    happened:
+      filters.happened === "all" ? undefined : filters.happened === "yes",
+  });
 
-    setAppointments(res.appointments || []);
-    setPagination(res.pagination || pagination);
-    setLoading(false);
-  };
+  setAppointments(res.appointments || []);
+  setPagination(res.pagination || pagination);
+  setLoading(false);
+}, [pagination.current_page, filters]); // Dependencies added here
+
+useEffect(() => {
+  fetchAppointments();
+}, [fetchAppointments]);
 
   useEffect(() => {
     setPagination((prev) => ({ ...prev, current_page: 1 })); // Reset to page 1 on filter change
     fetchAppointments();
   }, [filters]);
 
-  useEffect(() => {
-    fetchAppointments();
-  }, [pagination.current_page]);
 
   // Reset Filters
   const resetFilters = () => {
