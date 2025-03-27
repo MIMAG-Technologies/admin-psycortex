@@ -2,7 +2,8 @@ import { CounsellorDetails } from "@/types/counsellors";
 import { toast } from "react-toastify";
 import { updatePersonalInfo, UpdateProfileImg } from "@/utils/counsellor";
 import { useLoading } from "@/context/LoadingContext";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { getFilters } from "@/utils/filters";
 
 export default function BasicDetails({
   counsellorDetails,
@@ -22,7 +23,10 @@ export default function BasicDetails({
   mode: string;
   id?: string;
 }) {
+
+   type Filter = { id: number; name: string; priority: number };
   const { setLoading } = useLoading();
+   const [genders, setGenders] = useState<Filter[]>([]);
   const UpdateBasicDetails = async () => {
     setLoading(true);
 
@@ -77,6 +81,18 @@ const UpdateImg = async ()=>{
       UpdateImg();
     }
   }, [profileImage]);
+
+    const fetchFilters = async () => {
+      
+      const filters = await getFilters();
+      setGenders(filters.genders?.sort((a:Filter, b:Filter) => b.priority - a.priority) || []);
+    };
+  
+    useEffect(() => {
+      setLoading(true);
+      fetchFilters();
+      setLoading(false);
+    }, []);
   
 
   return (
@@ -150,10 +166,10 @@ const UpdateImg = async ()=>{
             onChange={(e) => updateCounsellorDetails("gender", e.target.value)}
             className="mt-1 block w-full px-4 py-2 border rounded-lg shadow-sm focus:ring-primary focus:border-primary"
           >
-            <option value="">Select gender</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-            <option value="Other">Other</option>
+            <option value="" disabled>Select gender</option>
+            {genders.map((g) =>{
+              return <option key={g.id} value={g.name}>{g.name}</option>
+            })}
           </select>
         </div>
         <div>

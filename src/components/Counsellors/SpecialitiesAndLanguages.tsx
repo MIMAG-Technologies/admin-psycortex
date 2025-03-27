@@ -1,6 +1,8 @@
 import { useLoading } from "@/context/LoadingContext";
 import { Language } from "@/types/counsellors";
 import { updateLanguages, updateSpecialties } from "@/utils/counsellor";
+import { getFilters } from "@/utils/filters";
+import { useEffect, useState } from "react";
 import { IoAddCircleOutline, IoTrash, IoCreate } from "react-icons/io5";
 import { toast } from "react-toastify";
 
@@ -27,8 +29,14 @@ export default function SpecialitiesAndLanguages({
   mode: string;
   id?: string;
 }) {
+  type Filter = { id: number; name: string; priority: number };
+  const [languagesList, setLanguages] = useState<Filter[]>([]);
+  const [specialtiesList, setSpecialties] = useState<Filter[]>([]);
+
+
+
   const maxEntries = 3; // Maximum number of languages & specialties
-const { setLoading } = useLoading();
+  const { setLoading } = useLoading();
   const UpdateSpecialitiesandLanguages = async () => {
     setLoading(true);
     if (!id) {
@@ -38,24 +46,42 @@ const { setLoading } = useLoading();
     }
 
     if (languages.length < 2 || specialties.length < 2) {
-      toast.error(
-        "Please select at least two languages and two specialties.");
-        setLoading(false);
-        return;
+      toast.error("Please select at least two languages and two specialties.");
+      setLoading(false);
+      return;
     }
 
-    const res1 =   await updateSpecialties(id, specialties); 
-    const res2 =    await updateLanguages(id, languages);
-    if (!res1 ||!res2) {
+    const res1 = await updateSpecialties(id, specialties);
+    const res2 = await updateLanguages(id, languages);
+    if (!res1 || !res2) {
       toast.error("Error updating specialties and languages");
       setLoading(false);
       return;
     }
     toast.success("Specialties and languages updated successfully");
     setLoading(false);
+  };
 
-    
-  }
+
+    const fetchFilters = async () => {
+      const filters = await getFilters();
+      setLanguages(
+        filters.languages?.sort(
+          (a: Filter, b: Filter) => b.priority - a.priority
+        ) || []
+      );
+      setSpecialties(
+        filters.specialties?.sort(
+          (a: Filter, b: Filter) => b.priority - a.priority
+        ) || []
+      );
+    };
+
+    useEffect(() => {
+       setLoading(true);
+      fetchFilters();
+       setLoading(false);
+    }, []);
 
   return (
     <div className="mx-auto p-6 bg-white rounded-lg">
@@ -85,30 +111,35 @@ const { setLoading } = useLoading();
             className="bg-gray-100 p-4 rounded-lg mt-3 flex flex-col sm:flex-row items-center sm:items-start"
           >
             <div className="flex-1">
-              <input
-                type="text"
-                value={lang.language}
-                onChange={(e) =>
-                  updateLanguage(index, { language: e.target.value })
-                }
-                className="block w-full px-4 py-2 mb-2 border rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="Enter Language"
-              />
               <select
-                value={lang.proficiencyLevel}
-                onChange={(e) =>
-                  updateLanguage(index, {
-                    proficiencyLevel: e.target
-                      .value as Language["proficiencyLevel"],
-                  })
-                }
-                className="block w-full px-4 py-2 border rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+              value={lang.language}
+              onChange={(e) =>
+                updateLanguage(index, { language: e.target.value })
+              }
+              className="block w-full px-4 py-2 mb-2 border rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
               >
-                <option value="Basic">Basic</option>
-                <option value="Conversational">Conversational</option>
-                <option value="Professional">Professional</option>
-                <option value="Fluent">Fluent</option>
-                <option value="Native">Native</option>
+              <option value="" disabled>Select Language</option>
+              {languagesList.map((language) => (
+                <option key={language.id} value={language.name}>
+                {language.name}
+                </option>
+              ))}
+              </select>
+              <select
+              value={lang.proficiencyLevel}
+              onChange={(e) =>
+                updateLanguage(index, {
+                proficiencyLevel: e.target
+                  .value as Language["proficiencyLevel"],
+                })
+              }
+              className="block w-full px-4 py-2 border rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+              >
+              <option value="Basic">Basic</option>
+              <option value="Conversational">Conversational</option>
+              <option value="Professional">Professional</option>
+              <option value="Fluent">Fluent</option>
+              <option value="Native">Native</option>
               </select>
             </div>
             <button
@@ -146,13 +177,18 @@ const { setLoading } = useLoading();
             className="bg-gray-100 p-4 rounded-lg mt-3 flex flex-col sm:flex-row items-center sm:items-start"
           >
             <div className="flex-1">
-              <input
-                type="text"
-                value={specialty}
-                onChange={(e) => updateSpecialty(index, e.target.value)}
-                className="block w-full px-4 py-2 mb-2 border rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="Enter Specialty"
-              />
+              <select
+              value={specialty}
+              onChange={(e) => updateSpecialty(index, e.target.value)}
+              className="block w-full px-4 py-2 mb-2 border rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+              >
+              <option value="" disabled>Select Specialty</option>
+              {specialtiesList.map((specialty) => (
+                <option key={specialty.id} value={specialty.name}>
+                {specialty.name}
+                </option>
+              ))}
+              </select>
             </div>
             <button
               onClick={() => deleteSpecialty(index)}

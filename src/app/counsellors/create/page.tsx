@@ -26,6 +26,7 @@ import {
   updatePersonalInfo,
   updatePricing,
   updateProfessionalInfo,
+  UpdateProfileImg,
   updateSchedule,
   updateSpecialties,
   updateVerification,
@@ -510,6 +511,7 @@ export default function Page() {
   };
   const createUser = async () => {
     setLoading(true);
+
     try {
       const id = await createCounsellor(
         counsellorDetails.name,
@@ -521,6 +523,9 @@ export default function Page() {
         toast.error("Error creating counsellor");
         setLoading(false);
         return;
+      }
+      if(profileImage){
+        await UpdateProfileImg(id, profileImage);
       }
       await updatePersonalInfo(id, {
         name: counsellorDetails.name,
