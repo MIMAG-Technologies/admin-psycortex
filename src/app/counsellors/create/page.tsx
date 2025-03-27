@@ -119,6 +119,13 @@ export default function Page() {
   const [languages, setLanguages] = useState<Array<Language>>([]);
 
   const [specialties, setSpecialties] = useState<Array<string>>([]);
+  const [profileImage, setProfileImage] = useState<File | null>(null);
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      setProfileImage(event.target.files[0]);
+    }
+  };
 
   // 1. Function to update counsellorDetails
   const updateCounsellorDetails = (
@@ -591,6 +598,8 @@ export default function Page() {
           <BasicDetails
             counsellorDetails={counsellorDetails}
             updateCounsellorDetails={updateCounsellorDetails}
+            profileImage={profileImage}
+            handleFileChange={handleFileChange}
             mode={usermode ? usermode : ""}
             id={counsellorId ? counsellorId : ""}
           />

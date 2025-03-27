@@ -1,28 +1,32 @@
 import { CounsellorDetails } from "@/types/counsellors";
 import { toast } from "react-toastify";
-import { updatePersonalInfo } from "@/utils/counsellor";
+import { updatePersonalInfo, UpdateProfileImg } from "@/utils/counsellor";
 import { useLoading } from "@/context/LoadingContext";
+import { useEffect } from "react";
 
 export default function BasicDetails({
   counsellorDetails,
   updateCounsellorDetails,
   mode,
   id,
+  profileImage,
+  handleFileChange,
 }: {
   counsellorDetails: CounsellorDetails;
   updateCounsellorDetails: (
     attribute: keyof CounsellorDetails,
     value: any
   ) => void;
+  profileImage: File | null;
+  handleFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   mode: string;
   id?: string;
 }) {
-
-   const { setLoading } = useLoading();
-  const UpdateBasicDetails = async() => {
+  const { setLoading } = useLoading();
+  const UpdateBasicDetails = async () => {
     setLoading(true);
 
-    if(!id){
+    if (!id) {
       toast.error("Counsellor ID not provided");
       setLoading(false);
       return;
@@ -38,25 +42,42 @@ export default function BasicDetails({
       toast.error("Please fill all the fields");
     }
 
-    const res =  await updatePersonalInfo(id, {
-            name: counsellorDetails.name,
-            dateOfBirth: counsellorDetails.dateOfBirth,
-            gender: counsellorDetails.gender,
-            biography: counsellorDetails.biography,
-            email: counsellorDetails.email,
-            phone: counsellorDetails.phone,
-            profileImage: counsellorDetails.profileImage,
-          });
+    const res = await updatePersonalInfo(id, {
+      name: counsellorDetails.name,
+      dateOfBirth: counsellorDetails.dateOfBirth,
+      gender: counsellorDetails.gender,
+      biography: counsellorDetails.biography,
+      email: counsellorDetails.email,
+      phone: counsellorDetails.phone,
+      profileImage: counsellorDetails.profileImage,
+    });
 
-    if(res){
+    if (res) {
       toast.success("Counsellor details updated successfully");
-    }
-    else{
+    } else {
       toast.error("Failed to update counsellor details");
     }
     setLoading(false);
-
+  };
+const UpdateImg = async ()=>{
+  setLoading(true);
+  if (id && profileImage) {
+    const res = await UpdateProfileImg(id, profileImage);
+    if (res) {
+      toast.success("Profile image updated successfully");
+    } else {
+      toast.error("Failed to update profile image");
+    }
+    
   }
+  setLoading(false);
+}
+  useEffect(() => {
+    if (profileImage && id && mode === "edit") {
+      UpdateImg();
+    }
+  }, [profileImage]);
+  
 
   return (
     <div className="mx-auto p-6 bg-white rounded-lg">
@@ -135,10 +156,22 @@ export default function BasicDetails({
             <option value="Other">Other</option>
           </select>
         </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Profile Image
+          </label>
+
+          <input
+            accept="image/*"
+            onChange={handleFileChange}
+            type="file"
+            className="mt-1 flex h-10 w-full rounded-md border border-input bg-white px-3 py-2 text-sm text-gray-400 file:border-0 file:bg-transparent file:text-gray-600 file:text-sm file:font-medium"
+          />
+        </div>
 
         {/* Biography */}
         <div className="sm:col-span-2">
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-mediu</svg>m text-gray-700">
             Biography
           </label>
           <textarea
@@ -159,7 +192,7 @@ export default function BasicDetails({
           onClick={UpdateBasicDetails}
           className="mt-4 px-6 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-secondary  w-full disabled:opacity-50"
         >
-         Update
+          Update
         </button>
       )}
     </div>

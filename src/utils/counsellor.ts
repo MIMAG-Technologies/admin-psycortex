@@ -6,17 +6,10 @@ import {
   ScheduleItem,
 } from "@/types/counsellors";
 import axios from "axios";
+import FormData from "form-data";
 
 const base_url = process.env.NEXT_PUBLIC_BASE_URL;
 
-/**
- * Creates a new counsellor
- * @param name - Counsellor's name
- * @param email - Counsellor's email
- * @param phone - Counsellor's phone number
- * @param timezone - Counsellor's timezone
- * @returns The created counsellor's ID or empty string on failure
- */
 export const createCounsellor = async (
   name: string,
   email: string,
@@ -43,12 +36,6 @@ export const createCounsellor = async (
   }
 };
 
-/**
- * Updates counsellor's personal information
- * @param counsellorId - Counsellor's ID
- * @param personalInfo - Object containing personal information
- * @returns Boolean indicating success or failure
- */
 export const updatePersonalInfo = async (
   counsellorId: string,
   personalInfo: {
@@ -80,12 +67,6 @@ export const updatePersonalInfo = async (
   }
 };
 
-/**
- * Updates counsellor's professional information
- * @param counsellorId - Counsellor's ID
- * @param professionalInfo - Object containing professional information
- * @returns Boolean indicating success or failure
- */
 export const updateProfessionalInfo = async (
   counsellorId: string,
   professionalInfo: {
@@ -114,12 +95,6 @@ export const updateProfessionalInfo = async (
   }
 };
 
-/**
- * Updates counsellor's pricing information
- * @param counsellorId - Counsellor's ID
- * @param rates - Array of session rates
- * @returns Boolean indicating success or failure
- */
 export const updatePricing = async (
   counsellorId: string,
   rates: Array<PricingItem>
@@ -143,12 +118,6 @@ export const updatePricing = async (
   }
 };
 
-/**
- * Updates counsellor's communication modes
- * @param counsellorId - Counsellor's ID
- * @param communicationModes - Comma-separated string of communication modes
- * @returns Boolean indicating success or failure
- */
 export const updateCommunicationModes = async (
   counsellorId: string,
   communicationModes: string
@@ -172,12 +141,6 @@ export const updateCommunicationModes = async (
   }
 };
 
-/**
- * Updates counsellor's weekly schedule
- * @param counsellorId - Counsellor's ID
- * @param weeklySchedule - Array of daily schedules
- * @returns Boolean indicating success or failure
- */
 export const updateSchedule = async (
   counsellorId: string,
   weeklySchedule: Array<ScheduleItem>
@@ -201,12 +164,6 @@ export const updateSchedule = async (
   }
 };
 
-/**
- * Updates counsellor's languages
- * @param counsellorId - Counsellor's ID
- * @param languages - Array of language proficiencies
- * @returns Boolean indicating success or failure
- */
 export const updateLanguages = async (
   counsellorId: string,
   languages: Array<Language>
@@ -230,12 +187,6 @@ export const updateLanguages = async (
   }
 };
 
-/**
- * Updates counsellor's specialties
- * @param counsellorId - Counsellor's ID
- * @param specialties - Array of specialties
- * @returns Boolean indicating success or failure
- */
 export const updateSpecialties = async (
   counsellorId: string,
   specialties: string[]
@@ -259,12 +210,6 @@ export const updateSpecialties = async (
   }
 };
 
-/**
- * Updates counsellor's profile picture
- * @param counsellorId - Counsellor's ID
- * @param imageFile - Profile image file
- * @returns Boolean indicating success or failure
- */
 export const updateProfilePic = async (
   counsellorId: string,
   imageFile: File
@@ -291,12 +236,6 @@ export const updateProfilePic = async (
   }
 };
 
-/**
- * Updates counsellor's verification status
- * @param counsellorId - Counsellor's ID
- * @param verificationData - Object containing verification information
- * @returns Boolean indicating success or failure
- */
 export const updateVerification = async (
   counsellorId: string,
   verificationData: {
@@ -347,6 +286,7 @@ export const getCounsellors = async () => {
     return [];
   }
 };
+
 export const returnAppointmentCounsellors = async () => {
   try {
     const response = await axios.get(
@@ -369,3 +309,29 @@ export const returnAppointmentCounsellors = async () => {
     return [];
   }
 };
+
+
+
+export async function UpdateProfileImg(id: string, img: File): Promise<boolean> {
+  try {
+    const data = new FormData();
+    data.append("ID", id);
+    data.append("file", img);
+
+    const config = {
+      method: "post",
+      maxBodyLength: Infinity,
+      url: `${base_url}/counsellor/update_profile_pic.php`,
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+      data: data,
+    };
+
+    await axios.request(config);
+    return true;
+  } catch (error) {
+    console.error("Error updating profile image:", error);
+    return false;
+  }
+}
