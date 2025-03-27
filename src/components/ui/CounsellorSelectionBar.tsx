@@ -127,7 +127,7 @@ export function CounsellorSelectionBar(props: {
                         )}
                       />
                       <img
-                        src={item.profilepic}
+                        src={item.profilepic || "/images/user-dummy-img.png"}
                         className="h-6 w-6 rounded-full object-cover"
                         alt={`${item.label}'s profile`}
                       />

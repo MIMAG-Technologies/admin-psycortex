@@ -16,6 +16,7 @@ import { CounsellorSelectionBar } from "@/components/ui/CounsellorSelectionBar";
 import { BranchesSelectionBar } from "@/components/ui/BranchesSelectionBar";
 import { getUserRecords } from "@/utils/users";
 import AppointmentModal from "@/components/Appointments/AppointmentModal";
+import { getCounsellorSchedule } from "@/utils/appointments";
 
 export default function CreateAppointment() {
   const router = useRouter();
@@ -46,6 +47,21 @@ export default function CreateAppointment() {
       full_address: string;
     };
   } | null>(null);
+
+  useEffect(() => {
+    const fetchSchedule = async()=>{
+      const schedule = await getCounsellorSchedule(counsellor, date);
+      setworkingHours(schedule);
+      
+    }
+    if(date !== "" && counsellor != ""){
+      fetchSchedule();
+    }
+
+  }, [date])
+
+  const [workingHours, setworkingHours] = useState<Array<any>>([])
+  
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
@@ -157,20 +173,23 @@ export default function CreateAppointment() {
                 />
               </div>
 
-              <div className="col-span-1">
+                <div className="col-span-1">
                 <label className=" text-sm font-semibold mb-1.5 text-gray-800 flex items-center">
                   <FaCalendar className="mr-2 text-primary" />
                   <span>Date</span>
                 </label>
                 <input
+                  disabled={counsellor === ""}
                   type="date"
                   className="border border-gray-300 rounded-md w-full px-3 py-2.5 text-gray-700 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary bg-white shadow-sm"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
+                  min={new Date().toISOString().split('T')[0]}
+                  max={new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}
                 />
-              </div>
+                </div>
 
-                <div className="col-span-1">
+              <div className="col-span-1">
                 <label className="text-sm font-semibold mb-1.5 text-gray-800 flex items-center">
                   <FaClock className="mr-2 text-secondary" />
                   <span>Time Slot</span>
@@ -180,17 +199,27 @@ export default function CreateAppointment() {
                   value={time}
                   onChange={(e) => setTime(e.target.value)}
                 >
-                  <option value="">Select Time</option>
-                  {Array.from({ length: 12 }, (_, i) => {
-                  const hour = i + 9; // Starting from 9 AM
-                  return (
-                    <option key={hour} value={`${hour}:00:00`}>
-                    {hour <= 12 ? `${hour}:00 AM` : `${hour-12}:00 PM`}
+                  {date === "" ? (
+                    <option value="" disabled>
+                      Select Date first
                     </option>
-                  );
-                  })}
+                  ) : (
+                    <option value="" disabled>
+                      Select Time
+                    </option>
+                  )}
+
+                  {workingHours.map((timeSlot) => (
+                    <option key={timeSlot.time} value={timeSlot.time}>
+                      {new Date(`2000-01-01T${timeSlot.time}`).toLocaleTimeString('en-US', {
+                      hour: 'numeric',
+                      minute: '2-digit',
+                      hour12: true
+                      })}
+                    </option>
+                  ))}
                 </select>
-                </div>
+              </div>
 
               <div className="col-span-1">
                 <label className="text-sm font-semibold mb-1.5 text-gray-800 flex items-center">

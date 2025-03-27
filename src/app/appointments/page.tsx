@@ -95,6 +95,7 @@ export default function AppointmentManagement() {
     });
     setPagination((prev) => ({ ...prev, current_page: 1 }));
   };
+  
 
   return (
     <div className="p-6">

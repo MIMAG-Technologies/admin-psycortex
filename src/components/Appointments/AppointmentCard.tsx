@@ -120,7 +120,7 @@ export default function AppointmentCard({
       <div className="bg-gray-100 p-4 rounded-lg border border-gray-300">
         <div className="flex items-center text-gray-800 font-medium mb-1">
           <FaNotesMedical className="text-gray-500 mr-2" />
-          Notes
+          Description
         </div>
         <p className="text-gray-700">{notes ? notes : "No notes available"}</p>
       </div>

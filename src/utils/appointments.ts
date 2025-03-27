@@ -27,7 +27,7 @@ export const getAppointments = async ({
 
     const params = new URLSearchParams();
     if (page) params.append("page", String(page));
-    
+
     if (from) params.append("from", from);
     if (to) params.append("to", to);
     if (mode) params.append("mode", mode);
@@ -46,6 +46,29 @@ export const getAppointments = async ({
     return response.data;
   } catch (error) {
     console.error("Error fetching appointments:", error);
+    return [];
+  }
+};
+
+export const getCounsellorSchedule = async (
+  counsellorId: string,
+  date: string
+) => {
+  try {
+    const res = await axios.get(
+      `${base_url}/counsellor/get_counsellor_schedule.php?counsellorId=${counsellorId}`
+    );
+    const weeklySchedule = res.data.weeklySchedule;
+    const dailySchedule = weeklySchedule.filter((schedule: any) => 
+      schedule.date === date
+    );
+    const workingHours = dailySchedule[0].slots;
+    const availableHours = workingHours.filter((hour: any) => 
+      hour.is_available === true
+    );
+    return availableHours;
+  } catch {
+    console.error("Error fetching counsellor schedule");
     return [];
   }
 };
