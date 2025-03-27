@@ -68,7 +68,7 @@ export default function CounsellorCard({
     <div className=" border bg-slate-100 border-slate-300  rounded-lg p-5 flex flex-col sm:flex-row gap-4 items-center shadow-sm hover:shadow-md transition">
       {/* Profile Image */}
       <img
-        src={profileImage}
+        src={profileImage || "/images/user-dummy-img.png"}
         alt={name}
         className="w-20 h-20 rounded-full object-cover border border-gray-300"
       />

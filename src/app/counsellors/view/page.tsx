@@ -122,7 +122,9 @@ export default function OneCounsellorPage() {
       {/* Personal Info */}
       <div className="text-center">
         <img
-          src={counsellor.personalInfo.profileImage}
+          src={
+            counsellor.personalInfo.profileImage || "/images/user-dummy-img.png"
+          }
           alt={counsellor.personalInfo.name}
           className="w-32 h-32 mx-auto rounded-full shadow-md object-cover"
         />
