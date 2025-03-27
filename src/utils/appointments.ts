@@ -59,16 +59,54 @@ export const getCounsellorSchedule = async (
       `${base_url}/counsellor/get_counsellor_schedule.php?counsellorId=${counsellorId}`
     );
     const weeklySchedule = res.data.weeklySchedule;
-    const dailySchedule = weeklySchedule.filter((schedule: any) => 
-      schedule.date === date
+    const dailySchedule = weeklySchedule.filter(
+      (schedule: any) => schedule.date === date
     );
     const workingHours = dailySchedule[0].slots;
-    const availableHours = workingHours.filter((hour: any) => 
-      hour.is_available === true
+    const availableHours = workingHours.filter(
+      (hour: any) => hour.is_available === true
     );
     return availableHours;
   } catch {
     console.error("Error fetching counsellor schedule");
     return [];
+  }
+};
+
+export const BookSchedule = async (
+  user_id: string,
+  counsellor_id: string,
+  scheduled_at: string,
+  notes: string,
+  location: string,
+  duration: string
+) => {
+  try {
+    const token = localStorage.getItem("psycortex-admin-token");
+    if (!token) {
+      toast.error("Please login first!");
+      throw new Error("Please login first!");
+    }
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    };
+
+    await axios.post(
+      `${base_url}/admin/book_appointment.php`,
+      {
+        user_id,
+        counsellor_id,
+        scheduled_at,
+        notes,
+        location,
+        duration,
+      },
+      { headers }
+    );
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
   }
 };

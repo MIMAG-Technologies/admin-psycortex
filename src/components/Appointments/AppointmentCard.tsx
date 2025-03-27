@@ -143,7 +143,7 @@ export default function AppointmentCard({
           }`}
           disabled={cancellation !== null}
         >
-          Cancle Appointment
+          Cancel Appointment
         </button>
       )}
     </div>

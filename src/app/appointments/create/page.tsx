@@ -16,7 +16,8 @@ import { CounsellorSelectionBar } from "@/components/ui/CounsellorSelectionBar";
 import { BranchesSelectionBar } from "@/components/ui/BranchesSelectionBar";
 import { getUserRecords } from "@/utils/users";
 import AppointmentModal from "@/components/Appointments/AppointmentModal";
-import { getCounsellorSchedule } from "@/utils/appointments";
+import { BookSchedule, getCounsellorSchedule } from "@/utils/appointments";
+import { useLoading } from "@/context/LoadingContext";
 
 export default function CreateAppointment() {
   const router = useRouter();
@@ -35,6 +36,7 @@ export default function CreateAppointment() {
     full_address: "",
     city: "",
   });
+  const { setLoading } = useLoading();
   const [description, setDescription] = useState("");
   const [prevousRecord, setprevousRecord] = useState<{
     counsellor_id: string;
@@ -49,43 +51,48 @@ export default function CreateAppointment() {
   } | null>(null);
 
   useEffect(() => {
-    const fetchSchedule = async()=>{
+    const fetchSchedule = async () => {
       const schedule = await getCounsellorSchedule(counsellor, date);
       setworkingHours(schedule);
-      
-    }
-    if(date !== "" && counsellor != ""){
+    };
+    if (date !== "" && counsellor != "") {
+      setLoading(true);
       fetchSchedule();
+      setLoading(false);
+    }
+  }, [date]);
+
+  const [workingHours, setworkingHours] = useState<Array<any>>([]);
+
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement>
+  ): Promise<void> => {
+    e.preventDefault();
+    setLoading(true);
+
+    if (!user || !counsellor || !date || !time || !duration || !location) {
+      toast.error("All fields are required.");
+      setLoading(false);
+      return;
     }
 
-  }, [date])
+    const res = await BookSchedule(
+      user,
+      counsellor,
+      date + " " + time,
+      description,
+      location.city,
+      duration
+    );
 
-  const [workingHours, setworkingHours] = useState<Array<any>>([])
-  
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
-    e.preventDefault();
-    // if (validateForm()) {
-    //   const formData: AppointmentFormData = {
-    //     user,
-    //     counsellor,
-    //     date,
-    //     time,
-    //     duration,
-    //     location,
-    //     description,
-    //   };
-    //   console.log("Form Submitted", formData);
-    //   toast.success("Appointment Created Successfully!");
-    //   // Reset the form
-    //   setUser("");
-    //   setCounsellor("");
-    //   setDate("");
-    //   setTime("");
-    //   setDuration("");
-    //   setLocation("");
-    //   setDescription("");
-    // }
+    if (!res) {
+      toast.error("Error booking appointment");
+      setLoading(false);
+      return;
+    }
+    toast.success("Appointment booked successfully");
+    setLoading(false);
+    router.push(`/appointments`);
   };
 
   useEffect(() => {
@@ -106,10 +113,12 @@ export default function CreateAppointment() {
         setIsOpen(true);
       }
     };
-    if (user !== "") {
+    if (user !== "" && counsellor != "") {
+      setLoading(true);
       fetchPrevousRecords();
+      setLoading(false);
     }
-  }, [user]);
+  }, [user, counsellor]);
 
   function handleYes(): void {
     if (prevousRecord) {
@@ -173,7 +182,7 @@ export default function CreateAppointment() {
                 />
               </div>
 
-                <div className="col-span-1">
+              <div className="col-span-1">
                 <label className=" text-sm font-semibold mb-1.5 text-gray-800 flex items-center">
                   <FaCalendar className="mr-2 text-primary" />
                   <span>Date</span>
@@ -184,10 +193,14 @@ export default function CreateAppointment() {
                   className="border border-gray-300 rounded-md w-full px-3 py-2.5 text-gray-700 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary bg-white shadow-sm"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
-                  min={new Date().toISOString().split('T')[0]}
-                  max={new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}
+                  min={new Date().toISOString().split("T")[0]}
+                  max={
+                    new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+                      .toISOString()
+                      .split("T")[0]
+                  }
                 />
-                </div>
+              </div>
 
               <div className="col-span-1">
                 <label className="text-sm font-semibold mb-1.5 text-gray-800 flex items-center">
@@ -211,10 +224,12 @@ export default function CreateAppointment() {
 
                   {workingHours.map((timeSlot) => (
                     <option key={timeSlot.time} value={timeSlot.time}>
-                      {new Date(`2000-01-01T${timeSlot.time}`).toLocaleTimeString('en-US', {
-                      hour: 'numeric',
-                      minute: '2-digit',
-                      hour12: true
+                      {new Date(
+                        `2000-01-01T${timeSlot.time}`
+                      ).toLocaleTimeString("en-US", {
+                        hour: "numeric",
+                        minute: "2-digit",
+                        hour12: true,
                       })}
                     </option>
                   ))}
