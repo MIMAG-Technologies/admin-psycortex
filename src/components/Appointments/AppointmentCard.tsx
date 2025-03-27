@@ -11,12 +11,17 @@ import {
   FaMapMarkerAlt,
 } from "react-icons/fa";
 import { IconType } from "react-icons";
+import { CancleSchedule } from "@/utils/appointments";
+import { toast } from "react-toastify";
+import { useLoading } from "@/context/LoadingContext";
 type SessionMode = "chat" | "counselling" | "offline";
 
 interface Session {
   id: string;
   user_name: string;
+  user_id: string;
   counsellor_name: string;
+  counsellor_id: string;
   scheduled_at: string;
   mode: SessionMode;
   notes: string;
@@ -37,7 +42,9 @@ interface Session {
 }
 export default function AppointmentCard({
   user_name,
+  user_id,
   counsellor_name,
+  counsellor_id,
   scheduled_at,
   mode,
   status,
@@ -45,6 +52,25 @@ export default function AppointmentCard({
   notes,
   link,
 }: Session) {
+    const { setLoading } = useLoading();
+  const handleCancel = async () => {
+    setLoading(true);
+    if (confirm("Are you sure you want to cancel this appointment?")) {
+      const res = await CancleSchedule(
+        user_id,
+        counsellor_id,
+        scheduled_at,
+      )
+      if(!res){
+        toast.error("Error in cancelling appointment")
+        setLoading(false);
+        return;
+      }
+      toast.success("Appointment cancelled successfully");
+    }
+    setLoading(false);
+  };
+
   return (
     <div className="border border-gray-300 rounded-xl shadow-md p-6 transition-all duration-300 hover:shadow-lg w-full max-w-xl bg-white">
       <div className="flex items-center gap-4 mb-4">
@@ -94,7 +120,7 @@ export default function AppointmentCard({
           icon={
             status === "completed"
               ? FaCheckCircle
-              : status === "upcoming"
+              : status === "upcoming" || status === "scheduled"
               ? FaCalendar
               : status === "ongoing"
               ? FaClock
@@ -137,11 +163,12 @@ export default function AppointmentCard({
       {mode === "offline" && (
         <button
           className={` text-white px-4 py-2 rounded-md mt-4 w-full ${
-            cancellation !== null
+            cancellation !== null || new Date(scheduled_at) < new Date()
               ? "opacity-90 cursor-not-allowed bg-gray-500"
               : "hover:bg-red-600 bg-red-500"
           }`}
-          disabled={cancellation !== null}
+          disabled={cancellation !== null || new Date(scheduled_at) < new Date()}
+          onClick={() => handleCancel()}
         >
           Cancel Appointment
         </button>

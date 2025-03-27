@@ -23,7 +23,9 @@ export default function AppointmentManagement() {
   interface Session {
     id: string;
     user_name: string;
+    user_id: string;
     counsellor_name: string;
+    counsellor_id:string;
     scheduled_at: string;
     mode: SessionMode;
     notes: string;

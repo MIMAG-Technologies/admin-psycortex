@@ -110,3 +110,34 @@ export const BookSchedule = async (
     return false;
   }
 };
+export const CancleSchedule = async (
+  user_id: string,
+  counsellor_id: string,
+  scheduled_at: string,
+) => {
+  try {
+    const token = localStorage.getItem("psycortex-admin-token");
+    if (!token) {
+      toast.error("Please login first!");
+      throw new Error("Please login first!");
+    }
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    };
+
+    await axios.post(
+      `${base_url}/admin/cancel_appointment.php`,
+      {
+        user_id,
+        counsellor_id,
+        scheduled_at,
+      },
+      { headers }
+    );
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
