@@ -38,7 +38,7 @@ export default function ProfessionalInfo({
   id?: string;
 }) {
 
-  const maxEntries = 20; // Define max educations & licenses
+  const maxEntries = 9; // Define max educations & licenses
   const { setLoading } = useLoading();
   const updateProfessionalInformation = async () => {
     if (!id) {
