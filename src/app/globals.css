@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -17,6 +18,11 @@
 
 ::-webkit-scrollbar-thumb:hover {
   background: #4f46e5;
+}
+body * {
+  font-family: "Outfit", serif;
+  font-optical-sizing: auto;
+  font-style: normal;
 }
 
 
