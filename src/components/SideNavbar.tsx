@@ -25,9 +25,9 @@ export default function SideNavbar({
   const pathname = usePathname();
 
   const routes: { name: string; icon: ReactNode; path: string }[] = [
+    { name: "Users", icon: <FaUsers />, path: "/users" },
     { name: "Appointments", icon: <FaCalendarCheck />, path: "/appointments" },
     { name: "Counsellors", icon: <FaUserMd />, path: "/counsellors" },
-    { name: "Users", icon: <FaUsers />, path: "/users" },
     { name: "Tests", icon: <FaFileSignature />, path: "/tests" },
     { name: "Filters", icon: <FaFilter />, path: "/filters" },
     { name: "Payments", icon: <FaMoneyBillWave />, path: "/payments" },

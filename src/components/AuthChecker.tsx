@@ -15,7 +15,7 @@ export default function AuthChecker() {
       const isLogged = await isLoggedIn();
       if (isLogged) {
         if(pathname === "/" || pathname === "/login"){
-            router.push("/appointments");
+            router.push("/users");
           }
         }
         else{
