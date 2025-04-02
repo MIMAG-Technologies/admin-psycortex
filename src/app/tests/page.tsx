@@ -10,9 +10,20 @@ interface Test {
   slug: string;
   imageUrl?: string;
   description: string;
+  shortDescription?: string;
+  benefits: string[];
   details: {
     durationMinutes: number;
     totalQuestions: number;
+    minimumAge: number;
+    maximumAge?: number;
+  };
+  pricing: {
+    originalPrice: number;
+    discount?: number;
+    amount: number;
+    currency: string;
+    taxPercent: number;
   };
 }
 
@@ -70,7 +81,7 @@ const Tests = () => {
       </div>
 
       {filteredTests.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="flex flex-col gap-6">
           {filteredTests.map((test) => (
             <TestCard key={test.slug} test={test} />
           ))}

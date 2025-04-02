@@ -9,18 +9,24 @@ import { toast } from "react-toastify"; // Using react-toastify as shown in your
 import { updatetest } from "@/utils/tests";
 
 interface TestData {
-  slug: string;
   name: string;
+  slug: string;
+  imageUrl?: string;
   description: string;
+  benefits: string[];
   details: {
     durationMinutes: number;
     totalQuestions: number;
+    minimumAge: number;
+    maximumAge?: number;
   };
   pricing: {
+    originalPrice: number;
+    discount?: number;
     amount: number;
+    currency: string;
     taxPercent: number;
   };
-  imageUrl?: string;
 }
 
 export default function EditTestForm() {
@@ -36,7 +42,6 @@ function EditTestPage() {
   const { setLoading } = useLoading();
   const [error, setError] = useState<string | null>(null);
   const [isNewTest, setIsNewTest] = useState(false);
-  const [testData, setTestData] = useState<TestData | null>(null);
   const searchParams = useSearchParams();
   const slug = searchParams.get("slug");
   const base_url = process.env.NEXT_PUBLIC_BASE_URL;
@@ -46,6 +51,9 @@ function EditTestPage() {
     price: "",
     taxPercent: "",
     description: "",
+    benefits: "",
+    minimumAge: "",
+    maximumAge: "",
   });
   const [image, setImage] = useState<File | null>(null);
 
@@ -64,12 +72,14 @@ function EditTestPage() {
           );
 
           if (selectedTest) {
-            setTestData(selectedTest);
             setFormData({
               name: selectedTest.name || "",
               description: selectedTest.description || "",
               price: selectedTest.pricing?.amount?.toString() || "",
               taxPercent: selectedTest.pricing?.taxPercent?.toString() || "",
+              benefits: selectedTest.benefits?.join(", ") || "",
+              minimumAge: selectedTest.details?.minimumAge?.toString() || "",
+              maximumAge: selectedTest.details?.maximumAge?.toString() || "",
             });
           } else {
             setIsNewTest(true);
@@ -110,9 +120,11 @@ function EditTestPage() {
       description: formData.description,
       price: parseFloat(formData.price),
       taxPercent: parseFloat(formData.taxPercent),
-    })
-    
-    // Show the success notification immediately
+      benefits: formData.benefits,
+      minimumAge: parseInt(formData.minimumAge),
+      maximumAge: formData.maximumAge ? parseInt(formData.maximumAge) : undefined,
+    });
+
     if (res) {
       toast.success("Test updated successfully");
       router.back();
@@ -120,17 +132,16 @@ function EditTestPage() {
       toast.error("Error updating the test!");
     }
     setLoading(false);
-  
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-70 z-50 p-4">
-      <div className="relative bg-white rounded-lg shadow-xl w-full max-w-3xl overflow-hidden">
+    <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-70 z-50 p-4 ">
+      <div className="relative bg-white rounded-lg shadow-xl w-full max-w-3xl overflow-hidden max-h-[90vh] overflow-y-auto">
         <div className="bg-white px-6 py-4 border-b border-slate-200">
           <h2 className="text-xl font-semibold text-center text-slate-800">
             {isNewTest ? "Create New Test" : "Edit Test"}
           </h2>
-          
+
           <button
             className="absolute top-4 right-4 text-secondary hover:text-secondary-dark transition-colors"
             onClick={() => router.back()}
@@ -156,7 +167,9 @@ function EditTestPage() {
                   type="text"
                   className="w-full p-2.5 rounded-md border border-slate-200 focus:ring-2 focus:ring-primary focus:border-primary"
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
                   placeholder="Enter test name"
                   required
                 />
@@ -176,10 +189,9 @@ function EditTestPage() {
                       onChange={handleThumbnailChange}
                     />
                     <p className="text-xs mt-1.5 text-slate-500">
-                      {isNewTest 
-                        ? "Upload an image file for the test thumbnail (recommended size: 800x450px)" 
-                        : "Upload a new image to replace the current thumbnail"
-                      }
+                      {isNewTest
+                        ? "Upload an image file for the test thumbnail (recommended size: 800x450px)"
+                        : "Upload a new image to replace the current thumbnail"}
                     </p>
                   </div>
                 </div>
@@ -194,7 +206,9 @@ function EditTestPage() {
                   step="0.01"
                   className="w-full p-2.5 rounded-md border border-slate-200 focus:ring-2 focus:ring-primary focus:border-primary"
                   value={formData.price}
-                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, price: e.target.value })
+                  }
                   placeholder="0.00"
                   required
                 />
@@ -209,7 +223,9 @@ function EditTestPage() {
                   step="0.01"
                   className="w-full p-2.5 rounded-md border border-slate-200 focus:ring-2 focus:ring-primary focus:border-primary"
                   value={formData.taxPercent}
-                  onChange={(e) => setFormData({ ...formData, taxPercent: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, taxPercent: e.target.value })
+                  }
                   placeholder="0.00"
                   required
                 />
@@ -223,9 +239,57 @@ function EditTestPage() {
                   className="w-full p-2.5 rounded-md border border-slate-200 focus:ring-2 focus:ring-primary focus:border-primary"
                   style={{ minHeight: "120px" }}
                   value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, description: e.target.value })
+                  }
                   placeholder="Enter test description"
                   required
+                />
+              </div>
+
+              <div className="col-span-2">
+                <label className="block text-sm font-medium mb-1.5 text-slate-700">
+                  Benefits (comma-separated)
+                </label>
+                <input
+                  type="text"
+                  className="w-full p-2.5 rounded-md border border-slate-200 focus:ring-2 focus:ring-primary focus:border-primary"
+                  value={formData.benefits}
+                  onChange={(e) =>
+                    setFormData({ ...formData, benefits: e.target.value })
+                  }
+                  placeholder="Enter benefits separated by commas"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1.5 text-slate-700">
+                  Minimum Age
+                </label>
+                <input
+                  type="number"
+                  className="w-full p-2.5 rounded-md border border-slate-200 focus:ring-2 focus:ring-primary focus:border-primary"
+                  value={formData.minimumAge}
+                  onChange={(e) =>
+                    setFormData({ ...formData, minimumAge: e.target.value })
+                  }
+                  placeholder="Enter minimum age"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1.5 text-slate-700">
+                  Maximum Age
+                </label>
+                <input
+                  type="number"
+                  className="w-full p-2.5 rounded-md border border-slate-200 focus:ring-2 focus:ring-primary focus:border-primary"
+                  value={formData.maximumAge}
+                  onChange={(e) =>
+                    setFormData({ ...formData, maximumAge: e.target.value })
+                  }
+                  placeholder="Enter maximum age (optional)"
                 />
               </div>
             </div>
