@@ -47,7 +47,7 @@ export default function Schedule({
   return (
     <div className="mx-auto p-6 bg-white rounded-lg">
       {/* Schedule List */}
-      <div className="space-y-4">
+      <div className="space-y-4 mt-4">
         {schedule.map((item) => (
           <div key={item.day} className="bg-gray-100 p-4 rounded-lg shadow-sm">
             {/* Day Name */}

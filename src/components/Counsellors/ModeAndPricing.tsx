@@ -1,14 +1,19 @@
 import { useLoading } from "@/context/LoadingContext";
 import { CommunicationModes, PricingItem } from "@/types/counsellors";
 import { updateCommunicationModes, updatePricing } from "@/utils/counsellor";
+import { Dispatch, SetStateAction } from "react";
 import { IoChatbubble, IoCall, IoVideocam, IoPerson } from "react-icons/io5";
 import { toast } from "react-toastify";
+import { BranchesSelectionBar } from "../ui/BranchesSelectionBar";
 
 export default function ModeAndPricing({
   communication_modes,
   pricing,
   updateCommunicationMode,
   updatePricingItem,
+  preferredCenterAddress,
+  setpreferredCenterAddress,
+  UpdateBranchDetails,
   mode,
   id,
 }: {
@@ -19,6 +24,19 @@ export default function ModeAndPricing({
     value: boolean
   ) => void;
   updatePricingItem: (index: number, updates: Partial<PricingItem>) => void;
+  preferredCenterAddress: {
+    id: string;
+    full_address: string;
+    city: string;
+  };
+  setpreferredCenterAddress: Dispatch<
+    SetStateAction<{
+      id: string;
+      full_address: string;
+      city: string;
+    }>
+  >;
+  UpdateBranchDetails: () => Promise<void>;
   mode: string;
   id?: string;
 }) {
@@ -72,6 +90,9 @@ export default function ModeAndPricing({
     const res1 = await updatePricing(id, pricing);
     if (res && res1) {
       toast.success("Communication modes updated successfully");
+      if (communication_modes.in_person && preferredCenterAddress.id) {
+        await UpdateBranchDetails();
+      }
     } else {
       toast.error("Failed to update communication modes");
     }
@@ -172,6 +193,19 @@ export default function ModeAndPricing({
                     <option value="INR">INR</option>
                   </select>
                 </div>
+
+                {priceItem.typeOfAvailability === "in_person" && (
+                  <div className="mt-4 col-span-2">
+                    <h3 className="text-lg font-semibold text-gray-700">
+                      Preferred Center Address
+                    </h3>
+                    <BranchesSelectionBar
+                      value={preferredCenterAddress}
+                      setValue={setpreferredCenterAddress}
+                      isDisabled={false}
+                    />
+                  </div>
+                )}
               </div>
             </li>
           ))}

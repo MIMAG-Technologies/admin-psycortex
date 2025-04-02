@@ -8,6 +8,7 @@ import Verification from "@/components/Counsellors/Verification";
 import { useLoading } from "@/context/LoadingContext";
 import {
   AvailabilityType,
+  BranchType,
   CommunicationModes,
   CounsellorDetails,
   DayOfWeek,
@@ -21,6 +22,7 @@ import {
 import {
   createCounsellor,
   getCounsellor,
+  UpdateBranches,
   updateCommunicationModes,
   updateLanguages,
   updatePersonalInfo,
@@ -322,6 +324,49 @@ export default function Page() {
   const searchParams = useSearchParams();
   const mode = searchParams.get("mode");
   const id = searchParams.get("id");
+  const [primaryAddress, setprimaryAddress] = useState<BranchType>({
+    street_address: "",
+    city: "",
+    state: "",
+    pincode: "",
+  });
+  const [preferredCenterAddress, setpreferredCenterAddress] = useState<{
+    id: string;
+    full_address: string;
+    city: string;
+  }>({
+    id: "",
+    full_address: "",
+    city: "",
+  });
+
+
+  function extractAddress(data: {
+    id: string;
+    full_address: string;
+    city: string;
+  }) {
+    const parts = data.full_address.split(",").map((part) => part.trim());
+    const length = parts.length;
+
+    if (length < 3) {
+      throw new Error("Invalid address format");
+    }
+
+    return {
+      street_address: parts.slice(0, length - 3).join(", "),
+      city: parts[length - 3],
+      state: parts[length - 2],
+      pincode: parts[length - 1],
+    };
+  }
+
+  const updatePrimaryAddress = (field: keyof BranchType, value: string) => {
+    setprimaryAddress(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
 
   useEffect(() => {
     const fetchCounsellor = async (id: string) => {
@@ -399,9 +444,27 @@ export default function Page() {
           );
         }
 
-        // Set communication modes
-        const availableModes =
-          res.sessionInfo.availability.communicationModes || [];
+        if (res.addresses && res.addresses.length > 0) {
+          // Set primary address from first address
+          setprimaryAddress({
+            street_address: res.addresses[0].address || "",
+            city: res.addresses[0].city || "",
+            state: res.addresses[0].state || "",
+            pincode: res.addresses[0].pincode || "",
+          });
+
+          // Set preferred center address from second address if it exists
+          if (res.addresses.length > 1) {
+            setpreferredCenterAddress({
+              id: Math.random().toString(36).substr(2, 9),
+              full_address: `${res.addresses[1].address}, ${res.addresses[1].city}, ${res.addresses[1].state} - ${res.addresses[1].pincode}`,
+              city: res.addresses[1].city,
+            });
+          }
+        }
+          // Set communication modes
+          const availableModes =
+            res.sessionInfo.availability.communicationModes || [];
         setCommunication_modes({
           chat: availableModes.includes("chat"),
           call: availableModes.includes("call"),
@@ -509,6 +572,22 @@ export default function Page() {
       .map(([mode]) => mode)
       .join(",");
   };
+const UpdateBranchDetails = async () => {
+  if (!id) {
+    toast.error("Counsellor ID is required");
+    return;
+  }
+  console.log(extractAddress(preferredCenterAddress));
+  
+  const res = await UpdateBranches(
+    id,
+    primaryAddress,
+    extractAddress(preferredCenterAddress)
+  );
+  if (!res) {
+    toast.error("Error updating branch details");
+  }
+}
   const createUser = async () => {
     setLoading(true);
 
@@ -543,6 +622,7 @@ export default function Page() {
         education: education,
         licenses: lisences,
       });
+       await UpdateBranchDetails();
       await updatePricing(id, pricing);
       await updateCommunicationModes(
         id,
@@ -605,6 +685,9 @@ export default function Page() {
             updateCounsellorDetails={updateCounsellorDetails}
             profileImage={profileImage}
             handleFileChange={handleFileChange}
+            primaryAddress={primaryAddress}
+            UpdateBranchDetails={UpdateBranchDetails}
+            updatePrimaryAddress={updatePrimaryAddress}
             mode={usermode ? usermode : ""}
             id={counsellorId ? counsellorId : ""}
           />
@@ -641,6 +724,9 @@ export default function Page() {
             pricing={pricing}
             updateCommunicationMode={updateCommunicationMode}
             updatePricingItem={updatePricingItem}
+            preferredCenterAddress={preferredCenterAddress}
+            setpreferredCenterAddress={setpreferredCenterAddress}
+            UpdateBranchDetails={UpdateBranchDetails}
             mode={usermode ? usermode : ""}
             id={counsellorId ? counsellorId : ""}
           />
@@ -720,7 +806,11 @@ export default function Page() {
                   !counsellorDetails.phone.trim() ||
                   !counsellorDetails.dateOfBirth.trim() ||
                   !counsellorDetails.gender.trim() ||
-                  !counsellorDetails.biography.trim()
+                  !counsellorDetails.biography.trim() ||
+                  !primaryAddress.city.trim() ||
+                  !primaryAddress.pincode.trim() ||
+                  !primaryAddress.state.trim() ||
+                  !primaryAddress.street_address.trim()
                 ) {
                   isValid = false;
                   errorMessage =
@@ -732,11 +822,25 @@ export default function Page() {
                 if (
                   !counsellorDetails.title.trim() ||
                   counsellorDetails.yearsOfExperience <= 0 ||
-                  education.length === 0
+                  education.length === 0 ||
+                  education.some(
+                    (edu) =>
+                      !edu.degree.trim() ||
+                      !edu.field.trim() ||
+                      !edu.institution.trim() ||
+                      !edu.year
+                  ) ||
+                  lisences.some(
+                    (license) =>
+                      !license.type.trim() ||
+                      !license.licenseNumber.trim() ||
+                      !license.issuingAuthority.trim() ||
+                      !license.validUntil
+                  )
                 ) {
                   isValid = false;
                   errorMessage =
-                    "Please provide a title, experience, and at least one education entry.";
+                    "Please provide a title, experience, and at least one education entry with all fields filled. If licenses are provided, ensure no fields are empty.";
                 }
               }
 
@@ -747,19 +851,30 @@ export default function Page() {
                   selectedModes < 2 ||
                   pricing.some(
                     (item) => item.price <= 0 || !item.sessionTitle.trim()
-                  )
+                  ) ||
+                  (communication_modes.in_person &&
+                    (!preferredCenterAddress.full_address.trim() ||
+                      !preferredCenterAddress.city.trim()))
                 ) {
                   isValid = false;
                   errorMessage =
-                    "Select at least two communication modes and ensure their pricing details are complete.";
+                    "Select at least two communication modes, ensure their pricing details are complete, and provide a preferred center location if 'in_person' is selected.";
                 }
               }
 
               if (step === 4) {
-                if (languages.length < 2 || specialties.length < 2) {
+                if (
+                  languages.length < 2 ||
+                  specialties.length < 2 ||
+                  languages.some(
+                    (lang) =>
+                      !lang.language.trim() || !lang.proficiencyLevel.trim()
+                  ) ||
+                  specialties.some((specialty) => !specialty.trim())
+                ) {
                   isValid = false;
                   errorMessage =
-                    "Please select at least two languages and two specialties.";
+                    "Please select at least two languages and two specialties, and ensure no fields are empty.";
                 }
               }
 

@@ -74,3 +74,10 @@ export type Language = {
     | "Fluent"
     | "Native";
 };
+
+export type BranchType = {
+  street_address: string;
+  city: string;
+  state: string;
+  pincode: string;
+};

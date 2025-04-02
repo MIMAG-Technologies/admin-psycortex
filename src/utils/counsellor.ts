@@ -1,4 +1,5 @@
 import {
+  BranchType,
   Education,
   Language,
   License,
@@ -310,8 +311,6 @@ export const returnAppointmentCounsellors = async () => {
   }
 };
 
-
-
 export async function UpdateProfileImg(id: string, img: File): Promise<boolean> {
   try {
     const data = new FormData();
@@ -332,6 +331,24 @@ export async function UpdateProfileImg(id: string, img: File): Promise<boolean> 
     return true;
   } catch (error) {
     console.error("Error updating profile image:", error);
+    return false;
+  }
+}
+
+export async function UpdateBranches(
+  counsellorId: string,
+  primaryAddress: BranchType,
+  preferredCenterAddress: BranchType
+): Promise<boolean> {
+  try {
+    await axios.post(`${base_url}/counsellor/update_location.php`, {
+      counsellorId,
+      primaryAddress,
+      preferredCenterAddress,
+    });
+    return true;
+  } catch (error) {
+    console.error("Error updating branches:", error);
     return false;
   }
 }
