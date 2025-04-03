@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import { Suspense } from "react";
 import Link from "next/link";
-import { IoPeople, IoDocumentText, IoCalendar } from "react-icons/io5";
+import { IoPeople, IoCalendar } from "react-icons/io5";
 import Loading from "@/components/Loading";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -15,11 +15,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       name: "All Counsellors",
       path: "/counsellors",
       icon: <IoPeople size={18} />,
-    },
-    {
-      name: "Applications",
-      path: "/counsellors/applications",
-      icon: <IoDocumentText size={18} />,
     },
     {
       name: "Leaves",
