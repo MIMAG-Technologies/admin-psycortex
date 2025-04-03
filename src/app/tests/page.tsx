@@ -1,9 +1,11 @@
 
 "use client";
 import { useEffect, useState } from "react";
-import {fetchTests}from "@/utils/tests";
+import {disableDiscount, fetchTests}from "@/utils/tests";
 import TestCard from "@/components/Tests/TestCard";
 import { useLoading } from "@/context/LoadingContext";
+import Link from "next/link";
+import { toast } from "react-toastify";
 
 interface Test {
   name: string;
@@ -62,15 +64,27 @@ const Tests = () => {
     test.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const deleteDiscounts = async () => {
+    setLoading(true);
+    const res = await disableDiscount();
+    if(res){
+      toast.success("Discount offer deleted successfully!");
+    }
+    else{
+      toast.error("Error deleting discount offer");
+    }
+    setLoading(false);
+  }
+
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
+    <div className="p-4">
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4 py-6">
-        <h1 className="text-3xl sm:text-4xl font-semibold text-primary w-full text-center sm:text-left">
+        <h1 className="text-3xl sm:text-4xl font-semibold text-primary text-center sm:text-left">
           Tests For You
         </h1>
         <input
-          className="bg-zinc-100 text-zinc-600 font-mono ring-1 ring-zinc-300 focus:ring-2 focus:ring-primary outline-none duration-300 placeholder:text-zinc-600 placeholder:opacity-50 rounded-[10px] px-4 py-2 shadow-md focus:shadow-lg w-full sm:w-[400px]"
+          className="bg-zinc-100 text-zinc-600 font-mono ring-1 ring-zinc-300 focus:ring-2 focus:ring-primary outline-none duration-300 placeholder:text-zinc-600 placeholder:opacity-50 rounded-[10px] px-4 py-2 shadow-md focus:shadow-lg sm:w-[400px] ml-auto"
           autoComplete="off"
           placeholder="Search Test Name"
           name="search"
@@ -78,6 +92,46 @@ const Tests = () => {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
+        <Link
+          className="flex items-center gap-2 rounded-md bg-blue-500 px-4 py-2 text-white transition hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-2 w-fit"
+          href={"/tests/create-discount"}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="w-5 h-5"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 4.5v15m7.5-7.5h-15"
+            />
+          </svg>
+          Create Discount
+        </Link>
+        <button
+          className="flex items-center gap-2 rounded-md bg-red-500 px-4 py-2 text-white transition hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300 focus:ring-offset-2 w-fit"
+          onClick={deleteDiscounts}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="w-5 h-5"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+          Disable Discounts
+        </button>
       </div>
 
       {filteredTests.length > 0 ? (

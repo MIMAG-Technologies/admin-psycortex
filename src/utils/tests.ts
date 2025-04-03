@@ -51,3 +51,55 @@ export const updatetest = async (data: {
     return false;
   }
 };
+
+
+export const createDiscount = async(data:{
+  name: string;
+  discountPercent: number;
+  expiresOn: string;
+  description: string;
+})=>{
+  try {
+    const token = localStorage.getItem("psycortex-admin-token");
+    if (!token) {
+      toast.error("Please login first!");
+      throw new Error("Please login first!");
+    }
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    };
+    await axios.post(
+      `${base_url}/tests/update_discount.php`,
+      data,
+      { headers }
+    );
+    return true;
+
+    
+  } catch (error) {
+    console.log(error);
+    return false;
+    
+  }
+}
+export const disableDiscount = async()=>{
+  try {
+    const token = localStorage.getItem("psycortex-admin-token");
+    if (!token) {
+      toast.error("Please login first!");
+      throw new Error("Please login first!");
+    }
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    };
+    await axios.post(`${base_url}/tests/disable_discounts.php`, { headers });
+    return true;
+
+    
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+}
