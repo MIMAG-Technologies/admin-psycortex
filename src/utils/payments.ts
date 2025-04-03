@@ -1,5 +1,6 @@
 import axios from "axios";
 import { getCounsellors } from "./counsellor";
+import { toast } from "react-toastify";
 const base_url = process.env.NEXT_PUBLIC_BASE_URL;
 
 const getAllCounsellorOverview = async () => {
@@ -45,13 +46,26 @@ const getAllCounsellorOverview = async () => {
 export const getAllPaymentRecords = async (
   payment_type: "appointment" | "test",
   counsellorId: string,
-  type?: string,
-  from?: string,
-  to?: string
+  page:number = 1,
+  type?: string | null,
+  from?: string | null,
+  to?: string | null
 ) => {
   try {
+
+     const token = localStorage.getItem("psycortex-admin-token");
+        if (!token) {
+          toast.error("Please login first!");
+          throw new Error("Please login first!");
+        }
+        const headers = {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        };
+
     const responce = await axios.get(
-      `${base_url}/admin/get_payment_records.php?type=${type}&counsellorId=${counsellorId}&from=${from}&to=${to}&payment_type=${payment_type}`
+      `${base_url}/admin/get_payment_records.php?type=${type}&counsellorId=${counsellorId}&from=${from}&to=${to}&payment_type=${payment_type}&page=${page}`,
+      { headers }
     );
 
     return {

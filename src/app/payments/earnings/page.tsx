@@ -86,7 +86,9 @@ function OneCounsellorCard({
     <div className="bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200 transition-transform hover:scale-105 p-5">
       <div className="flex items-center gap-4">
         <img
-          src={counsellor.personalInfo.profileImage}
+          src={
+            counsellor.personalInfo.profileImage || "/images/user-dummy-img.png"
+          }
           alt={counsellor.personalInfo.name}
           width={60}
           height={60}
@@ -154,9 +156,12 @@ function OneCounsellorCard({
 
       {/* View More Button */}
       <div className="mt-5">
-        <button className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-medium py-2 px-4 rounded-lg transition" onClick={() => {
-          router.push(`/payments/counsellor?id=${counsellor.id}`);
-        }}>
+        <button
+          className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-medium py-2 px-4 rounded-lg transition"
+          onClick={() => {
+            router.push(`/payments/counsellor?id=${counsellor.id}`);
+          }}
+        >
           View More
         </button>
       </div>
