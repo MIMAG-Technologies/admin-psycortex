@@ -31,7 +31,14 @@ export function UserSelectionBar(props: {
 
   const [usersearchTerm, setusersearchTerm] = React.useState<string>("");
   const [userPreviewList, setuserPreviewList] = React.useState<
-    Array<{ label: string; value: string; age: number }>
+    Array<{
+      label: string;
+      value: string;
+      age: number;
+      phone: string;
+      gender: string;
+      profile_image: string;
+    }>
   >([]);
 
   const { setLoading } = useLoading();
@@ -41,23 +48,29 @@ export function UserSelectionBar(props: {
       const fetchUser = async () => {
         setLoading(true);
         try {
-          const response: Array<{ label: string; value: string; age: number }> =
-            await returnAppointmentUsers(usersearchTerm);
+          const response: Array<{
+            label: string;
+            value: string;
+            age: number;
+            phone: string;
+            gender: string;
+            profile_image: string;
+          }> = await returnAppointmentUsers(usersearchTerm);
 
           if (Array.isArray(response)) {
             const uniqueUsers = response.reduce((acc, user) => {
               if (!acc.some((u) => u.value === user.value)) acc.push(user);
               return acc;
-            }, [] as Array<{ label: string; value: string; age: number }>);
+            }, [] as Array<{ label: string; value: string; age: number; phone: string; gender: string; profile_image: string }>);
 
             setuserPreviewList(uniqueUsers);
           } else {
             console.error("Invalid API response format:", response);
-            setuserPreviewList([]); 
+            setuserPreviewList([]);
           }
         } catch (error) {
           console.error("Error fetching users:", error);
-          setuserPreviewList([]); 
+          setuserPreviewList([]);
         }
         setLoading(false);
       };
@@ -110,13 +123,30 @@ export function UserSelectionBar(props: {
                         setOpen(false);
                       }}
                     >
-                      <Check
-                        className={cn(
-                          "mr-2 h-4 w-4",
-                          value === item.value ? "opacity-100" : "opacity-0"
-                        )}
-                      />
-                      {item.label} ({item.age} years old)
+                      <div className="flex items-center gap-3">
+                        {/* Profile Image */}
+                        <img
+                          src={item.profile_image}
+                          alt={`${item.label}'s profile`}
+                          className="w-8 h-8 rounded-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src = "/images/user-dummy-img.png";
+                          }}
+                        />
+                        <div>
+                          {/* User Name and Age */}
+                          <p className="font-medium capitalize">
+                            {item.label.length > 16
+                              ? `${item.label.slice(0, 13)}...`
+                              : item.label}{" "}
+                            ({item.age} years old)
+                          </p>
+                          {/* Phone Number and Gender */}
+                          <p className="text-sm text-gray-500 capitalize">
+                            {item.phone} | {item.gender}
+                          </p>
+                        </div>
+                      </div>
                     </CommandItem>
                   );
                 })}

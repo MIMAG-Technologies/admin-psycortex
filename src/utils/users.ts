@@ -51,12 +51,18 @@ export const returnAppointmentUsers = async (search: string) => {
       label: string;
       value: string;
       age: number;
+      phone: string;
+      gender: string;
+      profile_image: string;
     }> = [];
     userList.forEach((user: any) => {
       returnlist.push({
         label: user.name,
         value: user.id,
         age: calculateAge(user.date_of_birth),
+        phone: user.phone,
+        gender: user.gender,
+        profile_image: user.profile_image || "/images/user-dummy-img.png",
       });
     });
     return returnlist;
