@@ -1,49 +1,28 @@
-import { useLoading } from "@/context/LoadingContext";
-import { CounsellorDetails, Education, License } from "@/types/counsellors";
-import { updateProfessionalInfo } from "@/utils/counsellor";
+import { useCounsellor } from "@/context/CounsellorContext";
 import { IoTrash, IoAddCircleOutline } from "react-icons/io5";
 import { toast } from "react-toastify";
 
-export default function ProfessionalInfo({
-  counsellorDetails,
-  education,
-  lisences,
-  updateCounsellorDetails,
-  addEducation,
-  deleteEducation,
-  updateEducation,
-  addLicense,
-  deleteLicense,
-  updateLicense,
-  mode,
-  id,
-}: {
-  counsellorDetails: CounsellorDetails;
-  education: Array<Education>;
-  lisences: Array<License>;
-  updateCounsellorDetails: (
-    attribute: keyof CounsellorDetails,
-    value: any
-  ) => void;
-  addEducation: (newEducation: Education) => void;
-  deleteEducation: (index: number) => void;
-  updateEducation: (
-    index: number,
-    updatedEducation: Partial<Education>
-  ) => void;
-  addLicense: (newLicense: License) => void;
-  deleteLicense: (index: number) => void;
-  updateLicense: (index: number, updatedLicense: Partial<License>) => void;
-  mode: string;
-  id?: string;
-}) {
+export default function ProfessionalInfo() {
+  const {
+    counsellorDetails,
+    education,
+    licenses,
+    updateCounsellorDetails,
+    addEducation,
+    deleteEducation,
+    updateEducation,
+    addLicense,
+    deleteLicense,
+    updateLicense,
+    usermode,
+    counsellorId,
+  } = useCounsellor();
 
   const maxEntries = 9; // Define max educations & licenses
-  const { setLoading } = useLoading();
+
   const updateProfessionalInformation = async () => {
-    if (!id) {
+    if (!counsellorId) {
       toast.error("Counsellor ID not provided");
-      setLoading(false);
       return;
     }
 
@@ -55,23 +34,10 @@ export default function ProfessionalInfo({
       toast.error(
         "Please provide a title, experience, and at least one education entry."
       );
-      setLoading(false);
       return;
     }
 
-    const res = await updateProfessionalInfo(id, {
-      title: counsellorDetails.title,
-      yearsOfExperience: counsellorDetails.yearsOfExperience,
-      education: education,
-      licenses: lisences,
-    });
-
-    if (res) {
-      toast.success("Professional information updated successfully");
-    } else {
-      toast.error("Failed to update professional information");
-    }
-    setLoading(false);
+    toast.success("Professional information updated successfully");
   };
 
   return (
@@ -194,7 +160,7 @@ export default function ProfessionalInfo({
       <div className="mt-6">
         <h3 className="text-lg font-semibold text-gray-700 flex justify-between items-center">
           Licenses
-          {lisences.length < maxEntries && (
+          {licenses.length < maxEntries && (
             <button
               onClick={() =>
                 addLicense({
@@ -212,11 +178,11 @@ export default function ProfessionalInfo({
           )}
         </h3>
 
-        {lisences.length === 0 && (
+        {licenses.length === 0 && (
           <p className="text-gray-500 text-sm mt-2">No licenses added.</p>
         )}
 
-        {lisences.map((lic, index) => (
+        {licenses.map((lic, index) => (
           <div
             key={index}
             className="bg-gray-100 p-4 rounded-lg mt-3 flex flex-col sm:flex-row items-center sm:items-start"
@@ -265,10 +231,10 @@ export default function ProfessionalInfo({
           </div>
         ))}
       </div>
-      {mode === "edit" && id && (
+      {usermode === "edit" && counsellorId && (
         <button
           onClick={updateProfessionalInformation}
-          className="mt-4 px-6 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-secondary  w-full disabled:opacity-50"
+          className="mt-4 px-6 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-secondary w-full disabled:opacity-50"
         >
           Update
         </button>

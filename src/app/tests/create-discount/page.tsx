@@ -1,7 +1,6 @@
 "use client";
 import { useLoading } from "@/context/LoadingContext";
 import { createDiscount } from "@/utils/tests";
-import { createUser } from "@/utils/users";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
@@ -38,6 +37,7 @@ export default function DiscountForm() {
       toast.success("Discount offer created successfully!");
       setLoading(false);
       router.back();
+      return;
     }
     toast.error("Error creating discount offer");
     setLoading(false);

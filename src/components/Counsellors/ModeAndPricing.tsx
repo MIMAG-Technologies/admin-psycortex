@@ -1,46 +1,25 @@
-import { useLoading } from "@/context/LoadingContext";
-import { CommunicationModes, PricingItem } from "@/types/counsellors";
-import { updateCommunicationModes, updatePricing } from "@/utils/counsellor";
-import { Dispatch, SetStateAction } from "react";
+import { useCounsellor } from "@/context/CounsellorContext";
 import { IoChatbubble, IoCall, IoVideocam, IoPerson } from "react-icons/io5";
 import { toast } from "react-toastify";
 import { BranchesSelectionBar } from "../ui/BranchesSelectionBar";
+import { useLoading } from "@/context/LoadingContext";
+import { updateCommunicationModes, updatePricing } from "@/utils/counsellor";
+import { CommunicationModes } from "@/types/counsellors";
 
-export default function ModeAndPricing({
-  communication_modes,
-  pricing,
-  updateCommunicationMode,
-  updatePricingItem,
-  preferredCenterAddress,
-  setpreferredCenterAddress,
-  UpdateBranchDetails,
-  mode,
-  id,
-}: {
-  communication_modes: CommunicationModes;
-  pricing: PricingItem[];
-  updateCommunicationMode: (
-    mode: keyof CommunicationModes,
-    value: boolean
-  ) => void;
-  updatePricingItem: (index: number, updates: Partial<PricingItem>) => void;
-  preferredCenterAddress: {
-    id: string;
-    full_address: string;
-    city: string;
-  };
-  setpreferredCenterAddress: Dispatch<
-    SetStateAction<{
-      id: string;
-      full_address: string;
-      city: string;
-    }>
-  >;
-  UpdateBranchDetails: () => Promise<void>;
-  mode: string;
-  id?: string;
-}) {
-  // Handle mode toggle
+export default function ModeAndPricing() {
+  const {
+    communication_modes,
+    pricing,
+    updateCommunicationMode,
+    updatePricingItem,
+    preferredCenterAddress,
+    setPreferredCenterAddress,
+    UpdateBranchDetails,
+    counsellorId: id,
+
+    usermode: mode,
+  } = useCounsellor();
+
   const handleModeToggle = (mode: keyof CommunicationModes) => {
     const newValue = !communication_modes[mode];
     updateCommunicationMode(mode, newValue);
@@ -201,7 +180,7 @@ export default function ModeAndPricing({
                     </h3>
                     <BranchesSelectionBar
                       value={preferredCenterAddress}
-                      setValue={setpreferredCenterAddress}
+                      setValue={setPreferredCenterAddress}
                       isDisabled={false}
                     />
                   </div>

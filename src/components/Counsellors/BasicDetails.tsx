@@ -1,46 +1,44 @@
-import { BranchType, CounsellorDetails } from "@/types/counsellors";
-import { toast } from "react-toastify";
-import { updatePersonalInfo, UpdateProfileImg } from "@/utils/counsellor";
-import { useLoading } from "@/context/LoadingContext";
+import { useCounsellor } from "@/context/CounsellorContext";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import { getFilters } from "@/utils/filters";
 
-export default function BasicDetails({
-  counsellorDetails,
-  updateCounsellorDetails,
-  mode,
-  id,
-  profileImage,
-  handleFileChange,
-  primaryAddress,
-  updatePrimaryAddress,
-  UpdateBranchDetails,
-}: {
-  counsellorDetails: CounsellorDetails;
-  updateCounsellorDetails: (
-    attribute: keyof CounsellorDetails,
-    value: any
-  ) => void;
-  profileImage: File | null;
-  handleFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  primaryAddress: BranchType;
-  updatePrimaryAddress: (field: keyof BranchType, value: string) => void;
-  UpdateBranchDetails: () => Promise<void>;
+export default function BasicDetails() {
+  const {
+    counsellorDetails,
+    updateCounsellorDetails,
+    profileImage,
+    setProfileImage,
+    primaryAddress,
+    updatePrimaryAddress,
+    createUser,
+    usermode,
+    counsellorId,
+  } = useCounsellor();
 
-  mode: string;
-  id?: string;
-}) {
   type Filter = { id: number; name: string; priority: number };
-  const { setLoading } = useLoading();
   const [genders, setGenders] = useState<Filter[]>([]);
-  const UpdateBasicDetails = async () => {
-    setLoading(true);
 
-    if (!id) {
-      toast.error("Counsellor ID not provided");
-      setLoading(false);
-      return;
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      setProfileImage(event.target.files[0]);
     }
+  };
+
+  const fetchFilters = async () => {
+    const filters = await getFilters();
+    setGenders(
+      filters.genders?.sort(
+        (a: Filter, b: Filter) => b.priority - a.priority
+      ) || []
+    );
+  };
+
+  useEffect(() => {
+    fetchFilters();
+  }, []);
+
+  const handleUpdateBasicDetails = async () => {
     if (
       !counsellorDetails.name.trim() ||
       !counsellorDetails.email.trim() ||
@@ -54,58 +52,11 @@ export default function BasicDetails({
       !primaryAddress.pincode.trim()
     ) {
       toast.error("Please fill all the fields");
+      return;
     }
 
-    const res = await updatePersonalInfo(id, {
-      name: counsellorDetails.name,
-      dateOfBirth: counsellorDetails.dateOfBirth,
-      gender: counsellorDetails.gender,
-      biography: counsellorDetails.biography,
-      email: counsellorDetails.email,
-      phone: counsellorDetails.phone,
-      profileImage: counsellorDetails.profileImage,
-    });
-
-    if (res) {
-      toast.success("Counsellor details updated successfully");
-      await UpdateBranchDetails();
-    } else {
-      toast.error("Failed to update counsellor details");
-    }
-    setLoading(false);
+    await createUser();
   };
-  const UpdateImg = async () => {
-    setLoading(true);
-    if (id && profileImage) {
-      const res = await UpdateProfileImg(id, profileImage);
-      if (res) {
-        toast.success("Profile image updated successfully");
-      } else {
-        toast.error("Failed to update profile image");
-      }
-    }
-    setLoading(false);
-  };
-  useEffect(() => {
-    if (profileImage && id && mode === "edit") {
-      UpdateImg();
-    }
-  }, [profileImage]);
-
-  const fetchFilters = async () => {
-    const filters = await getFilters();
-    setGenders(
-      filters.genders?.sort(
-        (a: Filter, b: Filter) => b.priority - a.priority
-      ) || []
-    );
-  };
-
-  useEffect(() => {
-    setLoading(true);
-    fetchFilters();
-    setLoading(false);
-  }, []);
 
   return (
     <div className="mx-auto p-6 bg-white rounded-lg">
@@ -181,20 +132,19 @@ export default function BasicDetails({
             <option value="" disabled>
               Select gender
             </option>
-            {genders.map((g) => {
-              return (
-                <option key={g.id} value={g.name}>
-                  {g.name}
-                </option>
-              );
-            })}
+            {genders.map((g) => (
+              <option key={g.id} value={g.name}>
+                {g.name}
+              </option>
+            ))}
           </select>
         </div>
+
+        {/* Profile Image */}
         <div>
           <label className="block text-sm font-medium text-gray-700">
             Profile Image
           </label>
-
           <input
             accept="image/*"
             onChange={handleFileChange}
@@ -205,7 +155,7 @@ export default function BasicDetails({
 
         {/* Biography */}
         <div className="sm:col-span-2">
-          <label className="block text-sm font-mediu</svg>m text-gray-700">
+          <label className="block text-sm font-medium text-gray-700">
             Biography
           </label>
           <textarea
@@ -274,10 +224,10 @@ export default function BasicDetails({
         </div>
       </div>
 
-      {mode === "edit" && id && (
+      {usermode === "edit" && counsellorId && (
         <button
-          onClick={UpdateBasicDetails}
-          className="mt-4 px-6 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-secondary  w-full disabled:opacity-50"
+          onClick={handleUpdateBasicDetails}
+          className="mt-4 px-6 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-secondary w-full disabled:opacity-50"
         >
           Update
         </button>
