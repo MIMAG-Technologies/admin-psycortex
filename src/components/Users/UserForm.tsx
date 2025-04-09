@@ -6,25 +6,57 @@ import React, { useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import { toast } from "react-toastify";
 
-export default function UserForm() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    date_of_birth: "",
-    gender: "",
-  });
+export default function UserForm(props: {
+  mode: string;
+  EditUser: () => Promise<void>;
+  formData: {
+    name: string;
+    email: string;
+    phone: string;
+    date_of_birth: string;
+    gender: string;
+  };
+  setFormData: React.Dispatch<
+    React.SetStateAction<{
+      name: string;
+      email: string;
+      phone: string;
+      date_of_birth: string;
+      gender: string;
+    }>
+  >;
+}) {
+  const { mode, formData, setFormData, EditUser } = props;
   const { setLoading } = useLoading();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if(!formData.name || !formData.email || !formData.phone || !formData.date_of_birth){
+    if (
+      !formData.name ||
+      !formData.email ||
+      !formData.phone ||
+      !formData.date_of_birth
+    ) {
       return toast.error("Please fill all the fields");
     }
-    
+
     setLoading(true);
-    const is_created = await createUser(formData.name, formData.email, formData.phone, formData.date_of_birth , formData.gender);
+
+    if (mode === "edit") {
+      await EditUser();
+      setLoading(false);
+      router.back();
+      return;
+    }
+
+    const is_created = await createUser(
+      formData.name,
+      formData.email,
+      formData.phone,
+      formData.date_of_birth,
+      formData.gender
+    );
     if (is_created) {
       alert("User created successfully!");
       setLoading(false);
@@ -34,8 +66,6 @@ export default function UserForm() {
       toast.error("Failed to create user. Please try again.");
     }
     setLoading(false);
-    
-    
   };
 
   return (
@@ -56,7 +86,7 @@ export default function UserForm() {
         </button>
 
         <h2 className="mb-6 text-center text-2xl font-semibold text-gray-700">
-          Create User
+          {mode === "edit" ? "Edit User" : "Create User"}
         </h2>
 
         <form onSubmit={handleSubmit}>
@@ -91,6 +121,7 @@ export default function UserForm() {
             </label>
             <input
               type="email"
+              disabled={mode === "edit"}
               id="email"
               name="email"
               value={formData.email}
@@ -174,7 +205,7 @@ export default function UserForm() {
             type="submit"
             className="w-full rounded-md bg-primary px-4 py-2 text-white transition hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-outline focus:ring-offset-2"
           >
-            Create User
+            {mode === "edit" ? "Update User" : "Create User"}
           </button>
         </form>
       </div>

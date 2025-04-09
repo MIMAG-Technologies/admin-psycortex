@@ -52,7 +52,7 @@ const router = useRouter();
         alt="User Profile"
         onError={(e) => {
           const target = e.target as HTMLImageElement;
-          target.onerror = null; 
+          target.onerror = null;
           target.src = "/images/user-dummy-img.png";
         }}
       />
@@ -91,7 +91,9 @@ const router = useRouter();
         </button>
         <button
           className="flex w-full items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-white transition hover:bg-secondary sm:w-auto"
-          onClick={() => toast.info("This Feature is not Implemented")}
+          onClick={() => {
+            router.push(`/users/create?id=${props.id}&mode=edit`);
+          }}
         >
           <AiOutlineEdit className="h-5 w-5" />
           Edit

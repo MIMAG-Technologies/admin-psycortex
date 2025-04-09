@@ -1,4 +1,5 @@
 import axios from "axios";
+import exp from "constants";
 import { toast } from "react-toastify";
 
 const base_url = process.env.NEXT_PUBLIC_BASE_URL;
@@ -128,15 +129,46 @@ export const getUserHistory = async (user_id: string) => {
 };
 
 export const getIndividualUserHistory = async (id: string) => {
-try {
-  const res = await axios.get(
-    base_url + "/user/get_single_case_history.php?id=" + id
-  );
-  return res.data.data;
-  
-} catch (error) {
-  console.log(error);
-  return null;
-  
-}
-}
+  try {
+    const res = await axios.get(
+      base_url + "/user/get_single_case_history.php?id=" + id
+    );
+    return res.data.data;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+
+export const getUserDetails = async (user_id: string) => {
+  try {
+    const res = await axios.get(
+      base_url + "/user/get_user_details.php?userId=" + user_id
+    );
+    return res.data.user;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+
+export const UpdateUser = async (data: {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  dateOfBirth: string;
+  gender: string;
+  timezone: string;
+}) => {
+  try {
+    const res = await axios.post(
+      base_url + "/user/submit_user_details.php",
+      data
+    );
+    return res.data.success;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
