@@ -126,3 +126,17 @@ export const getUserHistory = async (user_id: string) => {
     return [];
   }
 };
+
+export const getIndividualUserHistory = async (id: string) => {
+try {
+  const res = await axios.get(
+    base_url + "/user/get_single_case_history.php?id=" + id
+  );
+  return res.data.data;
+  
+} catch (error) {
+  console.log(error);
+  return null;
+  
+}
+}
