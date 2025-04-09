@@ -114,3 +114,15 @@ function calculateAge(date_of_birth: string): number {
 
   return age;
 }
+
+export const getUserHistory = async (user_id: string) => {
+  try {
+    const res = await axios.get(
+      base_url + "/user/get_case_history.php?user_id=" + user_id
+    );
+    return res.data.histories;
+  } catch (error) {
+    console.log(error);
+    return [];
+  }
+};

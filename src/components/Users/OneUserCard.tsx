@@ -1,3 +1,4 @@
+import { useRouter } from "next/navigation";
 import { AiOutlineEye, AiOutlineEdit } from "react-icons/ai";
 import {
   FaRegCalendarAlt,
@@ -38,6 +39,8 @@ const getGenderIcon = (gender: string | null | undefined) => {
       return <FaGenderless className="text-gray-500" />;
   }
 };
+
+const router = useRouter();
 
 
   return (
@@ -80,7 +83,7 @@ const getGenderIcon = (gender: string | null | undefined) => {
         <button
           className="flex w-full items-center justify-center gap-2 rounded-md border border-primary px-4 py-2 text-primary transition hover:bg-primary hover:text-white sm:w-auto"
           onClick={() => {
-            toast.info("This Feature is not Implemented");
+            router.push(`/users/view?id=${props.id}`);
           }}
         >
           <AiOutlineEye className="h-5 w-5" />
