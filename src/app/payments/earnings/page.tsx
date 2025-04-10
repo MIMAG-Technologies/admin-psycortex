@@ -13,6 +13,7 @@ import {
 import { MdOutlineLocalActivity } from "react-icons/md";
 import { IoPerson } from "react-icons/io5"; // Offline appointment icon
 import { useRouter } from "next/navigation";
+import VariablesPage from "@/components/Counsellors/VariablesPage";
 
 type SimplifiedCounsellor = {
   id: string;
@@ -62,6 +63,8 @@ export default function CounsellorEarning() {
   }, [setLoading]);
 
   return (
+    <>
+    <VariablesPage/>
     <div className="container mx-auto px-4 py-6">
       <h1 className="text-2xl font-semibold mb-4 text-center text-indigo-600">
         Counsellor Earnings
@@ -72,6 +75,7 @@ export default function CounsellorEarning() {
         ))}
       </div>
     </div>
+    </>
   );
 }
 

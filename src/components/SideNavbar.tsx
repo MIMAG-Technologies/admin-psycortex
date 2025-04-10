@@ -8,7 +8,6 @@ import {
   FaUsers,
   FaFilter,
   FaMoneyBillWave,
-  FaSlidersH,
   FaFileSignature,
   FaBuilding,
   FaUserShield,
@@ -31,7 +30,6 @@ export default function SideNavbar({
     { name: "Tests", icon: <FaFileSignature />, path: "/tests" },
     { name: "Filters", icon: <FaFilter />, path: "/filters" },
     { name: "Payments", icon: <FaMoneyBillWave />, path: "/payments" },
-    { name: "Variables", icon: <FaSlidersH />, path: "/variables" },
     { name: "Branches", icon: <FaBuilding />, path: "/branches" },
     { name: "Admin", icon: <FaUserShield />, path: "/admin" },
   ];

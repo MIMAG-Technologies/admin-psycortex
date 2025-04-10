@@ -20,6 +20,7 @@ export const updatetest = async (data: {
   benefits: string;
   minimumAge: number;
   maximumAge: number | undefined;
+  durationMinutes:number;
 }) => {
   try {
     const token = localStorage.getItem("psycortex-admin-token");
@@ -42,6 +43,7 @@ export const updatetest = async (data: {
         benefits: data.benefits,
         minimum_age: data.minimumAge,
         maximum_age: data.maximumAge,
+        duration_minutes: data.durationMinutes,
       },
       { headers }
     );

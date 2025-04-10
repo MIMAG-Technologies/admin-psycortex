@@ -54,6 +54,7 @@ function EditTestPage() {
     benefits: "",
     minimumAge: "",
     maximumAge: "",
+    durationMinutes: "",
   });
   const [image, setImage] = useState<File | null>(null);
 
@@ -80,6 +81,7 @@ function EditTestPage() {
               benefits: selectedTest.benefits?.join(", ") || "",
               minimumAge: selectedTest.details?.minimumAge?.toString() || "",
               maximumAge: selectedTest.details?.maximumAge?.toString() || "",
+              durationMinutes: selectedTest.details?.durationMinutes?.toString() || "",
             });
           } else {
             setIsNewTest(true);
@@ -123,6 +125,7 @@ function EditTestPage() {
       benefits: formData.benefits,
       minimumAge: parseInt(formData.minimumAge),
       maximumAge: formData.maximumAge ? parseInt(formData.maximumAge) : undefined,
+      durationMinutes: parseInt(formData.durationMinutes),
     });
 
     if (res) {
@@ -175,7 +178,7 @@ function EditTestPage() {
                 />
               </div>
 
-              <div className="col-span-2">
+              {/* <div className="col-span-2">
                 <label className="block text-sm font-medium mb-1.5 text-slate-700">
                   Thumbnail Image
                 </label>
@@ -195,7 +198,7 @@ function EditTestPage() {
                     </p>
                   </div>
                 </div>
-              </div>
+              </div> */}
 
               <div>
                 <label className="block text-sm font-medium mb-1.5 text-slate-700">
@@ -290,6 +293,20 @@ function EditTestPage() {
                     setFormData({ ...formData, maximumAge: e.target.value })
                   }
                   placeholder="Enter maximum age (optional)"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1.5 text-slate-700">
+                  Duration (in minutes)
+                </label>
+                <input
+                  type="number"
+                  className="w-full p-2.5 rounded-md border border-slate-200 focus:ring-2 focus:ring-primary focus:border-primary"
+                  value={formData.durationMinutes}
+                  onChange={(e) =>
+                    setFormData({ ...formData, durationMinutes: e.target.value })
+                  }
+                  placeholder="Enter duration in minutes"
                 />
               </div>
             </div>

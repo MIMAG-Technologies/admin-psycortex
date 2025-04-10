@@ -7,30 +7,6 @@ export default function VariablesPage() {
   // State for tax & commission values (default hidden)
   const [variables, setVariables] = useState([
     {
-      id: "tax_chat",
-      title: "Tax on Chat Booking (%)",
-      value: 5,
-      hidden: true,
-    },
-    {
-      id: "tax_call",
-      title: "Tax on Call Booking (%)",
-      value: 8,
-      hidden: true,
-    },
-    {
-      id: "tax_video",
-      title: "Tax on Video Booking (%)",
-      value: 10,
-      hidden: true,
-    },
-    {
-      id: "tax_in_person",
-      title: "Tax on In-Person Booking (%)",
-      value: 12,
-      hidden: true,
-    },
-    {
       id: "counsellor_commission",
       title: "Counsellor Commission (%)",
       value: 20,
@@ -89,8 +65,8 @@ export default function VariablesPage() {
 
   return (
     <div className="mx-auto p-6">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">
-        Global Tax & Commission Settings
+      <h1 className="text-2xl font-semibold mb-4 text-center text-indigo-600">
+        Commission Settings
       </h1>
 
       {/* List of Variables */}
