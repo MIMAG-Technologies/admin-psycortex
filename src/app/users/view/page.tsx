@@ -9,12 +9,16 @@ import {
   FaComments,
   FaPhone,
   FaHandshake,
+  FaHistory,
 } from "react-icons/fa";
 
 import { useLoading } from "@/context/LoadingContext";
 import { getUserHistory, getIndividualUserHistory } from "@/utils/users";
 import { AppointmentDetailModal } from "@/components/Users/AppointmentDetailModal";
-import { AppointmentDetails } from "@/types/user"; // <-- import type
+import { AppointmentDetails } from "@/types/user";
+import { UserDetails } from "@/types/user";
+import { getUserDetails } from "@/utils/users";
+import UserDetailedView from "@/components/Users/UserDetailedView";
 
 type HistoryItem = {
   id: number;
@@ -32,6 +36,7 @@ export default function Page() {
   const [selectedDetails, setSelectedDetails] =
     useState<AppointmentDetails | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [userDetails, setuserDetails] = useState<null | UserDetails>(null);
 
   const searchParams = useSearchParams();
   const { setLoading } = useLoading();
@@ -43,6 +48,8 @@ export default function Page() {
         setLoading(true);
         const res = await getUserHistory(id);
         setHistory(res);
+         const res2 = await getUserDetails(id);
+         setuserDetails(res2);
         setLoading(false);
       }
     };
@@ -74,69 +81,75 @@ export default function Page() {
 
   return (
     <div className="p-6 bg-white min-h-screen">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">User History</h1>
-      <div className="flex flex-col gap-4">
-        {history.length === 0 ? (
-          <p className="text-gray-500">No history available for this user.</p>
-        ) : (
-          history.map((item) => (
-            <div
-              key={item.id}
-              className="border bg-slate-100 border-slate-300 rounded-lg p-4 flex flex-col gap-4"
-            >
-              <div className="flex items-center gap-4">
-                <FaUser className="text-primary text-xl" />
-                <div>
-                  <h2 className="text-lg font-semibold text-gray-800">
-                    {item.user_details.name}
-                  </h2>
-                  <p className="text-sm text-gray-600">
-                    {item.user_details.gender}, {item.user_details.age} years
-                    old
+      {userDetails && <UserDetailedView user={userDetails} />}
+
+      <div className={`rounded-xl border shadow-sm bg-indigo-50`}>
+        <div className="px-5 py-4 border-b flex items-center gap-3 text-gray-800 font-semibold text-base">
+          <FaHistory /> User History
+        </div>
+        <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+          {history.length === 0 ? (
+            <p className="text-gray-500">No history available for this user.</p>
+          ) : (
+            history.map((item) => (
+              <div
+                key={item.id}
+                className="border bg-white border-slate-300 rounded-lg p-4 flex flex-col gap-4"
+              >
+                <div className="flex items-center gap-4">
+                  <FaUser className="text-primary text-xl" />
+                  <div>
+                    <h2 className="text-lg font-semibold text-gray-800">
+                      {item.user_details.name}
+                    </h2>
+                    <p className="text-sm text-gray-600">
+                      {item.user_details.gender}, {item.user_details.age} years
+                      old
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  {getSessionIcon(item.session_type)}
+                  <p className="text-gray-700">
+                    Session Type:{" "}
+                    <span className="font-medium">{item.session_type}</span>
                   </p>
                 </div>
+                <div className="flex items-center gap-4">
+                  <FaCalendarAlt className="text-yellow-500 text-xl" />
+                  <p className="text-gray-700">
+                    Date:{" "}
+                    <span className="font-medium">
+                      {new Date(item.created_at).toLocaleDateString()}
+                    </span>
+                  </p>
+                  <p className="text-gray-700">
+                    Time:{" "}
+                    <span className="font-medium">
+                      {new Date(item.created_at).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hour12: true,
+                      })}
+                    </span>
+                  </p>
+                </div>
+                <div className="flex items-center gap-4">
+                  <p className="text-gray-700">
+                    Counsellor:{" "}
+                    <span className="font-medium">{item.counsellor_name}</span>
+                  </p>
+                </div>
+                <button
+                  className="mt-auto bg-primary text-white py-2 px-4 rounded-lg hover:bg-secondary transition"
+                  onClick={() => handleViewMore(item.id)}
+                >
+                  View More
+                </button>
               </div>
-              <div className="flex items-center gap-4">
-                {getSessionIcon(item.session_type)}
-                <p className="text-gray-700">
-                  Session Type:{" "}
-                  <span className="font-medium">{item.session_type}</span>
-                </p>
-              </div>
-              <div className="flex items-center gap-4">
-                <FaCalendarAlt className="text-yellow-500 text-xl" />
-                <p className="text-gray-700">
-                  Date:{" "}
-                  <span className="font-medium">
-                    {new Date(item.created_at).toLocaleDateString()}
-                  </span>
-                </p>
-                <p className="text-gray-700">
-                  Time:{" "}
-                  <span className="font-medium">
-                    {new Date(item.created_at).toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      hour12: true,
-                    })}
-                  </span>
-                </p>
-              </div>
-              <div className="flex items-center gap-4">
-                <p className="text-gray-700">
-                  Counsellor:{" "}
-                  <span className="font-medium">{item.counsellor_name}</span>
-                </p>
-              </div>
-              <button
-                className="mt-auto bg-primary text-white py-2 px-4 rounded-lg hover:bg-secondary transition"
-                onClick={() => handleViewMore(item.id)}
-              >
-                View More
-              </button>
-            </div>
-          ))
-        )}
+            ))
+          )}
+        </div>
       </div>
 
       <AppointmentDetailModal

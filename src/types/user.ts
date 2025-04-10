@@ -84,3 +84,55 @@ export type AppointmentDetails = {
     };
   };
 };
+
+
+export type UserDetails = {
+  id: string;
+  personalInfo: {
+    name: string;
+    email: string;
+    phone: string;
+    dateOfBirth: string;
+    gender: string;
+    profileImage: string;
+  };
+  preferences: {
+    timezone: string;
+  };
+  accountInfo: {
+    createdAt: string;
+  };
+  stats: {
+    counselling: {
+      total: number;
+      completed: number;
+      upcoming: number;
+    };
+    chat: {
+      total: number;
+      completed: number;
+      upcoming: number;
+    };
+    call: {
+      total: number;
+      completed: number;
+      upcoming: number;
+      cancelled: number;
+      missed: number;
+    };
+    tests: {
+      total: number;
+      completed: number;
+      active: number;
+      pending: number;
+      paid: number;
+      referred: number;
+      referredUnpaid: number;
+    };
+    offline: {
+      total: number;
+      completed: number;
+      upcoming: number;
+    };
+  };
+};
