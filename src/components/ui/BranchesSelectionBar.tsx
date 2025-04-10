@@ -60,28 +60,18 @@ export function BranchesSelectionBar(props: {
       setLoading(true);
       try {
         const response: Array<any> = await getBranches();
-        let results: Array<{
-          city: string;
-          id: string;
-          full_address: string;
-        }> = [];
+        console.log("API Response:", response); // Debugging log
 
-        response.forEach((branch) => {
-          results.push({
-            city: branch.city,
-            id: branch.id,
-            full_address: branch.full_address,
-          });
-        });
-
-        if (Array.isArray(results) && results.length > 0) {
+        if (Array.isArray(response) && response.length > 0) {
+          const results = response.map((branch) => ({
+            city: branch.city || "Unknown City",
+            id: branch.id || "Unknown ID",
+            full_address: branch.full_address || "No Address Provided",
+          }));
           setBranchPreviewList(results);
           setBranchFilterList(results);
         } else {
-          console.error(
-            "Invalid API response format or empty results:",
-            response
-          );
+          console.error("Invalid API response format or empty results:", response);
           setBranchPreviewList([]);
         }
       } catch (error) {

@@ -18,6 +18,7 @@ export const getBranches = async () => {
       `${base_url}/counsellor/get_branches.php`,
       { headers }
     );
+    
     return response.data.data.branches || [];
   } catch (err) {
     return [];
@@ -28,18 +29,19 @@ export const addBranches = async (
   city: string,
   street_address: string,
   state: string,
-  pincode: string
+  pincode: string,
+  branch_name: string
 ) => {
   try {
-     const token = localStorage.getItem("psycortex-admin-token");
-     if (!token) {
-       toast.error("Please login first!");
-       throw new Error("Please login first!");
-     }
-     const headers = {
-       Authorization: `Bearer ${token}`,
-       "Content-Type": "application/json",
-     };
+    const token = localStorage.getItem("psycortex-admin-token");
+    if (!token) {
+      toast.error("Please login first!");
+      throw new Error("Please login first!");
+    }
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    };
     await axios.post(
       `${base_url}/counsellor/add_branch.php`,
       {
@@ -47,6 +49,7 @@ export const addBranches = async (
         street_address,
         state,
         pincode,
+        branch_name,
       },
       { headers }
     );

@@ -20,14 +20,15 @@ const cityIcons = [
    id: string;
    city: string;
    full_address: string;
+   branch_name: string;
    onDelete: (id: string) => void;
  };
 
 
 export default function BranchCard({
   id,
-  city,
   full_address,
+  branch_name,
   onDelete,
 }: Branch) {
   const randomIcon = cityIcons[Math.floor(Math.random() * cityIcons.length)];
@@ -39,7 +40,7 @@ export default function BranchCard({
         <div className="w-12 h-12 flex items-center justify-center bg-indigo-100 text-indigo-600 rounded-full text-2xl">
           {randomIcon}
         </div>
-        <h2 className="text-lg font-semibold text-gray-800">{city}</h2>
+        <h2 className="text-lg font-semibold text-gray-800">{branch_name}</h2>
       </div>
 
       {/* Full Address */}

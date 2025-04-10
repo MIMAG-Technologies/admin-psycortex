@@ -11,11 +11,16 @@ import { useLoading } from "@/context/LoadingContext";
 type branch = {
   id: string;
   city: string;
+  branch_name: string;
   full_address: string;
   street_address: string;
   state: string;
   pincode: string;
+  is_active: boolean;
 };
+
+
+
 
 export default function BranchesManagement() {
   const [branches, setBranches] = useState<Array<branch>>([]);
@@ -32,6 +37,7 @@ export default function BranchesManagement() {
   const fetchBranches = async () => {
     setLoading(true);
     const res = await getBranches();
+    
     setBranches(res);
     setcityList(Array.from(new Set(res.map((branch: branch) => branch.city))))
     setLoading(false);
@@ -54,13 +60,15 @@ export default function BranchesManagement() {
     street_address: string;
     state: string;
     pincode: string;
+    branch_name:string;
   }) => {
     setLoading(true);
     const res: boolean = await addBranches(
       branch.city,
       branch.street_address,
       branch.state,
-      branch.pincode
+      branch.pincode,
+      branch.branch_name
     );
     if (res) {
       toast.success("Branch added successfully");
@@ -114,6 +122,7 @@ export default function BranchesManagement() {
           <BranchCard
             key={branch.id}
             id={branch.id}
+            branch_name={branch.branch_name}
             city={branch.city}
             full_address={branch.full_address}
             onDelete={handleDeleteBranch}

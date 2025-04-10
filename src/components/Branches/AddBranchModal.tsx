@@ -16,12 +16,14 @@ export default function AddBranchModal({
     street_address: string;
     state: string;
     pincode: string;
+    branch_name: string;
   }) => Promise<void>;
 }) {
   const [city, setcity] = useState<string>("");
   const [street_address, setstreet_address] = useState<string>("");
   const [state, setState] = useState<string>("");
   const [pincode, setPincode] = useState<string>("");
+  const [branch_name, setBranchName] = useState<string>("");
 
   const handleSubmit = () => {
     if (!city || !street_address || !state || !pincode)
@@ -31,6 +33,7 @@ export default function AddBranchModal({
       street_address,
       state,
       pincode,
+      branch_name,
     });
     onClose();
   };
@@ -51,6 +54,18 @@ export default function AddBranchModal({
         </h2>
 
         {/* City Name Field */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700">
+            Branch Name
+          </label>
+          <input
+            type="text"
+            value={branch_name}
+            onChange={(e) => setBranchName(e.target.value)}
+            className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-indigo-500 text-gray-800"
+            placeholder="Enter Branch name"
+          />
+        </div>
         <div className="mb-3">
           <label className="block text-sm font-medium text-gray-700">
             City Name
