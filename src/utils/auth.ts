@@ -30,7 +30,7 @@ const sendOTP = async (username: string) => {
     toast.success("Otp sent to your mail!")
     return res.data;
   } catch (error) {
-    toast.error("Failed to send OTP!")
+    toast.error("Admin not Found!!")
     return {
       success: false,
       message: "Failed to send OTP",

@@ -15,7 +15,7 @@ export default function LoginPage() {
 
   const handleSendOTP = async () => {
     if (!username.trim()) {
-      alert("Please enter a username");
+      toast.warn("Please enter a username");
       return;
     }
 
