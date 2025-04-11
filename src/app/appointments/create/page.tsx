@@ -21,12 +21,17 @@ import { useLoading } from "@/context/LoadingContext";
 
 export default function CreateAppointment() {
   const router = useRouter();
+  const { setLoading } = useLoading();
+
+  const [mode, setMode] = useState<"individual" | "couple">("individual");
+
   const [user, setUser] = useState("");
+  const [user2, setUser2] = useState("");
+
   const [counsellor, setCounsellor] = useState("");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
-  const [duration, setDuration] = useState("");
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [duration, setDuration] = useState("45");
   const [location, setLocation] = useState<{
     id: string;
     full_address: string;
@@ -36,8 +41,9 @@ export default function CreateAppointment() {
     full_address: "",
     city: "",
   });
-  const { setLoading } = useLoading();
   const [description, setDescription] = useState("");
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [workingHours, setworkingHours] = useState<Array<any>>([]);
   const [prevousRecord, setprevousRecord] = useState<{
     counsellor_id: string;
     counsellor_name: string;
@@ -51,49 +57,20 @@ export default function CreateAppointment() {
   } | null>(null);
 
   useEffect(() => {
+    setDuration(mode === "individual" ? "45" : "90");
+  }, [mode]);
+
+  useEffect(() => {
     const fetchSchedule = async () => {
       const schedule = await getCounsellorSchedule(counsellor, date);
       setworkingHours(schedule);
     };
-    if (date !== "" && counsellor != "") {
+    if (date !== "" && counsellor !== "") {
       setLoading(true);
       fetchSchedule();
       setLoading(false);
     }
   }, [date]);
-
-  const [workingHours, setworkingHours] = useState<Array<any>>([]);
-
-  const handleSubmit = async (
-    e: React.FormEvent<HTMLFormElement>
-  ): Promise<void> => {
-    e.preventDefault();
-    setLoading(true);
-
-    if (!user || !counsellor || !date || !time || !duration || !location) {
-      toast.error("All fields are required.");
-      setLoading(false);
-      return;
-    }
-
-    const res = await BookSchedule(
-      user,
-      counsellor,
-      date + " " + time,
-      description,
-      location.city,
-      duration
-    );
-
-    if (!res) {
-      toast.error("Error booking appointment");
-      setLoading(false);
-      return;
-    }
-    toast.success("Appointment booked successfully");
-    setLoading(false);
-    router.push(`/appointments`);
-  };
 
   useEffect(() => {
     const fetchPrevousRecords = async () => {
@@ -113,12 +90,12 @@ export default function CreateAppointment() {
         setIsOpen(true);
       }
     };
-    if (user !== "" && counsellor != "") {
+    if (user !== "") {
       setLoading(true);
       fetchPrevousRecords();
       setLoading(false);
     }
-  }, [user, counsellor]);
+  }, [user]);
 
   function handleYes(): void {
     if (prevousRecord) {
@@ -134,6 +111,48 @@ export default function CreateAppointment() {
     }
   }
 
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement>
+  ): Promise<void> => {
+    e.preventDefault();
+    setLoading(true);
+
+    const selectedUsers = mode === "individual" ? user : `${user},${user2}`;
+
+    if (
+      !user ||
+      (mode === "couple" && !user2) ||
+      !counsellor ||
+      !date ||
+      !time ||
+      !duration ||
+      !location
+    ) {
+      toast.error("All fields are required.");
+      setLoading(false);
+      return;
+    }
+
+    const res = await BookSchedule(
+      selectedUsers,
+      counsellor,
+      date + " " + time,
+      description,
+      JSON.stringify(location.id),
+      duration
+    );
+
+    if (!res) {
+      toast.error("Error booking appointment");
+      setLoading(false);
+      return;
+    }
+
+    toast.success("Appointment booked successfully");
+    setLoading(false);
+    router.push(`/appointments`);
+  };
+
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-70 z-50 p-4">
       <AppointmentModal
@@ -142,20 +161,46 @@ export default function CreateAppointment() {
         record={prevousRecord}
         onYes={handleYes}
       />
+
       <div
-        className="relative bg-white rounded-lg shadow-xl w-full max-w-3xl overflow-hidden"
-        style={{ minHeight: "550px", width: "700px" }}
+        className="relative bg-white rounded-lg shadow-xl w-full max-w-3xl overflow-y-auto"
+        style={{ minHeight: "550px", maxHeight: "90vh", width: "700px" }}
       >
-        <div className="flex justify-between items-center px-6 py-4 border-b border-slate-200">
+        <div className="flex justify-between items-center px-6 py-4 border-b border-slate-200 sticky top-0 bg-white z-10">
           <h2 className="text-xl font-semibold text-center text-slate-800 w-full tracking-tight">
             Create An Offline Appointment
           </h2>
-
           <button
             className="text-gray-500 hover:text-gray-700 transition-colors"
             onClick={() => router.back()}
           >
             <AiOutlineClose size={24} />
+          </button>
+        </div>
+
+        {/* Mode Toggle */}
+        <div className="flex justify-center gap-4 mt-4 px-6 w-full">
+          <button
+            type="button"
+            onClick={() => setMode("individual")}
+            className={`px-4 py-2 w-1/2 rounded-md text-sm font-semibold ${
+              mode === "individual"
+                ? "bg-primary text-white"
+                : "bg-gray-200 text-gray-700"
+            }`}
+          >
+            Individual Counselling
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode("couple")}
+            className={`px-4 py-2 w-1/2 rounded-md text-sm font-semibold ${
+              mode === "couple"
+                ? "bg-primary text-white"
+                : "bg-gray-200 text-gray-700"
+            }`}
+          >
+            Couple Counselling
           </button>
         </div>
 
@@ -170,6 +215,16 @@ export default function CreateAppointment() {
                 <UserSelectionBar value={user} setValue={setUser} />
               </div>
 
+              {mode === "couple" && (
+                <div className="col-span-1">
+                  <label className="text-sm font-semibold mb-1.5 text-gray-800 flex items-center">
+                    <FaUser className="mr-2 text-primary" />
+                    <span>Partner</span>
+                  </label>
+                  <UserSelectionBar value={user2} setValue={setUser2} />
+                </div>
+              )}
+
               <div className="col-span-1">
                 <label className="text-sm font-semibold mb-1.5 text-gray-800 flex items-center">
                   <FaUserMd className="mr-2 text-secondary" />
@@ -183,7 +238,7 @@ export default function CreateAppointment() {
               </div>
 
               <div className="col-span-1">
-                <label className=" text-sm font-semibold mb-1.5 text-gray-800 flex items-center">
+                <label className="text-sm font-semibold mb-1.5 text-gray-800 flex items-center">
                   <FaCalendar className="mr-2 text-primary" />
                   <span>Date</span>
                 </label>
@@ -221,7 +276,6 @@ export default function CreateAppointment() {
                       Select Time
                     </option>
                   )}
-
                   {workingHours.map((timeSlot) => (
                     <option key={timeSlot.time} value={timeSlot.time}>
                       {new Date(
@@ -246,10 +300,7 @@ export default function CreateAppointment() {
                   onChange={(e) => setDuration(e.target.value)}
                   className="border border-gray-300 rounded-md w-full px-3 py-2.5 text-gray-700 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary bg-white shadow-sm"
                 >
-                  <option value="" disabled>
-                    Select Duration
-                  </option>
-                  <option value="45">45 Minutes</option>
+                  <option value={duration}>{duration} Minutes</option>
                 </select>
               </div>
 

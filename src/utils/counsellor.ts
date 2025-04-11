@@ -8,6 +8,7 @@ import {
 } from "@/types/counsellors";
 import axios from "axios";
 import FormData from "form-data";
+import { toast } from "react-toastify";
 
 const base_url = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -311,7 +312,10 @@ export const returnAppointmentCounsellors = async () => {
   }
 };
 
-export async function UpdateProfileImg(id: string, img: File): Promise<boolean> {
+export async function UpdateProfileImg(
+  id: string,
+  img: File
+): Promise<boolean> {
   try {
     const data = new FormData();
     data.append("ID", id);
@@ -350,5 +354,26 @@ export async function UpdateBranches(
   } catch (error) {
     console.error("Error updating branches:", error);
     return false;
+  }
+}
+
+export async function GetLeaves() {
+  try {
+     const token = localStorage.getItem("psycortex-admin-token");
+        if (!token) {
+          toast.error("Please login first!");
+          throw new Error("Please login first!");
+        }
+        const headers = {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        };
+    const res = await axios.get(base_url + "/admin/get_counsellor_leaves.php", {
+      headers,
+    });
+    return res.data.data;
+  } catch (error) {
+    console.error("Error getting leaves:", error);
+    return [];
   }
 }

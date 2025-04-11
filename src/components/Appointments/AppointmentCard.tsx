@@ -100,13 +100,17 @@ export default function AppointmentCard({
         <DetailItem
           label="Date"
           icon={FaCalendar}
-          text={scheduled_at.split(" ")[0]}
+          text={new Date(scheduled_at.split(" ")[0]).toLocaleDateString('en-GB')}
           color="text-blue-500"
         />
         <DetailItem
           label="Time"
           icon={FaClock}
-          text={scheduled_at.split(" ")[1]}
+          text={new Date(`2000-01-01 ${scheduled_at.split(" ")[1]}`).toLocaleTimeString('en-US', { 
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true 
+          })}
           color="text-blue-500"
         />
         <DetailItem
@@ -118,27 +122,27 @@ export default function AppointmentCard({
         <DetailItem
           label="Status"
           icon={
-            status === "completed"
-              ? FaCheckCircle
-              : status === "upcoming" || status === "scheduled"
-              ? FaCalendar
-              : status === "ongoing"
-              ? FaClock
-              : status === "cancelled" || "missed"
-              ? FaTimesCircle
-              : FaTimesCircle // for expired
+        status === "completed"
+          ? FaCheckCircle
+          : status === "upcoming" || status === "scheduled"
+          ? FaCalendar
+          : status === "ongoing"
+          ? FaClock
+          : status === "cancelled" || "missed"
+          ? FaTimesCircle
+          : FaTimesCircle // for expired
           }
           text={status}
           color={
-            status === "completed"
-              ? "text-green-500"
-              : status === "upcoming"
-              ? "text-blue-500"
-              : status === "ongoing"
-              ? "text-yellow-500"
-              : status === "cancelled" || "missed"
-              ? "text-red-500"
-              : "text-gray-500" // for expired
+        status === "completed"
+          ? "text-green-500"
+          : status === "upcoming"
+          ? "text-blue-500"
+          : status === "ongoing"
+          ? "text-yellow-500"
+          : status === "cancelled" || "missed"
+          ? "text-red-500"
+          : "text-gray-500" // for expired
           }
         />
       </div>

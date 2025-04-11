@@ -92,7 +92,11 @@ export default function UserDetailedView({ user }: { user: UserDetails }) {
             </p>
             <p className="text-sm text-gray-600 flex items-center gap-2">
               <FaBirthdayCake className="text-yellow-500" />{" "}
-              {personalInfo.dateOfBirth}
+              {new Date(personalInfo.dateOfBirth).toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+              })}
             </p>
           </div>
         </div>
@@ -125,7 +129,7 @@ export default function UserDetailedView({ user }: { user: UserDetails }) {
 
       {/* Stats: Counselling */}
       <Section
-        title="Counselling Stats"
+        title="Video Counselling Stats"
         icon={<FaUserClock />}
         accentColor="bg-blue-50"
       >
@@ -141,7 +145,7 @@ export default function UserDetailedView({ user }: { user: UserDetails }) {
 
       {/* Stats: Chat */}
       <Section
-        title="Chat Stats"
+        title="Chat Counselling Stats"
         icon={<FaComments />}
         accentColor="bg-purple-50"
       >
@@ -157,7 +161,7 @@ export default function UserDetailedView({ user }: { user: UserDetails }) {
 
       {/* Stats: Call */}
       <Section
-        title="Call Stats"
+        title="Call Counselling Stats"
         icon={<FaPhoneAlt />}
         accentColor="bg-yellow-50"
       >
@@ -170,22 +174,9 @@ export default function UserDetailedView({ user }: { user: UserDetails }) {
           />
         ))}
       </Section>
-
-      {/* Stats: Test */}
-      <Section title="Test Stats" icon={<FaVials />} accentColor="bg-pink-50">
-        {Object.entries(stats.tests).map(([key, value]) => (
-          <Item
-            key={key}
-            label={capitalize(key)}
-            value={value}
-            icon={<FaVials />}
-          />
-        ))}
-      </Section>
-
       {/* Stats: Offline */}
       <Section
-        title="Offline Session Stats"
+        title="Offline Counselling Stats"
         icon={<FaUserClock />}
         accentColor="bg-orange-50"
       >
@@ -195,6 +186,18 @@ export default function UserDetailedView({ user }: { user: UserDetails }) {
             label={capitalize(key)}
             value={value}
             icon={<FaUserClock />}
+          />
+        ))}
+      </Section>
+
+      {/* Stats: Test */}
+      <Section title="Tests Stats" icon={<FaVials />} accentColor="bg-pink-50">
+        {Object.entries(stats.tests).map(([key, value]) => (
+          <Item
+            key={key}
+            label={capitalize(key)}
+            value={value}
+            icon={<FaVials />}
           />
         ))}
       </Section>
