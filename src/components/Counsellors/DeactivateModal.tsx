@@ -1,20 +1,39 @@
+import { updatesCounsellorLeaves } from "@/utils/counsellor";
 import { useState } from "react";
 import { IoClose } from "react-icons/io5";
+import { toast } from "react-toastify";
 
 export default function DeactivateModal({
   isOpen,
   onClose,
   onSubmit,
   counsellorName,
+  counsellorId,
 }: {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (startDate: string, endDate: string, message: string) => void;
-  counsellorName: string;
+  counsellorName: string; 
+  counsellorId: string;
 }) {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [message, setMessage] = useState("");
+
+const LeaveCounsellor = async () => {
+  const res = await updatesCounsellorLeaves(
+    counsellorId,
+    startDate,
+    endDate,
+    message
+  )
+  if (res) {
+    toast.success("Counsellor Deactivated successfully!");
+    onClose();
+  } else {
+    toast.error("Failed to Deactivate Counsellor. Please try again.");
+  }
+}
 
   if (!isOpen) return null;
 
@@ -79,6 +98,7 @@ export default function DeactivateModal({
               alert("Please fill all fields before submitting.");
               return;
             }
+            LeaveCounsellor();
             onSubmit(startDate, endDate, message);
           }}
           className="mt-4 w-full px-4 py-2 rounded-md bg-red-600 text-white font-medium hover:bg-red-700 transition"

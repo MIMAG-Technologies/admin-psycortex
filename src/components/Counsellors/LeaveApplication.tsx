@@ -1,7 +1,6 @@
 import { IoEye } from "react-icons/io5";
 
 interface LeaveApplicationProps {
-  id: number;
   name: string;
   leaveStart: string;
   message: string;
@@ -14,7 +13,6 @@ const truncateMessage = (message: string) => {
 };
 
 export default function LeaveApplication({
-  id,
   name,
   leaveStart,
   message,

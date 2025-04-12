@@ -153,6 +153,7 @@ useEffect(() => {
         onClose={() => setIsDeactivateModalOpen(false)}
         onSubmit={() => setIsDeactivateModalOpen(false)}
         counsellorName={selectedCounsellor?.personalInfo.name || ""}
+        counsellorId={selectedCounsellor?.id || ""}
       />
     </div>
   );

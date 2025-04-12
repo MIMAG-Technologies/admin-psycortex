@@ -8,6 +8,7 @@ import {
 } from "@/types/counsellors";
 import axios from "axios";
 import FormData from "form-data";
+import { exportPages } from "next/dist/export/worker";
 import { toast } from "react-toastify";
 
 const base_url = process.env.NEXT_PUBLIC_BASE_URL;
@@ -357,7 +358,7 @@ export async function UpdateBranches(
   }
 }
 
-export async function GetLeaves() {
+export async function GetLeaves(month:string) {
   try {
     const token = localStorage.getItem("psycortex-admin-token");
     if (!token) {
@@ -368,7 +369,7 @@ export async function GetLeaves() {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     };
-    const res = await axios.get(base_url + "/admin/get_counsellor_leaves.php", {
+    const res = await axios.get(base_url + "/admin/get_counsellor_leaves.php?month="+month, {
       headers,
     });
     return res.data.data;
@@ -399,4 +400,37 @@ export async function createCredentials(id: string) {
     console.error("Error creating credentials:", error);
     return false;
   }
+}
+
+export async function updatesCounsellorLeaves(counsellorId: string , 
+  start_date: string,
+  end_date: string,
+  leave_reason: string
+) {
+  try {
+    const token = localStorage.getItem("psycortex-admin-token");
+    if (!token) {
+      toast.error("Please login first!");
+      throw new Error("Please login first!");
+    }
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    };
+    await axios.post(
+      base_url + "/counsellor/update_leaves.php",
+      {
+        counsellor_id: counsellorId,
+        start_date: start_date,
+        end_date: end_date,
+        leave_reason: leave_reason,
+      },
+    );
+    return true;
+  }
+  catch (error) {
+    console.error("Error updating leaves:", error);
+    return false;
+  }
+
 }
