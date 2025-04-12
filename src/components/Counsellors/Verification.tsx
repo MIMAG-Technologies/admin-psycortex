@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { useCounsellor } from "@/context/CounsellorContext";
 
-export default function Verification() {
-  const { counsellorDetails, updateCounsellorDetails, createUser } =
-    useCounsellor();
-
+export default function Verification({
+  createUser,
+}: {
+  createUser: () => Promise<void>;
+}) {
   const [agreements, setAgreements] = useState({
     basicDetails: false,
     professionalInfo: false,
@@ -117,20 +117,6 @@ export default function Verification() {
             responsibility for its accuracy.
           </span>
         </label>
-      </div>
-
-      {/* Email Verification */}
-      <div className="mt-6">
-        <label className="block text-sm font-medium text-gray-700">
-          Counsellor Email
-        </label>
-        <input
-          type="email"
-          value={counsellorDetails.email}
-          onChange={(e) => updateCounsellorDetails("email", e.target.value)}
-          className="block w-full px-3 py-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-gray-800"
-          placeholder="Enter counsellor email"
-        />
       </div>
 
       {/* Submit Button */}

@@ -1,43 +1,111 @@
-import { useCounsellor } from "@/context/CounsellorContext";
+import { useLoading } from "@/context/LoadingContext";
+import { CounsellorDetails, Education, License } from "@/types/counsellors";
+import { updateProfessionalInfo } from "@/utils/counsellor";
 import { IoTrash, IoAddCircleOutline } from "react-icons/io5";
 import { toast } from "react-toastify";
 
-export default function ProfessionalInfo() {
-  const {
-    counsellorDetails,
-    education,
-    licenses,
-    updateCounsellorDetails,
-    addEducation,
-    deleteEducation,
-    updateEducation,
-    addLicense,
-    deleteLicense,
-    updateLicense,
-    usermode,
-    counsellorId,
-  } = useCounsellor();
+export default function ProfessionalInfo({
+  counsellorDetails,
+  education,
+  lisences,
+  updateCounsellorDetails,
+  addEducation,
+  deleteEducation,
+  updateEducation,
+  addLicense,
+  deleteLicense,
+  updateLicense,
+  mode,
+  id,
+}: {
+  counsellorDetails: CounsellorDetails;
+  education: Array<Education>;
+  lisences: Array<License>;
+  updateCounsellorDetails: (
+    attribute: keyof CounsellorDetails,
+    value: any
+  ) => void;
+  addEducation: (newEducation: Education) => void;
+  deleteEducation: (index: number) => void;
+  updateEducation: (
+    index: number,
+    updatedEducation: Partial<Education>
+  ) => void;
+  addLicense: (newLicense: License) => void;
+  deleteLicense: (index: number) => void;
+  updateLicense: (index: number, updatedLicense: Partial<License>) => void;
+  mode: string;
+  id?: string;
+}) {
+  const maxEntries = 20; 
+  const { setLoading } = useLoading();
 
-  const maxEntries = 9; // Define max educations & licenses
+  const validateProfessionalInfo = () => {
+    if (!counsellorDetails.title.trim()) {
+      toast.error("Title is required.");
+      return false;
+    }
 
+    if (counsellorDetails.yearsOfExperience <= 0) {
+      toast.error("Years of experience must be greater than 0.");
+      return false;
+    }
+
+    if (education.length === 0) {
+      toast.error("At least one education entry is required.");
+      return false;
+    }
+
+    for (const edu of education) {
+      if (
+        !edu.degree.trim() ||
+        !edu.field.trim() ||
+        !edu.institution.trim() ||
+        !edu.year
+      ) {
+        toast.error("All fields in education must be filled.");
+        return false;
+      }
+    }
+
+    for (const lic of lisences) {
+      if (
+        !lic.type.trim() ||
+        !lic.licenseNumber.trim() ||
+        !lic.issuingAuthority.trim() ||
+        !lic.validUntil.trim()
+      ) {
+        toast.error("All fields in licenses must be filled.");
+        return false;
+      }
+    }
+
+    return true;
+  };
   const updateProfessionalInformation = async () => {
-    if (!counsellorId) {
+    if (!id) {
       toast.error("Counsellor ID not provided");
+      setLoading(false);
+      return;
+    }
+    if (!validateProfessionalInfo()) {
+      setLoading(false);
       return;
     }
 
-    if (
-      !counsellorDetails.title.trim() ||
-      counsellorDetails.yearsOfExperience <= 0 ||
-      education.length === 0
-    ) {
-      toast.error(
-        "Please provide a title, experience, and at least one education entry."
-      );
-      return;
-    }
+    const res = await updateProfessionalInfo(id, {
+      title: counsellorDetails.title,
+      yearsOfExperience: counsellorDetails.yearsOfExperience,
+      education: education,
+      licenses: lisences,
+    });
 
-    toast.success("Professional information updated successfully");
+    if (res) {
+      toast.success("Professional information updated successfully");
+    } else {
+      toast.error("Failed to update professional information");
+    }
+    setLoading(false);
   };
 
   return (
@@ -160,7 +228,7 @@ export default function ProfessionalInfo() {
       <div className="mt-6">
         <h3 className="text-lg font-semibold text-gray-700 flex justify-between items-center">
           Licenses
-          {licenses.length < maxEntries && (
+          {lisences.length < maxEntries && (
             <button
               onClick={() =>
                 addLicense({
@@ -178,11 +246,11 @@ export default function ProfessionalInfo() {
           )}
         </h3>
 
-        {licenses.length === 0 && (
+        {lisences.length === 0 && (
           <p className="text-gray-500 text-sm mt-2">No licenses added.</p>
         )}
 
-        {licenses.map((lic, index) => (
+        {lisences.map((lic, index) => (
           <div
             key={index}
             className="bg-gray-100 p-4 rounded-lg mt-3 flex flex-col sm:flex-row items-center sm:items-start"
@@ -231,10 +299,10 @@ export default function ProfessionalInfo() {
           </div>
         ))}
       </div>
-      {usermode === "edit" && counsellorId && (
+      {mode === "edit" && id && (
         <button
           onClick={updateProfessionalInformation}
-          className="mt-4 px-6 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-secondary w-full disabled:opacity-50"
+          className="mt-4 px-6 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-secondary  w-full disabled:opacity-50"
         >
           Update
         </button>

@@ -359,15 +359,15 @@ export async function UpdateBranches(
 
 export async function GetLeaves() {
   try {
-     const token = localStorage.getItem("psycortex-admin-token");
-        if (!token) {
-          toast.error("Please login first!");
-          throw new Error("Please login first!");
-        }
-        const headers = {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        };
+    const token = localStorage.getItem("psycortex-admin-token");
+    if (!token) {
+      toast.error("Please login first!");
+      throw new Error("Please login first!");
+    }
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    };
     const res = await axios.get(base_url + "/admin/get_counsellor_leaves.php", {
       headers,
     });
@@ -375,5 +375,28 @@ export async function GetLeaves() {
   } catch (error) {
     console.error("Error getting leaves:", error);
     return [];
+  }
+}
+
+export async function createCredentials(id: string) {
+  try {
+    const token = localStorage.getItem("psycortex-admin-token");
+    if (!token) {
+      toast.error("Please login first!");
+      throw new Error("Please login first!");
+    }
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    };
+    await axios.post(
+      base_url + "/counsellor/create_credentials.php",
+      { counsellorID: id },
+      { headers }
+    );
+    return true;
+  } catch (error) {
+    console.error("Error creating credentials:", error);
+    return false;
   }
 }

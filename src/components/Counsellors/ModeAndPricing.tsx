@@ -1,25 +1,46 @@
-import { useCounsellor } from "@/context/CounsellorContext";
+import { useLoading } from "@/context/LoadingContext";
+import { CommunicationModes, PricingItem } from "@/types/counsellors";
+import { updateCommunicationModes, updatePricing } from "@/utils/counsellor";
+import { Dispatch, SetStateAction } from "react";
 import { IoChatbubble, IoCall, IoVideocam, IoPerson } from "react-icons/io5";
 import { toast } from "react-toastify";
 import { BranchesSelectionBar } from "../ui/BranchesSelectionBar";
-import { useLoading } from "@/context/LoadingContext";
-import { updateCommunicationModes, updatePricing } from "@/utils/counsellor";
-import { CommunicationModes } from "@/types/counsellors";
 
-export default function ModeAndPricing() {
-  const {
-    communication_modes,
-    pricing,
-    updateCommunicationMode,
-    updatePricingItem,
-    preferredCenterAddress,
-    setPreferredCenterAddress,
-    UpdateBranchDetails,
-    counsellorId: id,
-
-    usermode: mode,
-  } = useCounsellor();
-
+export default function ModeAndPricing({
+  communication_modes,
+  pricing,
+  updateCommunicationMode,
+  updatePricingItem,
+  preferredCenterAddress,
+  setpreferredCenterAddress,
+  UpdateBranchDetails,
+  mode,
+  id,
+}: {
+  communication_modes: CommunicationModes;
+  pricing: PricingItem[];
+  updateCommunicationMode: (
+    mode: keyof CommunicationModes,
+    value: boolean
+  ) => void;
+  updatePricingItem: (index: number, updates: Partial<PricingItem>) => void;
+  preferredCenterAddress: {
+    id: string;
+    full_address: string;
+    city: string;
+  };
+  setpreferredCenterAddress: Dispatch<
+    SetStateAction<{
+      id: string;
+      full_address: string;
+      city: string;
+    }>
+  >;
+  UpdateBranchDetails: () => Promise<void>;
+  mode: string;
+  id?: string;
+}) {
+  // Handle mode toggle
   const handleModeToggle = (mode: keyof CommunicationModes) => {
     const newValue = !communication_modes[mode];
     updateCommunicationMode(mode, newValue);
@@ -144,18 +165,19 @@ export default function ModeAndPricing() {
                 {/* Price */}
                 <div>
                   <label className="block text-sm font-medium text-gray-600">
-                    Price (INR)
+                  Price (INR)
                   </label>
                   <input
-                    type="number"
-                    value={priceItem.price}
-                    onChange={(e) =>
-                      updatePricingItem(index, {
-                        price: parseFloat(e.target.value),
-                      })
-                    }
-                    className="block w-full px-3 py-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-gray-800"
-                    placeholder="Enter price"
+                  type="text"
+                  value={priceItem.price || 0}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/[^0-9.]/g, "");
+                    updatePricingItem(index, {
+                    price: value === "" ? 0 : parseFloat(value),
+                    });
+                  }}
+                  className="block w-full px-3 py-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-gray-800"
+                  placeholder="Enter price"
                   />
                 </div>
 
@@ -180,7 +202,7 @@ export default function ModeAndPricing() {
                     </h3>
                     <BranchesSelectionBar
                       value={preferredCenterAddress}
-                      setValue={setPreferredCenterAddress}
+                      setValue={setpreferredCenterAddress}
                       isDisabled={false}
                     />
                   </div>

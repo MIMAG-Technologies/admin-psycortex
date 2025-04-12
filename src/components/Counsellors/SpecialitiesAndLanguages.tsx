@@ -1,64 +1,90 @@
-import { useCounsellor } from "@/context/CounsellorContext";
-import { useEffect, useState } from "react";
-import { IoAddCircleOutline, IoTrash } from "react-icons/io5";
-import { toast } from "react-toastify";
+import { useLoading } from "@/context/LoadingContext";
+import { Language } from "@/types/counsellors";
+import { updateLanguages, updateSpecialties } from "@/utils/counsellor";
 import { getFilters } from "@/utils/filters";
+import { useEffect, useState } from "react";
+import { IoAddCircleOutline, IoTrash, IoCreate } from "react-icons/io5";
+import { toast } from "react-toastify";
 
-export default function SpecialitiesAndLanguages() {
-  const {
-    languages,
-    specialties,
-    addLanguage,
-    deleteLanguage,
-    updateLanguage,
-    addSpecialty,
-    deleteSpecialty,
-    updateSpecialty,
-    usermode,
-    counsellorId,
-  } = useCounsellor();
-
+export default function SpecialitiesAndLanguages({
+  languages,
+  specialties,
+  addLanguage,
+  deleteLanguage,
+  updateLanguage,
+  addSpecialty,
+  deleteSpecialty,
+  updateSpecialty,
+  mode,
+  id,
+}: {
+  languages: Language[];
+  specialties: string[];
+  addLanguage: (newLanguage: Language) => void;
+  deleteLanguage: (index: number) => void;
+  updateLanguage: (index: number, updates: Partial<Language>) => void;
+  addSpecialty: (specialty: string) => void;
+  deleteSpecialty: (index: number) => void;
+  updateSpecialty: (index: number, updatedSpecialty: string) => void;
+  mode: string;
+  id?: string;
+}) {
   type Filter = { id: number; name: string; priority: number };
-  const [languagesList, setLanguagesList] = useState<Filter[]>([]);
-  const [specialtiesList, setSpecialtiesList] = useState<Filter[]>([]);
+  const [languagesList, setLanguages] = useState<Filter[]>([]);
+  const [specialtiesList, setSpecialties] = useState<Filter[]>([]);
+
+
 
   const maxEntries = 3; // Maximum number of languages & specialties
-
-  const fetchFilters = async () => {
-    const filters = await getFilters();
-    setLanguagesList(
-      filters.languages?.sort(
-        (a: Filter, b: Filter) => b.priority - a.priority
-      ) || []
-    );
-    setSpecialtiesList(
-      filters.specialties?.sort(
-        (a: Filter, b: Filter) => b.priority - a.priority
-      ) || []
-    );
-  };
-
-  useEffect(() => {
-    fetchFilters();
-  }, []);
-
-  const handleUpdateSpecialitiesAndLanguages = async () => {
-    if (!counsellorId) {
+  const { setLoading } = useLoading();
+  const UpdateSpecialitiesandLanguages = async () => {
+    setLoading(true);
+    if (!id) {
       toast.error("Counsellor ID not provided");
+      setLoading(false);
       return;
     }
 
     if (languages.length < 2 || specialties.length < 2) {
       toast.error("Please select at least two languages and two specialties.");
+      setLoading(false);
       return;
     }
 
+    const res1 = await updateSpecialties(id, specialties);
+    const res2 = await updateLanguages(id, languages);
+    if (!res1 || !res2) {
+      toast.error("Error updating specialties and languages");
+      setLoading(false);
+      return;
+    }
     toast.success("Specialties and languages updated successfully");
+    setLoading(false);
   };
+
+
+    const fetchFilters = async () => {
+      const filters = await getFilters();
+      setLanguages(
+        filters.languages?.sort(
+          (a: Filter, b: Filter) => b.priority - a.priority
+        ) || []
+      );
+      setSpecialties(
+        filters.specialties?.sort(
+          (a: Filter, b: Filter) => b.priority - a.priority
+        ) || []
+      );
+    };
+
+    useEffect(() => {
+       setLoading(true);
+      fetchFilters();
+       setLoading(false);
+    }, []);
 
   return (
     <div className="mx-auto p-6 bg-white rounded-lg">
-      {/* Languages Section */}
       <div className="mb-6">
         <h3 className="text-lg font-semibold text-gray-700 flex justify-between items-center">
           Languages
@@ -86,35 +112,34 @@ export default function SpecialitiesAndLanguages() {
           >
             <div className="flex-1">
               <select
-                value={lang.language}
-                onChange={(e) =>
-                  updateLanguage(index, { language: e.target.value })
-                }
-                className="block w-full px-4 py-2 mb-2 border rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+              value={lang.language}
+              onChange={(e) =>
+                updateLanguage(index, { language: e.target.value })
+              }
+              className="block w-full px-4 py-2 mb-2 border rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
               >
-                <option value="" disabled>
-                  Select Language
+              <option value="" disabled>Select Language</option>
+              {languagesList.map((language) => (
+                <option key={language.id} value={language.name}>
+                {language.name}
                 </option>
-                {languagesList.map((language) => (
-                  <option key={language.id} value={language.name}>
-                    {language.name}
-                  </option>
-                ))}
+              ))}
               </select>
               <select
-                value={lang.proficiencyLevel}
-                onChange={(e) =>
-                  updateLanguage(index, {
-                    proficiencyLevel: e.target.value as "Basic" | "Conversational" | "Professional" | "Fluent" | "Native",
-                  })
-                }
-                className="block w-full px-4 py-2 border rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+              value={lang.proficiencyLevel}
+              onChange={(e) =>
+                updateLanguage(index, {
+                proficiencyLevel: e.target
+                  .value as Language["proficiencyLevel"],
+                })
+              }
+              className="block w-full px-4 py-2 border rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
               >
-                <option value="Basic">Basic</option>
-                <option value="Conversational">Conversational</option>
-                <option value="Professional">Professional</option>
-                <option value="Fluent">Fluent</option>
-                <option value="Native">Native</option>
+              <option value="Basic">Basic</option>
+              <option value="Conversational">Conversational</option>
+              <option value="Professional">Professional</option>
+              <option value="Fluent">Fluent</option>
+              <option value="Native">Native</option>
               </select>
             </div>
             <button
@@ -153,18 +178,16 @@ export default function SpecialitiesAndLanguages() {
           >
             <div className="flex-1">
               <select
-                value={specialty}
-                onChange={(e) => updateSpecialty(index, e.target.value)}
-                className="block w-full px-4 py-2 mb-2 border rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+              value={specialty}
+              onChange={(e) => updateSpecialty(index, e.target.value)}
+              className="block w-full px-4 py-2 mb-2 border rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
               >
-                <option value="" disabled>
-                  Select Specialty
+              <option value="" disabled>Select Specialty</option>
+              {specialtiesList.map((specialty) => (
+                <option key={specialty.id} value={specialty.name}>
+                {specialty.name}
                 </option>
-                {specialtiesList.map((specialty) => (
-                  <option key={specialty.id} value={specialty.name}>
-                    {specialty.name}
-                  </option>
-                ))}
+              ))}
               </select>
             </div>
             <button
@@ -176,11 +199,10 @@ export default function SpecialitiesAndLanguages() {
           </div>
         ))}
       </div>
-
-      {usermode === "edit" && counsellorId && (
+      {mode === "edit" && id && (
         <button
-          onClick={handleUpdateSpecialitiesAndLanguages}
-          className="mt-4 px-6 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-secondary w-full disabled:opacity-50"
+          onClick={UpdateSpecialitiesandLanguages}
+          className="mt-4 px-6 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-secondary  w-full disabled:opacity-50"
         >
           Update
         </button>
