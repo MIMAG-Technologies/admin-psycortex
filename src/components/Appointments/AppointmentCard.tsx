@@ -25,6 +25,8 @@ interface Session {
   counsellor_id: string;
   scheduled_at: string;
   mode: SessionMode;
+  is_group: boolean;
+  user_name2: string;
   notes: string;
   status: string;
   created_at: string;
@@ -47,6 +49,8 @@ export default function AppointmentCard({
   counsellor_name,
   counsellor_id,
   scheduled_at,
+   is_group,
+    user_name2,
   mode,
   status,
   cancellation,
@@ -85,12 +89,15 @@ export default function AppointmentCard({
 
         <div className="space-y-1 flex-1">
           <div className="flex items-center text-gray-900 font-semibold">
-            <FaUser className="text-blue-500 mr-2" />
-            {user_name}
+        <FaUser className="text-blue-500 mr-2" />
+        {user_name} {is_group && mode !== "offline" && "(Couple Counselling)"}
+        {is_group && mode === "offline" && (
+          <span className="ml-2">& {user_name2}</span>
+        )}
           </div>
           <div className="flex items-center text-gray-700">
-            <FaUserMd className="text-gray-500 mr-2" />
-            {counsellor_name}
+        <FaUserMd className="text-gray-500 mr-2" />
+        {counsellor_name}
           </div>
         </div>
       </div>

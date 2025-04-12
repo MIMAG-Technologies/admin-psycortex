@@ -82,7 +82,7 @@ export default function CreateAppointment() {
           date_time: records.date_time,
           duration: records.duration,
           location: {
-            id: records.location.location_id,
+            id: records.location.id,
             city: records.location.city,
             full_address: records.location.full_address,
           },
@@ -100,7 +100,6 @@ export default function CreateAppointment() {
   function handleYes(): void {
     if (prevousRecord) {
       setCounsellor(prevousRecord.counsellor_id);
-      setDuration(prevousRecord.duration.toString());
       setLocation({
         id: prevousRecord.location.id,
         full_address: prevousRecord.location.full_address,
@@ -153,6 +152,15 @@ export default function CreateAppointment() {
     setLoading(false);
     router.push(`/appointments`);
   };
+
+  useEffect(() => {
+    if( user !== "" && user2 === user){
+      toast.error("User and partner cannot be the same person.");
+      setUser2("");
+    }
+
+  }, [user2])
+  
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-70 z-50 p-4">
