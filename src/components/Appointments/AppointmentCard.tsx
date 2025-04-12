@@ -9,12 +9,13 @@ import {
   FaNotesMedical,
   FaLink,
   FaMapMarkerAlt,
+  FaPhoneSquare,
 } from "react-icons/fa";
 import { IconType } from "react-icons";
 import { CancleSchedule } from "@/utils/appointments";
 import { toast } from "react-toastify";
 import { useLoading } from "@/context/LoadingContext";
-type SessionMode = "chat" | "counselling" | "offline";
+type SessionMode = "chat" | "counselling" | "offline" | "call";
 
 interface Session {
   id: string;
@@ -100,16 +101,20 @@ export default function AppointmentCard({
         <DetailItem
           label="Date"
           icon={FaCalendar}
-          text={new Date(scheduled_at.split(" ")[0]).toLocaleDateString('en-GB')}
+          text={new Date(scheduled_at.split(" ")[0]).toLocaleDateString(
+            "en-GB"
+          )}
           color="text-blue-500"
         />
         <DetailItem
           label="Time"
           icon={FaClock}
-          text={new Date(`2000-01-01 ${scheduled_at.split(" ")[1]}`).toLocaleTimeString('en-US', { 
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true 
+          text={new Date(
+            `2000-01-01 ${scheduled_at.split(" ")[1]}`
+          ).toLocaleTimeString("en-US", {
+            hour: "numeric",
+            minute: "2-digit",
+            hour12: true,
           })}
           color="text-blue-500"
         />
@@ -122,27 +127,27 @@ export default function AppointmentCard({
         <DetailItem
           label="Status"
           icon={
-        status === "completed"
-          ? FaCheckCircle
-          : status === "upcoming" || status === "scheduled"
-          ? FaCalendar
-          : status === "ongoing"
-          ? FaClock
-          : status === "cancelled" || "missed"
-          ? FaTimesCircle
-          : FaTimesCircle // for expired
+            status === "completed"
+              ? FaCheckCircle
+              : status === "upcoming" || status === "scheduled"
+              ? FaCalendar
+              : status === "ongoing"
+              ? FaClock
+              : status === "cancelled" || "missed"
+              ? FaTimesCircle
+              : FaTimesCircle // for expired
           }
           text={status}
           color={
-        status === "completed"
-          ? "text-green-500"
-          : status === "upcoming"
-          ? "text-blue-500"
-          : status === "ongoing"
-          ? "text-yellow-500"
-          : status === "cancelled" || "missed"
-          ? "text-red-500"
-          : "text-gray-500" // for expired
+            status === "completed"
+              ? "text-green-500"
+              : status === "upcoming"
+              ? "text-blue-500"
+              : status === "ongoing"
+              ? "text-yellow-500"
+              : status === "cancelled" || "missed"
+              ? "text-red-500"
+              : "text-gray-500" // for expired
           }
         />
       </div>
@@ -158,9 +163,24 @@ export default function AppointmentCard({
 
       {link && (
         <DetailItem
-          label={mode === "counselling" ? "Join Link" : "Location"}
-          icon={mode === "counselling" ? FaLink : FaMapMarkerAlt}
-          text={link}
+          label={
+            mode === "counselling"
+              ? "Join Link"
+              : mode === "call"
+              ? "Number"
+              : "Location"
+          }
+          icon={
+            mode === "counselling"
+              ? FaLink
+              : mode === "call"
+              ? FaPhoneSquare
+              : FaMapMarkerAlt
+          }
+          text={mode === "call"
+          ? link.replace(/(\d{4})\d*(\d{4})/, '$1XXXX$2')
+          : link
+          }
           color="text-blue-500"
         />
       )}
@@ -171,7 +191,9 @@ export default function AppointmentCard({
               ? "opacity-90 cursor-not-allowed bg-gray-500"
               : "hover:bg-red-600 bg-red-500"
           }`}
-          disabled={cancellation !== null || new Date(scheduled_at) < new Date()}
+          disabled={
+            cancellation !== null || new Date(scheduled_at) < new Date()
+          }
           onClick={() => handleCancel()}
         >
           Cancel Appointment

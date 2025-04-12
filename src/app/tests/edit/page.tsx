@@ -14,11 +14,10 @@ interface TestData {
   imageUrl?: string;
   description: string;
   benefits: string[];
+  shortDescription: string;
   details: {
     durationMinutes: number;
     totalQuestions: number;
-    minimumAge: number;
-    maximumAge?: number;
   };
   pricing: {
     originalPrice: number;
@@ -52,8 +51,7 @@ function EditTestPage() {
     taxPercent: "",
     description: "",
     benefits: "",
-    minimumAge: "",
-    maximumAge: "",
+    shortDescription: "",
     durationMinutes: "",
   });
   const [image, setImage] = useState<File | null>(null);
@@ -79,8 +77,7 @@ function EditTestPage() {
               price: selectedTest.pricing?.amount?.toString() || "",
               taxPercent: selectedTest.pricing?.taxPercent?.toString() || "",
               benefits: selectedTest.benefits?.join(", ") || "",
-              minimumAge: selectedTest.details?.minimumAge?.toString() || "",
-              maximumAge: selectedTest.details?.maximumAge?.toString() || "",
+              shortDescription:selectedTest.shortDescription || null,
               durationMinutes: selectedTest.details?.durationMinutes?.toString() || "",
             });
           } else {
@@ -123,8 +120,7 @@ function EditTestPage() {
       price: parseFloat(formData.price),
       taxPercent: parseFloat(formData.taxPercent),
       benefits: formData.benefits,
-      minimumAge: parseInt(formData.minimumAge),
-      maximumAge: formData.maximumAge ? parseInt(formData.maximumAge) : undefined,
+      shortDescription:formData.shortDescription || "",
       durationMinutes: parseInt(formData.durationMinutes),
     });
 
@@ -249,6 +245,21 @@ function EditTestPage() {
                   required
                 />
               </div>
+              <div className="col-span-2">
+                <label className="block text-sm font-medium mb-1.5 text-slate-700">
+                  Reasons
+                </label>
+                <textarea
+                  className="w-full p-2.5 rounded-md border border-slate-200 focus:ring-2 focus:ring-primary focus:border-primary"
+                  style={{ minHeight: "120px" }}
+                  value={formData.shortDescription || ""}
+                  onChange={(e) =>
+                    setFormData({ ...formData, shortDescription: e.target.value || "" })
+                  }
+                  placeholder="Enter test description"
+                  required
+                />
+              </div>
 
               <div className="col-span-2">
                 <label className="block text-sm font-medium mb-1.5 text-slate-700">
@@ -265,36 +276,6 @@ function EditTestPage() {
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium mb-1.5 text-slate-700">
-                  Minimum Age
-                </label>
-                <input
-                  type="number"
-                  className="w-full p-2.5 rounded-md border border-slate-200 focus:ring-2 focus:ring-primary focus:border-primary"
-                  value={formData.minimumAge}
-                  onChange={(e) =>
-                    setFormData({ ...formData, minimumAge: e.target.value })
-                  }
-                  placeholder="Enter minimum age"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1.5 text-slate-700">
-                  Maximum Age
-                </label>
-                <input
-                  type="number"
-                  className="w-full p-2.5 rounded-md border border-slate-200 focus:ring-2 focus:ring-primary focus:border-primary"
-                  value={formData.maximumAge}
-                  onChange={(e) =>
-                    setFormData({ ...formData, maximumAge: e.target.value })
-                  }
-                  placeholder="Enter maximum age (optional)"
-                />
-              </div>
               <div>
                 <label className="block text-sm font-medium mb-1.5 text-slate-700">
                   Duration (in minutes)

@@ -7,7 +7,7 @@ interface AppointmentParams {
   page?: Number;
   from?: string;
   to?: string;
-  mode?: "chat" | "counselling" | "offline";
+  mode?: "chat" | "counselling" | "offline" | "call";
   happened?: boolean | null;
 }
 
@@ -75,6 +75,8 @@ export const getCounsellorSchedule = async (
 
 export const BookSchedule = async (
   user_id: string,
+  user_id2: string | null,
+  mode: "individual" | "couple",
   counsellor_id: string,
   scheduled_at: string,
   notes: string,
@@ -92,18 +94,34 @@ export const BookSchedule = async (
       "Content-Type": "application/json",
     };
 
-    await axios.post(
-      `${base_url}/admin/book_appointment.php`,
-      {
-        user_id,
-        counsellor_id,
-        scheduled_at,
-        notes,
-        location,
-        duration,
-      },
-      { headers }
-    );
+    if (mode === "couple") {
+      await axios.post(
+        `${base_url}/offline/book_group_session.php`,
+        {
+          user_id1: user_id,
+          user_id2: user_id2,
+          counsellor_id: counsellor_id,
+          scheduled_at: scheduled_at,
+          notes: notes,
+          branch_id: location,
+          duration: 90,
+        },
+        { headers }
+      );
+    } else {
+      await axios.post(
+        `${base_url}/admin/book_appointment.php`,
+        {
+          user_id,
+          counsellor_id,
+          scheduled_at,
+          notes,
+          branch_id: location,
+          duration,
+        },
+        { headers }
+      );
+    }
     return true;
   } catch (error) {
     console.error(error);
@@ -113,7 +131,7 @@ export const BookSchedule = async (
 export const CancleSchedule = async (
   user_id: string,
   counsellor_id: string,
-  scheduled_at: string,
+  scheduled_at: string
 ) => {
   try {
     const token = localStorage.getItem("psycortex-admin-token");

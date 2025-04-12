@@ -117,7 +117,6 @@ export default function CreateAppointment() {
     e.preventDefault();
     setLoading(true);
 
-    const selectedUsers = mode === "individual" ? user : `${user},${user2}`;
 
     if (
       !user ||
@@ -134,11 +133,13 @@ export default function CreateAppointment() {
     }
 
     const res = await BookSchedule(
-      selectedUsers,
+      user,
+      user2,
+      mode,
       counsellor,
       date + " " + time,
       description,
-      JSON.stringify(location.id),
+      location.id,
       duration
     );
 

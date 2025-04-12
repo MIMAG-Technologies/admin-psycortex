@@ -9,7 +9,7 @@ import { LuSettings2 } from "react-icons/lu";
 import { BiPlus } from "react-icons/bi";
 
 export default function AppointmentManagement() {
-  type SessionMode = "chat" | "counselling" | "offline";
+  type SessionMode = "chat" | "counselling" | "offline" | "call" ;
   type StatusType =
     | "upcoming"
     | "ongoing"
@@ -169,6 +169,7 @@ useEffect(() => {
               <option value="offline">Offline</option>
               <option value="chat">Chat</option>
               <option value="counselling">Video</option>
+              <option value="call">Call</option>
             </select>
           </div>
 
