@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   FaUser,
@@ -19,6 +19,7 @@ import { AppointmentDetails } from "@/types/user";
 import { UserDetails } from "@/types/user";
 import { getUserDetails } from "@/utils/users";
 import UserDetailedView from "@/components/Users/UserDetailedView";
+import Loading from "@/components/Loading";
 
 type HistoryItem = {
   id: number;
@@ -31,7 +32,7 @@ type HistoryItem = {
   created_at: string;
 };
 
-export default function Page() {
+function UserViewPage() {
   const [history, setHistory] = useState<Array<HistoryItem>>([]);
   const [selectedDetails, setSelectedDetails] =
     useState<AppointmentDetails | null>(null);
@@ -48,8 +49,8 @@ export default function Page() {
         setLoading(true);
         const res = await getUserHistory(id);
         setHistory(res);
-         const res2 = await getUserDetails(id);
-         setuserDetails(res2);
+        const res2 = await getUserDetails(id);
+        setuserDetails(res2);
         setLoading(false);
       }
     };
@@ -158,5 +159,13 @@ export default function Page() {
         data={selectedDetails}
       />
     </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<Loading/>}>
+      <UserViewPage />
+    </Suspense>
   );
 }

@@ -1,12 +1,14 @@
 "use client";
+
+import Loading from "@/components/Loading";
 import UserForm from "@/components/Users/UserForm";
 import { useLoading } from "@/context/LoadingContext";
 import { getUserDetails, UpdateUser } from "@/utils/users";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { toast } from "react-toastify";
 
-export default function page() {
+function UserCreatePage() {
   const searchParams = useSearchParams();
   const { setLoading } = useLoading();
   const id = searchParams.get("id");
@@ -66,7 +68,14 @@ export default function page() {
       setFormData={setFormData}
       mode={mode || "create"}
       EditUser={EditUser}
-      
     />
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<Loading/>}>
+      <UserCreatePage />
+    </Suspense>
   );
 }
