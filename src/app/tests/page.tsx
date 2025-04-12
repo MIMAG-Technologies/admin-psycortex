@@ -1,7 +1,6 @@
-
 "use client";
 import { useEffect, useState } from "react";
-import {disableDiscount, fetchTests}from "@/utils/tests";
+import { disableDiscount, fetchTests, UpdatePriorities } from "@/utils/tests";
 import TestCard from "@/components/Tests/TestCard";
 import { useLoading } from "@/context/LoadingContext";
 import Link from "next/link";
@@ -33,6 +32,9 @@ const Tests = () => {
   const [tests, setTests] = useState<Test[]>([]);
   const { setLoading } = useLoading();
   const [searchQuery, setSearchQuery] = useState("");
+  const [test_priorities, setTest_priorities] = useState<
+    Array<{ slug: string; priority: number }>
+  >([]);
 
   useEffect(() => {
     let isMounted = true;
@@ -44,6 +46,11 @@ const Tests = () => {
         if (isMounted) {
           setTests(fetchedTests);
         }
+        const priorities = fetchedTests.map((test: Test, index: number) => ({
+          slug: test.slug,
+          priority: fetchedTests.length - index,
+        }));
+        setTest_priorities(priorities);
       } catch (error) {
         console.error("Error fetching tests:", error);
       } finally {
@@ -63,19 +70,31 @@ const Tests = () => {
   const filteredTests = tests.filter((test) =>
     test.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+ const updatePriorities = async (updatedTests: Test[]) => {
+   const priorities = updatedTests.map((test, index) => ({
+     slug: test.slug,
+     priority: updatedTests.length - index,
+   }));
+   setLoading(true);
+   const res = await UpdatePriorities(priorities);
+   if (res) {
+     toast.success("Test priorities updated successfully!");
+   } else {
+     toast.error("Error updating test priorities");
+   }
+   setLoading(false);
+ };
 
   const deleteDiscounts = async () => {
     setLoading(true);
     const res = await disableDiscount();
-    if(res){
+    if (res) {
       toast.success("Discount offer deleted successfully!");
-    }
-    else{
+    } else {
       toast.error("Error deleting discount offer");
     }
     setLoading(false);
-  }
-
+  };
 
   return (
     <div className="p-4">
@@ -136,8 +155,15 @@ const Tests = () => {
 
       {filteredTests.length > 0 ? (
         <div className="flex flex-col gap-6">
-          {filteredTests.map((test) => (
-            <TestCard key={test.slug} test={test} />
+          {filteredTests.map((test, index) => (
+            <TestCard
+              key={test.slug}
+              test={test}
+              index={index}
+              tests={tests}
+              setTests={setTests}
+              updatePriorities={updatePriorities}
+            />
           ))}
         </div>
       ) : (
