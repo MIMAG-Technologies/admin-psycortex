@@ -133,7 +133,7 @@ export default function PaymentPage() {
                     </td>
                     <td
                       className={`border border-gray-300 p-3 capitalize font-medium ${
-                        record.status === "success"
+                        record.status.toLowerCase() === "success"
                           ? "text-green-500"
                           : "text-red-500"
                       }`}

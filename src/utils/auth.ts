@@ -45,7 +45,6 @@ const verifyOTP = async (otp: string, hashOTP: string) => {
       otp,
       hashOTP
     });
-    toast.success("OTP verified!")
     return res.data;
   } catch (error) {
     toast.error("Invalid OTP!")

@@ -37,7 +37,7 @@ export default function ProfessionalInfo({
   mode: string;
   id?: string;
 }) {
-  const maxEntries = 20; 
+  const maxEntries = 20;
   const { setLoading } = useLoading();
 
   const validateProfessionalInfo = () => {
@@ -132,11 +132,11 @@ export default function ProfessionalInfo({
           </label>
           <input
             type="number"
-            value={counsellorDetails.yearsOfExperience}
+            value={counsellorDetails.yearsOfExperience || ""}
             onChange={(e) =>
               updateCounsellorDetails(
-                "yearsOfExperience",
-                parseInt(e.target.value)
+          "yearsOfExperience",
+          e.target.value ? parseInt(e.target.value) : 0
               )
             }
             className="mt-1 block w-full px-4 py-2 border rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"

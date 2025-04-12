@@ -44,7 +44,8 @@ export default function LoginPage() {
 
       if (response.success && response.token) {
         localStorage.setItem("psycortex-admin-token", response.token);
-        router.push("/appointments");
+        router.push("/users");
+        toast.success("OTP verified!");
       }
     }, 800);
   };

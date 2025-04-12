@@ -11,10 +11,9 @@ import {
   FaDollarSign,
 } from "react-icons/fa";
 import { MdOutlineLocalActivity } from "react-icons/md";
-import { IoPerson } from "react-icons/io5"; // Offline appointment icon
+import { IoPerson } from "react-icons/io5";
 import { useRouter } from "next/navigation";
 import VariablesPage from "@/components/Counsellors/VariablesPage";
-
 type SimplifiedCounsellor = {
   id: string;
   personalInfo: {
@@ -48,6 +47,7 @@ export default function CounsellorEarning() {
   const [counsellors, setCounsellors] = useState<Array<SimplifiedCounsellor>>(
     []
   );
+  const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
 
   useEffect(() => {
@@ -55,26 +55,52 @@ export default function CounsellorEarning() {
       setLoading(true);
       const res = await getAllCounsellorOverview();
       setCounsellors(res);
-      console.log(res);
-      
       setLoading(false);
     };
     fetchCounsellorData();
   }, [setLoading]);
 
+  const filteredCounsellors = counsellors.filter((counsellor) =>
+    counsellor.personalInfo.name
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase())
+  );
+
   return (
     <>
-    <VariablesPage/>
-    <div className="container mx-auto px-4 py-6">
-      <h1 className="text-2xl font-semibold mb-4 text-center text-indigo-600">
-        Counsellor Earnings
-      </h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {counsellors.map((counsellor) => (
-          <OneCounsellorCard key={counsellor.id} counsellor={counsellor} router={router} />
-        ))}
+      <VariablesPage />
+      <div className="container mx-auto px-4 py-6">
+        <div className="mb-10 flex justify-around items-center gap-2">
+        <h1 className="text-2xl font-semibold  text-center text-indigo-600">
+          Counsellor Earnings
+        </h1>
+
+        {/* Search Bar */}
+          <input
+            type="text"
+            placeholder="Search by counsellor name"
+            className="w-full max-w-md px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredCounsellors.length > 0 ? (
+            filteredCounsellors.map((counsellor) => (
+              <OneCounsellorCard
+                key={counsellor.id}
+                counsellor={counsellor}
+                router={router}
+              />
+            ))
+          ) : (
+            <p className="text-center col-span-full text-gray-500">
+              No counsellors match your search.
+            </p>
+          )}
+        </div>
       </div>
-    </div>
     </>
   );
 }

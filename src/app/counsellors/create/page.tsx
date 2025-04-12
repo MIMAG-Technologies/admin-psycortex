@@ -903,8 +903,8 @@ export default function Page() {
 
               if (step === 4) {
                 if (
-                  languages.length < 2 ||
-                  specialties.length < 2 ||
+                  languages.length < 1 ||
+                  specialties.length < 1 ||
                   languages.some(
                     (lang) =>
                       !lang.language.trim() || !lang.proficiencyLevel.trim()
@@ -913,7 +913,7 @@ export default function Page() {
                 ) {
                   isValid = false;
                   errorMessage =
-                    "Please select at least two languages and two specialties, and ensure no fields are empty.";
+                    "Please select at least one languages and one specialties, and ensure no fields are empty.";
                 }
               }
 
