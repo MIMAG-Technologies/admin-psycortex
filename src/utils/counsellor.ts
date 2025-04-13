@@ -8,7 +8,6 @@ import {
 } from "@/types/counsellors";
 import axios from "axios";
 import FormData from "form-data";
-import { exportPages } from "next/dist/export/worker";
 import { toast } from "react-toastify";
 
 const base_url = process.env.NEXT_PUBLIC_BASE_URL;
@@ -485,5 +484,57 @@ export async function updateCounsellorCommissions(commission_rate:number) {
   } catch (error) {
     console.error("Error getting commissions:", error);
     return false;
+  }
+}
+
+export async function updateCounsellorMetrics(data: {
+  counsellorId: string;
+  totalSessions: number ;
+  averageRating: number ;
+  totalReviews: number ;
+  responseRate: number ;
+  cancellationRate: number ;
+}) {
+  try {
+    const token = localStorage.getItem("psycortex-admin-token");
+    if (!token) {
+      toast.error("Please login first!");
+      throw new Error("Please login first!");
+    }
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    };
+    await axios.post(base_url + "/counsellor/update_metrics.php", data,);
+    return true;
+    
+  } catch (error) {
+    console.error("Error getting commissions:", error);
+    return false;
+    
+  }
+}
+
+export async function getCounsellorMetrics(counsellorId: string) {
+  try{
+    const token = localStorage.getItem("psycortex-admin-token");
+    if (!token) {
+      toast.error("Please login first!");
+      throw new Error("Please login first!");
+    }
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    };
+    const response = await axios.get(
+      base_url +
+        "/counsellor/get_counsellor_details.php?counsellorId=" +
+        counsellorId
+    );
+    const data = response.data.data.metrics;
+    return data;
+  }catch(error){
+    console.error("Error getting commissions:", error);
+    return null;
   }
 }

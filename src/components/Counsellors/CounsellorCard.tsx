@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
   IoEye,
   IoPencil,
@@ -6,7 +7,9 @@ import {
   IoCall,
   IoVideocam,
   IoPerson,
+  IoStatsChart,
 } from "react-icons/io5";
+import UpdateMetricsModal from "@/components/Counsellors/UpdateMetricsModal";
 
 interface Counsellor {
   id: string;
@@ -52,6 +55,8 @@ export default function CounsellorCard({
   const { specialties, languages } = counsellor.practiceInfo;
   const { communicationModes } = counsellor.sessionInfo.availability;
 
+  const [isMetricsModalOpen, setIsMetricsModalOpen] = useState(false);
+
   // Define available communication modes with icons
   const communicationIcons = [
     { mode: "chat", icon: <IoChatbubble size={20} />, color: "text-blue-500" },
@@ -65,7 +70,7 @@ export default function CounsellorCard({
   ];
 
   return (
-    <div className=" border bg-slate-100 border-slate-300  rounded-lg p-5 flex flex-col sm:flex-row gap-4 items-center shadow-sm hover:shadow-md transition">
+    <div className="border bg-slate-100 border-slate-300 rounded-lg p-5 flex flex-col sm:flex-row gap-4 items-center shadow-sm hover:shadow-md transition">
       {/* Profile Image */}
       <img
         src={profileImage || "/images/user-dummy-img.png"}
@@ -136,7 +141,22 @@ export default function CounsellorCard({
           <IoTrash className="text-red-600" size={18} />
           Deactivate
         </button>
+
+        <button
+          onClick={() => setIsMetricsModalOpen(true)}
+          className="flex items-center gap-2 px-4 py-2 border border-gray-300 bg-white rounded-md text-gray-700 font-medium hover:bg-gray-100 transition"
+        >
+          <IoStatsChart className="text-indigo-600" size={18} />
+          Edit Metrics
+        </button>
       </div>
+
+      {/* Update Metrics Modal */}
+      <UpdateMetricsModal
+        isOpen={isMetricsModalOpen}
+        onClose={() => setIsMetricsModalOpen(false)}
+        counsellorId={counsellor.id}
+      />
     </div>
   );
 }
