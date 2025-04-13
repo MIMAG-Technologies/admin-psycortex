@@ -434,3 +434,56 @@ export async function updatesCounsellorLeaves(counsellorId: string ,
   }
 
 }
+
+export async function getCounsellorCommissions() {
+  try {
+    const token = localStorage.getItem("psycortex-admin-token");
+    if (!token) {
+      toast.error("Please login first!");
+      throw new Error("Please login first!");
+    }
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    };
+    const res = await axios.get(
+      base_url + "/admin/update_commission.php",
+      {
+        headers,
+      }
+    );
+    const data = res.data.commissions;
+    const commissions = data.filter((item: any) => item.service_type === "offline");
+    return commissions[0].commission_rate;
+  } catch (error) {
+    console.error("Error getting commissions:", error);
+    return 0;
+  }
+}
+export async function updateCounsellorCommissions(commission_rate:number) {
+  try {
+    const token = localStorage.getItem("psycortex-admin-token");
+    if (!token) {
+      toast.error("Please login first!");
+      throw new Error("Please login first!");
+    }
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    };
+    const res = await axios.post(
+      base_url + "/admin/update_commission.php",
+      {
+        service_type: "offline",
+        commission_rate: commission_rate,
+      },
+      {
+        headers,
+      }
+    );
+    return true;
+  } catch (error) {
+    console.error("Error getting commissions:", error);
+    return false;
+  }
+}

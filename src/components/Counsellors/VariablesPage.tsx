@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { getCounsellorCommissions, updateCounsellorCommissions } from "@/utils/counsellor";
+import { useEffect, useState } from "react";
 import { IoEye, IoEyeOff, IoPencil } from "react-icons/io5";
+import { toast } from "react-toastify";
 
 export default function VariablesPage() {
   // State for tax & commission values (default hidden)
@@ -9,7 +11,7 @@ export default function VariablesPage() {
     {
       id: "counsellor_commission",
       title: "Counsellor Commission (%)",
-      value: 20,
+      value: 0,
       hidden: true,
     },
   ]);
@@ -18,7 +20,8 @@ export default function VariablesPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [tempValue, setTempValue] = useState<number | null>(null);
   const [showDialog, setShowDialog] = useState(false);
-  const [email, setEmail] = useState("");
+  const [confirmationCode, setConfirmationCode] = useState("");
+  const [userInputCode, setUserInputCode] = useState("");
   const [confirmUpdate, setConfirmUpdate] = useState(false);
 
   // Function to toggle visibility
@@ -44,30 +47,76 @@ export default function VariablesPage() {
 
   // Function to confirm update (open dialog)
   const handleUpdateClick = () => {
+    // Generate a random 8-character confirmation code
+    const generateCode = () => {
+      const chars = "ABCDEFGHIJKLMNPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz123456789";
+      let code = "";
+      for (let i = 0; i < 8; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return code;
+    };
+
+    setConfirmationCode(generateCode());
     setShowDialog(true);
   };
 
   // Function to apply updates
-  const handleConfirmUpdate = () => {
+  const handleConfirmUpdate = async () => {
     if (!editingId || tempValue === null) return;
 
-    setVariables((prev) =>
-      prev.map((item) =>
-        item.id === editingId ? { ...item, value: tempValue } : item
-      )
+    if (userInputCode !== confirmationCode) {
+      toast.error("Confirmation code does not match. Please try again.");
+      return;
+    }
+
+    const updatedVariables = variables.map((item) =>
+      item.id === editingId ? { ...item, value: tempValue } : item
     );
 
+    setVariables(updatedVariables);
     setEditingId(null);
     setShowDialog(false);
-    setEmail("");
+    setUserInputCode("");
     setConfirmUpdate(false);
+
+    // Update the backend
+    const res = await updateCounsellorCommissions(tempValue);
+    if (res) {
+      toast.success("Counsellor commission updated successfully!");
+    } else {
+      toast.error("Failed to update counsellor commission!");
+    }
   };
+
+  const fetchCounsellorCommission = async () => {
+    const res = await getCounsellorCommissions();
+    setVariables([
+      {
+        id: "counsellor_commission",
+        title: "Counsellor Commission (%)",
+        value: res,
+        hidden: true,
+      },
+    ]);
+  };
+
+  useEffect(() => {
+    fetchCounsellorCommission();
+  }, []);
 
   return (
     <div className="mx-auto p-6">
       <h1 className="text-2xl font-semibold mb-4 text-center text-indigo-600">
         Commission Settings
       </h1>
+
+      {/* Warning/Note */}
+      <p className="text-sm text-center text-red-500 mb-4">
+        Note: The number entered will represent the commission percentage for
+        the counsellor. For example, if it's 90% and the fees are ₹1000, ₹900
+        will go to the counsellor, and ₹100 to the company.
+      </p>
 
       {/* List of Variables */}
       <div className="space-y-4">
@@ -144,30 +193,22 @@ export default function VariablesPage() {
               Confirm Update
             </h2>
             <p className="text-sm text-gray-600 mt-2">
-              Please confirm the update by verifying your email.
+              Please enter the following confirmation code to proceed:
             </p>
 
-            {/* Email Input */}
+            {/* Display Confirmation Code */}
+            <div className="mt-3 px-4 py-2 bg-gray-100 text-gray-800 font-mono text-center rounded-md select-none">
+              {confirmationCode}
+            </div>
+
+            {/* Input for Confirmation Code */}
             <input
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="text"
+              placeholder="Enter the confirmation code"
+              value={userInputCode}
+              onChange={(e) => setUserInputCode(e.target.value)}
               className="w-full mt-3 px-3 py-2 border rounded-md text-gray-700 focus:ring-2 focus:ring-indigo-400 outline-none"
             />
-
-            {/* Checkbox */}
-            <div className="flex items-center gap-2 mt-3">
-              <input
-                type="checkbox"
-                checked={confirmUpdate}
-                onChange={() => setConfirmUpdate(!confirmUpdate)}
-                className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500"
-              />
-              <label className="text-sm text-gray-600">
-                I confirm this update
-              </label>
-            </div>
 
             {/* Buttons */}
             <div className="flex justify-end gap-3 mt-4">
@@ -179,9 +220,9 @@ export default function VariablesPage() {
               </button>
               <button
                 onClick={handleConfirmUpdate}
-                disabled={!email || !confirmUpdate}
+                disabled={userInputCode !== confirmationCode}
                 className={`px-4 py-2 text-sm font-medium rounded-md transition ${
-                  !email || !confirmUpdate
+                  userInputCode !== confirmationCode
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                     : "bg-indigo-600 text-white hover:bg-indigo-700"
                 }`}
