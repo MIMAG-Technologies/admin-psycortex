@@ -1,7 +1,6 @@
 "use client";
 
 import { useLoading } from "@/context/LoadingContext";
-import getAllCounsellorOverview from "@/utils/payments";
 import { useEffect, useState } from "react";
 import {
   FaVideo,
@@ -14,6 +13,7 @@ import { MdOutlineLocalActivity } from "react-icons/md";
 import { IoPerson } from "react-icons/io5";
 import { useRouter } from "next/navigation";
 import VariablesPage from "@/components/Counsellors/VariablesPage";
+import { getAllCounsellorOverview } from "@/utils/payments";
 type SimplifiedCounsellor = {
   id: string;
   personalInfo: {
@@ -23,22 +23,6 @@ type SimplifiedCounsellor = {
   professionalInfo: {
     title: string;
     yearsOfExperience: number;
-  };
-  sessionCounts: {
-    video: number;
-    chat: number;
-    phone: number;
-    offline: number;
-    total: number;
-  };
-  testReferrals: number;
-  earnings: {
-    video: string;
-    chat: string;
-    phone: string;
-    offline: string;
-    testRecommendation: string;
-    total: string;
   };
 };
 
@@ -135,7 +119,7 @@ function OneCounsellorCard({
       </div>
 
       {/* Session Earnings Section */}
-      <div className="mt-4 p-4 bg-indigo-50 rounded-lg">
+      {/* <div className="mt-4 p-4 bg-indigo-50 rounded-lg">
         <h3 className="text-md font-medium text-indigo-700 mb-2 flex items-center gap-2">
           <FaUserCheck className="text-indigo-600" /> Session Earnings
         </h3>
@@ -166,10 +150,10 @@ function OneCounsellorCard({
             {counsellor.earnings.total}
           </span>
         </div>
-      </div>
+      </div> */}
 
       {/* Test Referral Earnings Section */}
-      <div className="mt-4 p-4 bg-gray-100 rounded-lg">
+      {/* <div className="mt-4 p-4 bg-gray-100 rounded-lg">
         <h3 className="text-md font-medium text-gray-700 mb-2 flex items-center gap-2">
           <MdOutlineLocalActivity className="text-gray-600" /> Test Referral
           Earnings
@@ -182,7 +166,7 @@ function OneCounsellorCard({
           <FaDollarSign className="text-gray-700" /> Earnings:{" "}
           <strong>₹{counsellor.earnings.testRecommendation}</strong>
         </p>
-      </div>
+      </div> */}
 
       {/* View More Button */}
       <div className="mt-5">
@@ -192,7 +176,7 @@ function OneCounsellorCard({
             router.push(`/payments/counsellor?id=${counsellor.id}`);
           }}
         >
-          View More
+          View Earning
         </button>
       </div>
     </div>

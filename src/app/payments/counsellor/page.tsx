@@ -1,5 +1,11 @@
 "use client";
 
+import { useLoading } from "@/context/LoadingContext";
+import {
+  getAllPaymentRecords,
+  getOneCounsellorOverview,
+  getRefreredTests,
+} from "@/utils/payments";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
@@ -39,13 +45,23 @@ type BasePaymentRecord = {
   payment_type: string;
 };
 
-type TestPaymentRecords = BasePaymentRecord & {
-  test_name: string;
-  referred_by: string | null;
-  meta: {
-    user_id: string;
-    test_slug: string;
-    counsellor_id: string | null;
+type TestPaymentRecords = {
+  booking_id: string;
+  user: {
+    id: string;
+    name: string;
+  };
+  test: {
+    slug: string;
+    name: string;
+  };
+  purchase_date: string;
+  payment: {
+    amount: string;
+    currency: string;
+    mode: string;
+    transaction_id: string;
+    status: string;
   };
 };
 
@@ -127,23 +143,23 @@ const AppointmentEarningsCard = ({
 
 // 📌 Test Earnings Card
 const TestEarningsCard = ({ record }: { record: TestPaymentRecords }) => {
-  const counsellorEarning = (record.raw_amount * 0.1).toFixed(2); // 10% of payment
+  const counsellorEarning = (0.1 * parseFloat(record.payment.amount)).toFixed(2); 
   return (
     <div className="border bg-slate-100 border-slate-300  rounded-lg p-6   w-full mb-6">
-      <h3 className="text-xl font-bold text-indigo-600">{record.test_name}</h3>
-      <p className="text-sm text-gray-500">{record.date_time}</p>
+      <h3 className="text-xl font-bold text-indigo-600">{record.test.name}</h3>
+      <p className="text-sm text-gray-500">{record.purchase_date}</p>
 
       <div className="mt-4 space-y-3 text-gray-700">
         <div className="flex items-center gap-2">
           <MdPayment className="text-indigo-500" />
           <span>
-            <strong>Payment Mode:</strong> {record.payment_mode}
+            <strong>Payment Mode:</strong> {record.payment.mode}
           </span>
         </div>
         <div className="flex items-center gap-2">
           <FaUser className="text-indigo-500" />
           <span>
-            <strong>Referred To:</strong> {record.user_name}
+            <strong>Referred To:</strong> {record.user.name}
           </span>
         </div>
       </div>
@@ -152,7 +168,7 @@ const TestEarningsCard = ({ record }: { record: TestPaymentRecords }) => {
         <div className="flex items-center gap-2 text-blue-600">
           <FaMoneyBillWave className="text-blue-600 text-lg" />
           <span>
-            <strong>Payment Done:</strong> {record.amount}
+            <strong>Payment Done:</strong> {record.payment.amount} {record.payment.currency}
           </span>
         </div>
         <div className="flex items-center gap-2 text-green-600">
@@ -166,7 +182,7 @@ const TestEarningsCard = ({ record }: { record: TestPaymentRecords }) => {
   );
 };
 
-type SimplifiedCounsellor = null |  {
+type SimplifiedCounsellor = null | {
   id: string;
   personalInfo: {
     name: string;
@@ -288,7 +304,6 @@ const EarningsOverview = ({ data }: { data: SimplifiedCounsellor }) => {
   );
 };
 
-
 // 📌 Main Component for fetching and displaying earnings
 export default function OneCounsellorEarnings() {
   const searchParams = useSearchParams();
@@ -298,339 +313,47 @@ export default function OneCounsellorEarnings() {
   const [appointmentRecords, setAppointmentRecords] = useState<
     Array<AppointmentPaymentRecords>
   >([]);
-  const [earningOverview, setearningOverview] = useState<SimplifiedCounsellor>(null)
+  const [earningOverview, setearningOverview] =
+    useState<SimplifiedCounsellor>(null);
+
+  const [pagination, setPagination] = useState({
+    current_page: 1,
+    total_pages: 1,
+    total_results: 1,
+    results_per_page: 10,
+  });
+  const { setLoading } = useLoading();
+
+  const fetchCounsellotPaymentRecords = async (page: number) => {
+    if (!id) {
+      return;
+    }
+    setLoading(true);
+    const currentDate = new Date();
+    const futureDate = new Date();
+    futureDate.setFullYear(currentDate.getFullYear() + 5);
+    const res = await getAllPaymentRecords(
+      "appointment",
+      id,
+      page,
+      "",
+      "2025-01-01",
+      futureDate.toISOString().split("T")[0]
+    );
+    setPagination(res.pagination);
+    setAppointmentRecords(res.payment_records);
+
+    const overviewdata = await getOneCounsellorOverview(id);
+    setearningOverview(overviewdata);
+
+    const testdata = await getRefreredTests(id);
+    setTestRecords(testdata);
+    setLoading(false);
+  };
 
   useEffect(() => {
-    if (!id) return;
-
- const testRecords: TestPaymentRecords[] = [
-   {
-     id: "pay_17409117726074",
-     order_id: "order_1740911685057",
-     tracking_id: "113668327108",
-     bank_ref_no: "542756938148",
-     date_time: "2025-03-03 16:05:12",
-     payment_mode: "Credit Card",
-     amount: "INR 2.00",
-     raw_amount: 2,
-     status: "Success",
-     error_message: "",
-     currency: "INR",
-     billing_info: {
-       name: "John Doe",
-       address: "Test Address",
-       city: "Mumbai",
-       state: "Maharashtra",
-       zip: "400001",
-       country: "India",
-       phone: "912345678901",
-       email: "johndoe@example.com",
-     },
-     user_name: "John Doe",
-     payment_type: "test",
-     test_name: "Mental Health Test",
-     referred_by: null,
-     meta: {
-       user_id: "7FINihOcYidB1rfajTdoNAFnTDC4",
-       test_slug: "mental-health",
-       counsellor_id: "counsellor_123",
-     },
-   },
-   {
-     id: "pay_17409117726075",
-     order_id: "order_1740911685058",
-     tracking_id: "113668327109",
-     bank_ref_no: "542756938149",
-     date_time: "2025-03-04 16:05:12",
-     payment_mode: "Debit Card",
-     amount: "INR 3.00",
-     raw_amount: 3,
-     status: "Success",
-     error_message: "",
-     currency: "INR",
-     billing_info: {
-       name: "Jane Smith",
-       address: "Another Address",
-       city: "Pune",
-       state: "Maharashtra",
-       zip: "411001",
-       country: "India",
-       phone: "919876543210",
-       email: "janesmith@example.com",
-     },
-     user_name: "Jane Smith",
-     payment_type: "test",
-     test_name: "Physical Fitness Test",
-     referred_by: null,
-     meta: {
-       user_id: "8FINihOcYidB1rfajTdoNAFnTDC5",
-       test_slug: "physical-fitness",
-       counsellor_id: "counsellor_123",
-     },
-   },
-   {
-     id: "pay_17409117726076",
-     order_id: "order_1740911685059",
-     tracking_id: "113668327110",
-     bank_ref_no: "542756938150",
-     date_time: "2025-03-05 16:05:12",
-     payment_mode: "Net Banking",
-     amount: "INR 4.00",
-     raw_amount: 4,
-     status: "Success",
-     error_message: "",
-     currency: "INR",
-     billing_info: {
-       name: "Alice Johnson",
-       address: "Some Address",
-       city: "Nagpur",
-       state: "Maharashtra",
-       zip: "440001",
-       country: "India",
-       phone: "911234567890",
-       email: "alicejohnson@example.com",
-     },
-     user_name: "Alice Johnson",
-     payment_type: "test",
-     test_name: "Emotional Intelligence Test",
-     referred_by: null,
-     meta: {
-       user_id: "9FINihOcYidB1rfajTdoNAFnTDC6",
-       test_slug: "emotional-intelligence",
-       counsellor_id: "counsellor_123",
-     },
-   },
-   {
-     id: "pay_17409117726077",
-     order_id: "order_1740911685060",
-     tracking_id: "113668327111",
-     bank_ref_no: "542756938151",
-     date_time: "2025-03-06 16:05:12",
-     payment_mode: "UPI",
-     amount: "INR 5.00",
-     raw_amount: 5,
-     status: "Success",
-     error_message: "",
-     currency: "INR",
-     billing_info: {
-       name: "Bob Brown",
-       address: "Yet Another Address",
-       city: "Aurangabad",
-       state: "Maharashtra",
-       zip: "431001",
-       country: "India",
-       phone: "910987654321",
-       email: "bobbrown@example.com",
-     },
-     user_name: "Bob Brown",
-     payment_type: "test",
-     test_name: "Cognitive Skills Test",
-     referred_by: null,
-     meta: {
-       user_id: "10FINihOcYidB1rfajTdoNAFnTDC7",
-       test_slug: "cognitive-skills",
-       counsellor_id: "counsellor_123",
-     },
-   },
- ];
- setTestRecords(testRecords);
- const paymentRecords: AppointmentPaymentRecords[] = [
-   {
-     id: "pay_17422748827222",
-     order_id: "order_1742274714297",
-     tracking_id: "113686871200",
-     bank_ref_no: "123456789",
-     date_time: "2025-03-18 10:41:59",
-     payment_mode: "Unified Payments",
-     amount: "INR 1,048.95",
-     raw_amount: 1048.95,
-     status: "Success",
-     error_message: "",
-     currency: "INR",
-     billing_info: {
-       name: "Adarsh Nagrikar",
-       address: "Test Address",
-       city: "Test City",
-       state: "Test State",
-       zip: "PINCODE",
-       country: "India",
-       phone: "917620216605",
-       email: "adarshnagrikar1404@gmail.com",
-     },
-     user_name: "Adarsh Nagrikar",
-     payment_type: "appointment",
-     counsellor_name: "Dr. Sarah Johnson",
-     meta: {
-       user_id: "6FINihOcYidB1rfajTdoNAFnTDC3",
-       counsellor_id: "c123456",
-       session_time: "2025-02-23 18:43:00",
-       session_type: "video",
-     },
-   },
-   {
-     id: "pay_17422748827223",
-     order_id: "order_1742274714298",
-     tracking_id: "113686871201",
-     bank_ref_no: "987654321",
-     date_time: "2025-03-19 11:00:00",
-     payment_mode: "Credit Card",
-     amount: "INR 2,000.00",
-     raw_amount: 2000.0,
-     status: "Success",
-     error_message: "",
-     currency: "INR",
-     billing_info: {
-       name: "John Doe",
-       address: "Another Address",
-       city: "Another City",
-       state: "Another State",
-       zip: "123456",
-       country: "India",
-       phone: "912345678901",
-       email: "johndoe@example.com",
-     },
-     user_name: "John Doe",
-     payment_type: "appointment",
-     counsellor_name: "Dr. Sarah Johnson",
-     meta: {
-       user_id: "7FINihOcYidB1rfajTdoNAFnTDC4",
-       counsellor_id: "c123456",
-       session_time: "2025-02-24 19:00:00",
-       session_type: "audio",
-     },
-   },
-   {
-     id: "pay_17422748827224",
-     order_id: "order_1742274714299",
-     tracking_id: "113686871202",
-     bank_ref_no: "456789123",
-     date_time: "2025-03-20 12:00:00",
-     payment_mode: "Debit Card",
-     amount: "INR 1,500.00",
-     raw_amount: 1500.0,
-     status: "Success",
-     error_message: "",
-     currency: "INR",
-     billing_info: {
-       name: "Jane Smith",
-       address: "Some Address",
-       city: "Some City",
-       state: "Some State",
-       zip: "654321",
-       country: "India",
-       phone: "919876543210",
-       email: "janesmith@example.com",
-     },
-     user_name: "Jane Smith",
-     payment_type: "appointment",
-     counsellor_name: "Dr. Sarah Johnson",
-     meta: {
-       user_id: "8FINihOcYidB1rfajTdoNAFnTDC5",
-       counsellor_id: "c123456",
-       session_time: "2025-02-25 20:00:00",
-       session_type: "chat",
-     },
-   },
-   {
-     id: "pay_17422748827225",
-     order_id: "order_1742274714300",
-     tracking_id: "113686871203",
-     bank_ref_no: "321654987",
-     date_time: "2025-03-21 13:00:00",
-     payment_mode: "Net Banking",
-     amount: "INR 3,000.00",
-     raw_amount: 3000.0,
-     status: "Success",
-     error_message: "",
-     currency: "INR",
-     billing_info: {
-       name: "Alice Johnson",
-       address: "Another Address",
-       city: "Another City",
-       state: "Another State",
-       zip: "789456",
-       country: "India",
-       phone: "911234567890",
-       email: "alicejohnson@example.com",
-     },
-     user_name: "Alice Johnson",
-     payment_type: "appointment",
-     counsellor_name: "Dr. Sarah Johnson",
-     meta: {
-       user_id: "9FINihOcYidB1rfajTdoNAFnTDC6",
-       counsellor_id: "c123456",
-       session_time: "2025-02-26 21:00:00",
-       session_type: "video",
-     },
-   },
-   {
-     id: "pay_17422748827226",
-     order_id: "order_1742274714301",
-     tracking_id: "113686871204",
-     bank_ref_no: "654987321",
-     date_time: "2025-03-22 14:00:00",
-     payment_mode: "UPI",
-     amount: "INR 2,500.00",
-     raw_amount: 2500.0,
-     status: "Success",
-     error_message: "",
-     currency: "INR",
-     billing_info: {
-       name: "Bob Brown",
-       address: "Yet Another Address",
-       city: "Yet Another City",
-       state: "Yet Another State",
-       zip: "987654",
-       country: "India",
-       phone: "910987654321",
-       email: "bobbrown@example.com",
-     },
-     user_name: "Bob Brown",
-     payment_type: "appointment",
-     counsellor_name: "Dr. Sarah Johnson",
-     meta: {
-       user_id: "10FINihOcYidB1rfajTdoNAFnTDC7",
-       counsellor_id: "c123456",
-       session_time: "2025-02-27 22:00:00",
-       session_type: "audio",
-     },
-   },
- ];
-
- setAppointmentRecords(paymentRecords);
-
- const overview = {
-   id: "c123456",
-   personalInfo: {
-     name: "Dr. Sarah Johnson",
-     profileImage:
-       "https://backend.psycortex.in/profile/counsellor/c123456.png",
-   },
-   professionalInfo: {
-     title: "Clinical Psychologist",
-     yearsOfExperience: 12,
-   },
-   sessionCounts: {
-     video: 3,
-     chat: 3,
-     phone: 1,
-     offline: 0,
-     total: 7,
-   },
-   testReferrals: 1,
-   earnings: {
-     video: "6300.00",
-     chat: "2100.00",
-     phone: "350.00",
-     offline: "0.00",
-     testRecommendation: "99.90",
-     total: "8849.90",
-   },
- };
-
- setearningOverview(overview);
-
-  }, [id]);
+    fetchCounsellotPaymentRecords(pagination.current_page);
+  }, [pagination.current_page]);
 
   return (
     <div className="p-8 mx-auto">
@@ -644,18 +367,26 @@ export default function OneCounsellorEarnings() {
         <h3 className="text-2xl font-semibold text-gray-800 mb-4">
           Appointment Earnings
         </h3>
-        {appointmentRecords.map((record) => (
-          <AppointmentEarningsCard key={record.id} record={record} />
-        ))}
+        {appointmentRecords.length > 0 ? (
+          appointmentRecords.map((record) => (
+        <AppointmentEarningsCard key={record.id} record={record} />
+          ))
+        ) : (
+          <p className="text-gray-500">No appointment records available.</p>
+        )}
       </div>
 
       <div className="mt-10">
         <h3 className="text-2xl font-semibold text-gray-800 mb-4">
           Test Recommendation Earnings
         </h3>
-        {testRecords.map((record) => (
-          <TestEarningsCard key={record.id} record={record} />
-        ))}
+        {testRecords.length > 0 ? (
+          testRecords.map((record) => (
+        <TestEarningsCard key={record.booking_id} record={record} />
+          ))
+        ) : (
+          <p className="text-gray-500">No test recommendation records available.</p>
+        )}
       </div>
     </div>
   );

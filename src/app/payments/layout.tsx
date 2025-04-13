@@ -26,7 +26,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div className="w-full">
       {/* Navigation Header */}
-      <div className="flex items-center justify-center gap-5 sm:gap-20 px-6 py-3 border-b bg-white shadow-sm sticky top-0">
+      <div className="flex items-center justify-center gap-5 sm:gap-20 px-6 py-3 border-b bg-white shadow-sm sticky top-0 z-50">
         {tabs.map((tab) => (
           <Link
             key={tab.path}
