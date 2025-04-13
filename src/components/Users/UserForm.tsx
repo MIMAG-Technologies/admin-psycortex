@@ -124,6 +124,9 @@ export default function UserForm(props: {
               disabled={mode === "edit"}
               id="email"
               name="email"
+              style={{
+                cursor: mode === "edit" ? "not-allowed" : "text",
+              }}
               value={formData.email}
               onChange={(e) =>
                 setFormData({ ...formData, email: e.target.value })
@@ -144,6 +147,10 @@ export default function UserForm(props: {
             <input
               type="tel"
               id="phone"
+              disabled={mode === "edit"}
+              style={{
+                cursor: mode === "edit" ? "not-allowed" : "text",
+              }}
               name="phone"
               value={formData.phone}
               onChange={(e) =>

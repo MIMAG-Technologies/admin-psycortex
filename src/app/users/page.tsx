@@ -44,7 +44,7 @@ export default function Page() {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-6">s
       {/* Header Section */}
       <div className="mb-6 flex flex-wrap items-center gap-2 sm:gap-4 border-slate-300 justify-center sm:justify-between">
         <h1 className="text-2xl w-full sm:w-fit font-bold text-gray-800 mr-auto text-center sm:text-left">
