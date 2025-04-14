@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { IoSearch, IoAddCircle } from "react-icons/io5";
 import AddBranchModal from "@/components/Branches/AddBranchModal";
 import BranchCard from "@/components/Branches/BranchCard";
@@ -20,15 +20,25 @@ type branch = {
   is_active: boolean;
 };
 
+function SearchParamsHandler({ setModalOpen }: { setModalOpen: (open: boolean) => void }) {
+  const searchParams = useSearchParams();
+  const mode = searchParams.get("mode");
 
+  useEffect(() => {
+    if (mode === "create") {
+      setModalOpen(true);
+    }
+  }, [mode, setModalOpen]);
 
+  return null;
+}
 
 export default function BranchesManagement() {
   const [branches, setBranches] = useState<Array<branch>>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setModalOpen] = useState(false);
-  const [cityList, setcityList] = useState<Array<string>>([])
-   const { setLoading } = useLoading();
+  const [cityList, setcityList] = useState<Array<string>>([]);
+  const { setLoading } = useLoading();
 
   // Filter branches based on search query
   const filteredBranches = branches.filter((branch) =>
@@ -38,9 +48,9 @@ export default function BranchesManagement() {
   const fetchBranches = async () => {
     setLoading(true);
     const res = await getBranches();
-    
+
     setBranches(res);
-    setcityList(Array.from(new Set(res.map((branch: branch) => branch.city))))
+    setcityList(Array.from(new Set(res.map((branch: branch) => branch.city))));
     setLoading(false);
   };
 
@@ -56,12 +66,13 @@ export default function BranchesManagement() {
     }
     setLoading(false);
   };
+
   const handleAddBranch = async (branch: {
     city: string;
     street_address: string;
     state: string;
     pincode: string;
-    branch_name:string;
+    branch_name: string;
   }) => {
     setLoading(true);
     const res: boolean = await addBranches(
@@ -84,20 +95,16 @@ export default function BranchesManagement() {
     fetchBranches();
   }, []);
 
-
-    const searchParams = useSearchParams();
-    const mode = searchParams.get("mode");
-      useEffect(() => {
-        if (mode === "create") {
-          setModalOpen(true);
-        }
-      }, [mode]);
-
   return (
     <div className="p-6 mx-auto">
       <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">
         Branches Management
       </h1>
+
+      {/* Suspense Boundary for SearchParams */}
+      <Suspense fallback={null}>
+        <SearchParamsHandler setModalOpen={setModalOpen} />
+      </Suspense>
 
       {/* Search and Add Button */}
       <div className="flex flex-col sm:flex-row gap-4 mb-6">
