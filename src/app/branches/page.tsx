@@ -6,6 +6,7 @@ import AddBranchModal from "@/components/Branches/AddBranchModal";
 import BranchCard from "@/components/Branches/BranchCard";
 import { addBranches, deleteBranches, getBranches } from "@/utils/branches";
 import { toast } from "react-toastify";
+import { useSearchParams } from "next/navigation";
 import { useLoading } from "@/context/LoadingContext";
 
 type branch = {
@@ -82,6 +83,15 @@ export default function BranchesManagement() {
   useEffect(() => {
     fetchBranches();
   }, []);
+
+
+    const searchParams = useSearchParams();
+    const mode = searchParams.get("mode");
+      useEffect(() => {
+        if (mode === "create") {
+          setModalOpen(true);
+        }
+      }, [mode]);
 
   return (
     <div className="p-6 mx-auto">

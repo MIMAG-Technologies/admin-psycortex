@@ -220,7 +220,7 @@ const EarningsOverview = ({ data }: { data: SimplifiedCounsellor }) => {
       {/* Header Section */}
       <div className="flex items-center gap-4 border-b pb-4">
         <img
-          src={data.personalInfo.profileImage}
+          src={data.personalInfo.profileImage || "/images/user-dummy-img.png"}
           alt={data.personalInfo.name}
           className="w-20 h-20 rounded-full object-cover border-4 border-indigo-500"
         />

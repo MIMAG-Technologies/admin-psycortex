@@ -259,7 +259,7 @@ export default function CreateAppointment() {
                   onChange={(e) => setDate(e.target.value)}
                   min={new Date().toISOString().split("T")[0]}
                   max={
-                    new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+                    new Date(Date.now() + 15 * 24 * 60 * 60 * 1000)
                       .toISOString()
                       .split("T")[0]
                   }
@@ -280,7 +280,13 @@ export default function CreateAppointment() {
                     <option value="" disabled>
                       Select Date first
                     </option>
-                  ) : (
+                  ) : 
+                  workingHours.length === 0 ? (
+                    <option value="" disabled>
+                      No available time slots
+                    </option>
+                  ) :
+                  (
                     <option value="" disabled>
                       Select Time
                     </option>

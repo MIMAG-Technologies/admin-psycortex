@@ -18,6 +18,9 @@ export default function DiscountForm() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const today = new Date();
+    const expiresOnDate = new Date(formData.expiresOn);
+
     if (
       !formData.name ||
       !formData.discountPercent ||
@@ -25,6 +28,14 @@ export default function DiscountForm() {
       !formData.expiresOn
     ) {
       return toast.error("Please fill all the fields");
+    }
+
+    if (Number(formData.discountPercent) >= 100) {
+      return toast.error("Discount percent must be less than 100");
+    }
+
+    if (expiresOnDate < today) {
+      return toast.error("Expiration date cannot be in the past");
     }
 
     setLoading(true);
@@ -104,6 +115,11 @@ export default function DiscountForm() {
               }
               className="w-full rounded-md border border-gray-300 px-3 py-2 text-gray-700 focus:border-outline focus:outline-none focus:ring-1 focus:ring-outline"
               placeholder="Enter Discount Percent"
+              min="0"
+              max="99"
+              onKeyDown={(e) =>
+                ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()
+              } // Disable non-numeric input
             />
           </div>
 

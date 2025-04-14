@@ -10,11 +10,13 @@ import {
   FaArrowRight,
 } from "react-icons/fa";
 import { useLoading } from "@/context/LoadingContext";
+import { format } from "date-fns";
+import { enUS } from "date-fns/locale";
 
 export default function PaymentPage() {
   const [from, setFrom] = useState<string | null>("");
   const [to, setTo] = useState<string | null>("");
-   const { setLoading } = useLoading();
+  const { setLoading } = useLoading();
 
   const [paymentType, setPaymentType] = useState<"appointment" | "test">(
     "appointment"
@@ -33,10 +35,20 @@ export default function PaymentPage() {
 
   const fetchPayments = async (page: number) => {
     setLoading(true);
-    const res = await getAllPaymentRecords(paymentType, "",page, "", from, to, );
+    const res = await getAllPaymentRecords(paymentType, "", page, "", from, to);
     setPagination(res.pagination);
     setPaymentRecords(res.payment_records);
     setLoading(false);
+  };
+
+  const resetFilters = () => {
+    setFrom("");
+    setTo("");
+    setPaymentType("appointment");
+  };
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return format(date, "dd/MM/yyyy hh:mm a", { locale: enUS });
   };
 
   return (
@@ -85,6 +97,14 @@ export default function PaymentPage() {
             </select>
           </div>
         </div>
+        <div className="mt-4">
+          <button
+            onClick={resetFilters}
+            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
+          >
+            Reset Filters
+          </button>
+        </div>
       </div>
 
       {/* Payment Records Section */}
@@ -126,10 +146,10 @@ export default function PaymentPage() {
                   <tr key={record.id} className="hover:bg-gray-50 transition">
                     <td className="border border-gray-300 p-3">{record.id}</td>
                     <td className="border border-gray-300 p-3">
-                      {record.date_time}
+                      {formatDate(record.date_time)}
                     </td>
                     <td className="border border-gray-300 p-3 text-green-600 font-semibold">
-                      ${record.amount}
+                      {record.amount}
                     </td>
                     <td
                       className={`border border-gray-300 p-3 capitalize font-medium ${

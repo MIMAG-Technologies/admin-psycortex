@@ -20,6 +20,7 @@ import {
 import { useLoading } from "@/context/LoadingContext";
 import { FaMagnifyingGlass } from "react-icons/fa6";
 import { getBranches } from "@/utils/branches";
+import Link from "next/link";
 
 export function BranchesSelectionBar(props: {
   value: {
@@ -141,7 +142,15 @@ export function BranchesSelectionBar(props: {
           </div>
           <CommandList className="max-h-[250px] overflow-y-auto">
             {branchFilterList.length === 0 ? (
-              <CommandEmpty>No branches found.</CommandEmpty>
+              <div className="p-4">
+                <CommandEmpty>No Branches found.</CommandEmpty>
+                <Link
+                  href=" /branches?mode=create"
+                  className="inline-block w-full text-center bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition"
+                >
+                  Create Branch
+                </Link>
+              </div>
             ) : (
               <CommandGroup heading="Branches">
                 {branchFilterList.map((item) => (

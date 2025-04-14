@@ -20,7 +20,7 @@ import {
 import { useLoading } from "@/context/LoadingContext";
 import { FaMagnifyingGlass } from "react-icons/fa6";
 import { returnAppointmentCounsellors } from "@/utils/counsellor";
-import { toast } from "react-toastify";
+import Link from "next/link";
 
 export function CounsellorSelectionBar(props: {
   value: string;
@@ -105,7 +105,15 @@ export function CounsellorSelectionBar(props: {
           </div>
           <CommandList>
             {coounsellorFilterList.length === 0 ? (
-              <CommandEmpty>No counsellors found.</CommandEmpty>
+              <div className="p-4">
+                <CommandEmpty>No counsellors found.</CommandEmpty>
+                <Link
+                  href="/counsellors/create"
+                  className="inline-block w-full text-center bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition"
+                >
+                  Create Counsellor
+                </Link>
+              </div>
             ) : (
               <CommandGroup heading="User List">
                 {coounsellorFilterList.map((item) => {

@@ -248,7 +248,7 @@ export default function Page() {
             sessionType,
             sessionTitle: "",
             price: 0, // Default price
-            currency: "USD", // Default currency
+            currency: "INR", // Default currency
             typeOfAvailability: availabilityType,
           });
         }
@@ -385,7 +385,15 @@ export default function Page() {
     const length = parts.length;
 
     if (length < 3) {
-      throw new Error("Invalid address format");
+      if (mode === "edit") {
+        toast.error("Please enter a valid address");
+      }
+      return {
+        street_address: "",
+        city: "",
+        state: "",
+        pincode: "",
+      };
     }
 
     return {
@@ -638,12 +646,6 @@ export default function Page() {
         setLoading(false);
         return;
       }
-      const ccres = await createCredentials(id);
-      if (!ccres) {
-        toast.error("Error creating credentials");
-        setLoading(false);
-        return;
-      }
       if (profileImage) {
         await UpdateProfileImg(id, profileImage);
       }
@@ -677,7 +679,15 @@ export default function Page() {
         documentsVerified: counsellorDetails.documentsVerified,
         backgroundCheckDate: counsellorDetails.backgroundCheckDate,
       });
-      toast.success("Counsellor created successfully");
+
+      const ccres = await createCredentials(id);
+      if (!ccres) {
+        toast.warn(
+          "Counsellor created successfully but Error creating credentials please contact dev team"
+        );
+      } else {
+        toast.success("Counsellor created successfully");
+      }
       router.push(`/counsellors`);
     } catch (error) {
       toast.error("Error creating counsellor");

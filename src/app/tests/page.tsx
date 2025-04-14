@@ -70,26 +70,29 @@ const Tests = () => {
   const filteredTests = tests.filter((test) =>
     test.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
- const updatePriorities = async (updatedTests: Test[]) => {
-   const priorities = updatedTests.map((test, index) => ({
-     slug: test.slug,
-     priority: updatedTests.length - index,
-   }));
-   setLoading(true);
-   const res = await UpdatePriorities(priorities);
-   if (res) {
-     toast.success("Test priorities updated successfully!");
-   } else {
-     toast.error("Error updating test priorities");
-   }
-   setLoading(false);
- };
+  const updatePriorities = async (updatedTests: Test[]) => {
+    const priorities = updatedTests.map((test, index) => ({
+      slug: test.slug,
+      priority: updatedTests.length - index,
+    }));
+    setLoading(true);
+    const res = await UpdatePriorities(priorities);
+    if (res) {
+      toast.success("Test priorities updated successfully!");
+    } else {
+      toast.error("Error updating test priorities");
+    }
+    setLoading(false);
+  };
 
   const deleteDiscounts = async () => {
     setLoading(true);
     const res = await disableDiscount();
     if (res) {
       toast.success("Discount offer deleted successfully!");
+
+      const fetchedTests = await fetchTests();
+      setTests(fetchedTests);
     } else {
       toast.error("Error deleting discount offer");
     }

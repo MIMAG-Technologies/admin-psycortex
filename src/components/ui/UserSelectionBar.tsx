@@ -1,15 +1,13 @@
 "use client";
 
 import * as React from "react";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { ChevronsUpDown } from "lucide-react";
 
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Command,
   CommandEmpty,
   CommandGroup,
-  CommandInput,
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
@@ -21,6 +19,7 @@ import {
 import { useLoading } from "@/context/LoadingContext";
 import { returnAppointmentUsers } from "@/utils/users";
 import { FaMagnifyingGlass } from "react-icons/fa6";
+import Link from "next/link";
 
 export function UserSelectionBar(props: {
   value: string;
@@ -109,7 +108,15 @@ export function UserSelectionBar(props: {
           </div>
           <CommandList>
             {userPreviewList.length === 0 ? (
-              <CommandEmpty>No users found.</CommandEmpty>
+              <div className="p-4">
+                <CommandEmpty>No user found.</CommandEmpty>
+                <Link
+                  href="/users/create"
+                  className="inline-block w-full text-center bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition"
+                >
+                  Create User
+                </Link>
+              </div>
             ) : (
               <CommandGroup heading="User List">
                 {userPreviewList.map((item) => {

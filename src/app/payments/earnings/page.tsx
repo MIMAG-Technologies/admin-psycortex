@@ -117,58 +117,6 @@ function OneCounsellorCard({
           </p>
         </div>
       </div>
-
-      {/* Session Earnings Section */}
-      {/* <div className="mt-4 p-4 bg-indigo-50 rounded-lg">
-        <h3 className="text-md font-medium text-indigo-700 mb-2 flex items-center gap-2">
-          <FaUserCheck className="text-indigo-600" /> Session Earnings
-        </h3>
-
-        <div className="grid grid-cols-2 gap-3 text-sm sm:flex sm:flex-col">
-          <span className="flex items-center gap-2">
-            <FaVideo className="text-indigo-500" />
-            {counsellor.sessionCounts.video} sessions - ₹
-            {counsellor.earnings.video}
-          </span>
-          <span className="flex items-center gap-2">
-            <FaCommentDots className="text-green-500" />
-            {counsellor.sessionCounts.chat} sessions - ₹
-            {counsellor.earnings.chat}
-          </span>
-          <span className="flex items-center gap-2">
-            <FaPhoneAlt className="text-yellow-500" />
-            {counsellor.sessionCounts.phone} sessions - ₹
-            {counsellor.earnings.phone}
-          </span>
-          <span className="flex items-center gap-2">
-            <IoPerson className="text-red-500" />
-            {counsellor.sessionCounts.offline} sessions - ₹
-            {counsellor.earnings.offline}
-          </span>
-          <span className="flex items-center gap-2 font-medium text-indigo-700 col-span-2 sm:col-span-1">
-            <FaDollarSign className="text-indigo-700" /> Total Earnings: ₹
-            {counsellor.earnings.total}
-          </span>
-        </div>
-      </div> */}
-
-      {/* Test Referral Earnings Section */}
-      {/* <div className="mt-4 p-4 bg-gray-100 rounded-lg">
-        <h3 className="text-md font-medium text-gray-700 mb-2 flex items-center gap-2">
-          <MdOutlineLocalActivity className="text-gray-600" /> Test Referral
-          Earnings
-        </h3>
-        <p className="text-sm flex items-center gap-2">
-          <FaUserCheck className="text-gray-600" /> Referred Tests:{" "}
-          <strong>{counsellor.testReferrals}</strong>
-        </p>
-        <p className="text-sm flex items-center gap-2 mt-2">
-          <FaDollarSign className="text-gray-700" /> Earnings:{" "}
-          <strong>₹{counsellor.earnings.testRecommendation}</strong>
-        </p>
-      </div> */}
-
-      {/* View More Button */}
       <div className="mt-5">
         <button
           className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-medium py-2 px-4 rounded-lg transition"
