@@ -8,14 +8,14 @@ export default function AddAdminModal({
   onAdd,
 }: {
   onClose: () => void;
-  onAdd: (admin: { id: string; name: string; email: string }) => void;
+  onAdd: (admin: { name: string; email: string }) => void;
 }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
 
   const handleSubmit = () => {
     if (!name || !email) return alert("Both fields are required.");
-    onAdd({ id: Math.random().toString(36).substring(2, 9), name, email });
+    onAdd({ name, email });
     onClose();
   };
 

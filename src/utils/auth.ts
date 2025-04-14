@@ -25,7 +25,7 @@ const sendOTP = async (username: string) => {
   try {
 
     const res = await axios.post(`${base_url}/admin/send_otp.php`, {
-      username
+      email:username,
     });
     toast.success("Otp sent to your mail!")
     return res.data;

@@ -1,55 +1,71 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { IoTrash, IoPersonAdd, IoSearch } from "react-icons/io5";
 import AddAdminModal from "@/components/Admin/AddAdminModal";
+import { addAdmins, deleteAdmins, getAdmins } from "@/utils/admins";
+import { useLoading } from "@/context/LoadingContext";
+import { toast } from "react-toastify";
 
-// Dummy Data for Admins
-const initialAdmins = [
-  {
-    id: "1",
-    name: "Rajesh Kumar",
-    email: "rajesh@company.com",
-    role: "superadmin",
-  },
-  {
-    id: "2",
-    name: "Ananya Iyer",
-    email: "ananya@company.com",
-    role: "superadmin",
-  },
-  { id: "3", name: "Vikram Singh", email: "vikram@company.com", role: "admin" },
-  { id: "4", name: "Neha Sharma", email: "neha@company.com", role: "admin" },
-  {
-    id: "5",
-    name: "Karthik Reddy",
-    email: "karthik@company.com",
-    role: "admin",
-  },
-];
 
 export default function AdminManagement() {
-  const [admins, setAdmins] = useState(initialAdmins);
+  const [admins, setAdmins] = useState<
+    Array<{
+      id: string;
+      name: string;
+      email: string;
+      role: string;
+    }>
+  >([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setModalOpen] = useState(false);
+
+  const { setLoading } = useLoading();
+  // Delete Admin Function
+  const handleDeleteAdmin = async (email: string) => {
+    setLoading(true);
+    const res = await deleteAdmins(email);
+    if (res) {
+      toast.success("Admin deleted successfully!");
+      fetchAdmins();
+    } else {
+      toast.error("Failed to delete admin. Please try again.");
+    }
+    setLoading(false);
+  };
+  const fetchAdmins = async () => {
+    setLoading(true);
+    const adminsres = await getAdmins();
+    setAdmins(adminsres);
+    setLoading(false);
+  };
+  useEffect(() => {
+
+    fetchAdmins();
+  }, []);
 
   // Filter admins based on search query
   const filteredAdmins = admins.filter((admin) =>
     admin.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Delete Admin Function
-  const handleDeleteAdmin = (id: string) => {
-    setAdmins((prev) => prev.filter((admin) => admin.id !== id));
-  };
-
   // Add New Admin Function
-  const handleAddAdmin = (newAdmin: {
-    id: string;
+  const handleAddAdmin = async (newAdmin: {
     name: string;
     email: string;
   }) => {
-    setAdmins((prev) => [...prev, { ...newAdmin, role: "admin" }]);
+    setLoading(true);
+    const res = await addAdmins(newAdmin.name, newAdmin.email);
+    if (res) {
+      toast.success("Admin added successfully!");
+      setModalOpen(false);
+      fetchAdmins();
+    }
+    else{
+      toast.error("Failed to add admin. Please try again.");
+    }
+    setLoading(false);
+
   };
 
   return (
@@ -131,7 +147,7 @@ export default function AdminManagement() {
                       {admin.name} ({admin.email})
                     </span>
                     <button
-                      onClick={() => handleDeleteAdmin(admin.id)}
+                      onClick={() => handleDeleteAdmin(admin.email)}
                       className="text-red-600 hover:text-red-700 transition"
                     >
                       <IoTrash size={18} />
