@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { AiOutlineArrowDown, AiOutlineArrowUp, AiOutlineEdit } from "react-icons/ai";
+import { AiOutlineEdit, AiOutlineReload } from "react-icons/ai";
 interface Test {
   name: string;
   slug: string;
@@ -62,25 +62,16 @@ const TestCard: React.FC<TestProps> = ({
   const defaultImage = "/images/default.jpg";
   const router = useRouter();
   const [showFullDescription, setShowFullDescription] = useState(false);
+  const [priority, setPriority] = useState(tests.length - index);
 
-  const handleIncreasePriority = async () => {
-    if (index === 0) return; // Can't increase priority if it's the first item
+  const handlePriorityUpdate = async () => {
     const updatedTests = [...tests];
-    [updatedTests[index], updatedTests[index - 1]] = [
-      updatedTests[index - 1],
-      updatedTests[index],
-    ];
-    setTests(updatedTests);
-    await updatePriorities(updatedTests);
-  };
-
-  const handleDecreasePriority = async () => {
-    if (index === tests.length - 1) return; // Can't decrease priority if it's the last item
-    const updatedTests = [...tests];
-    [updatedTests[index], updatedTests[index + 1]] = [
-      updatedTests[index + 1],
-      updatedTests[index],
-    ];
+    // Remove the test from its current position
+    const testToMove = updatedTests.splice(index, 1)[0];
+    // Calculate new position based on priority (higher priority = lower index)
+    const newPosition = Math.max(0, Math.min(tests.length - 1, tests.length - priority));
+    // Insert the test at its new position
+    updatedTests.splice(newPosition, 0, testToMove);
     setTests(updatedTests);
     await updatePriorities(updatedTests);
   };
@@ -156,24 +147,32 @@ const TestCard: React.FC<TestProps> = ({
               </span>
               Edit Test
             </button>
-            <button
-              onClick={handleIncreasePriority}
-              className="flex items-center justify-center py-3 px-6 bg-green-100 text-green-700 text-lg rounded-lg border border-green-500 hover:bg-green-200 transition-all duration-300 shadow-lg w-full md:w-1/3"
-            >
-              <span className="mr-2">
-              <AiOutlineArrowUp />
-              </span>
-              Increase Priority
-            </button>
-            <button
-              onClick={handleDecreasePriority}
-              className="flex items-center justify-center py-3 px-6 bg-red-100 text-red-700 text-lg rounded-lg border border-red-500 hover:bg-red-200 transition-all duration-300 shadow-lg w-full md:w-1/3"
-            >
-              <span className="mr-2">
-              <AiOutlineArrowDown />
-              </span>
-              Decrease Priority
-            </button>
+            <div className="flex flex-col md:flex-row items-center gap-2 w-full md:w-2/3">
+              <div className="flex items-center w-full md:w-1/2">
+                <label htmlFor="priority" className="mr-2 font-medium text-gray-700">Priority:</label>
+                <input
+                  id="priority"
+                  type="text"
+                  value={priority}
+                  onChange={(e) => {
+                    const val = parseInt(e.target.value);
+                    if (!isNaN(val) && val >= 1 && val <= tests.length) {
+                      setPriority(val);
+                    }
+                  }}
+                  className="w-24 py-2 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+              <button
+                onClick={handlePriorityUpdate}
+                className="flex items-center justify-center py-3 px-6 bg-green-100 text-green-700 text-lg rounded-lg border border-green-500 hover:bg-green-200 transition-all duration-300 shadow-lg w-full md:w-1/2"
+              >
+                <span className="mr-2">
+                <AiOutlineReload />
+                </span>
+                Update Priority
+              </button>
+            </div>
             </div>
         </div>
       </div>

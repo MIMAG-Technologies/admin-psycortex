@@ -105,16 +105,38 @@ export const UpdatePriorities = async (
       toast.error("Please login first!");
       throw new Error("Please login first!");
     }
-    const headers = {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    };
     await axios.post(`${base_url}/mods/set_test_priority.php`, {
       test_priorities,
     });
     return true;
   } catch (error) {
     console.log(error);
+    return false;
+  }
+};
+
+
+
+export const suggestTest = async (
+  userId: string,
+  testSlug: string,
+  amount: number
+) => {
+  try {
+    await axios.post(`${base_url}/tests/book_test.php`, {
+      userId: userId,
+      testSlug: testSlug,
+      paymentMode: "Unified Payments",
+      transactionId: `pay_${Math.floor(Math.random() * 100000000000000)
+        .toString()
+        .padStart(14, "0")}`,
+      amount: amount,
+      currency: "INR",
+      notes: "Additional notes",
+    });
+    return true;
+  } catch (error) {
+    console.error(error);
     return false;
   }
 };

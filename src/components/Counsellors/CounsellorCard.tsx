@@ -8,8 +8,11 @@ import {
   IoVideocam,
   IoPerson,
   IoStatsChart,
+  IoMail,
 } from "react-icons/io5";
 import UpdateMetricsModal from "@/components/Counsellors/UpdateMetricsModal";
+import { createCredentials } from "@/utils/counsellor";
+import { toast } from "react-toastify";
 
 interface Counsellor {
   id: string;
@@ -148,6 +151,20 @@ export default function CounsellorCard({
         >
           <IoStatsChart className="text-indigo-600" size={18} />
           Edit Metrics
+        </button>
+        <button
+          onClick={ async() =>{
+            const res = await createCredentials(counsellor.id);
+            if(res){
+              toast.success("Credentials sent successfully");
+            }else{
+              toast.error("Failed to send credentials");
+            }
+          }}
+          className="flex items-center gap-2 px-4 py-2 border border-gray-300 bg-white rounded-md text-gray-700 font-medium hover:bg-gray-100 transition"
+        >
+          <IoMail className="text-green-600" size={18} />
+          Send Credentials
         </button>
       </div>
 
