@@ -61,4 +61,28 @@ export const getTestData = async()=>{
     }
 }
 
+export const updateTestQuestion = async (question: TestQuestion[]) => {
+    try {
+        await axios.post(
+          `${base_url}/edits/academic/set_question.php`,
+          question
+        );
+        return true
+    } catch (error) {
+        console.error("Error updating test question:", error);
+        return false;
+    }
+}
 
+export const updateTestInterpretation = async (interpretation: TestInterpretation[]) => {
+    try {
+        await axios.post(
+          `${base_url}/edits/academic/set_interpretation.php`,
+          interpretation
+        );
+        return true
+    } catch (error) {
+        console.error("Error updating test interpretation:", error);
+        return false;
+    }
+}
