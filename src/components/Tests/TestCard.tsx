@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { AiOutlineEdit, AiOutlineReload } from "react-icons/ai";
+import { AiOutlineEdit, AiOutlineReload, AiOutlineQuestionCircle } from "react-icons/ai";
 interface Test {
   name: string;
   slug: string;
@@ -63,6 +63,8 @@ const TestCard: React.FC<TestProps> = ({
   const router = useRouter();
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [priority, setPriority] = useState(tests.length - index);
+    const completed: string[] = ["academic"];
+  const isCompleted = completed.includes(test.slug);
 
   const handlePriorityUpdate = async () => {
     const updatedTests = [...tests];
@@ -137,19 +139,40 @@ const TestCard: React.FC<TestProps> = ({
             </p>
           </div>
 
-            <div className="mt-6 flex flex-col md:flex-row gap-4 w-full">
+          <div className="mt-6 flex flex-col md:flex-row gap-4 w-full">
             <button
               onClick={() => router.push(`/tests/edit?slug=${test.slug}`)}
-              className="flex items-center justify-center py-3 px-6 bg-primary bg-opacity-20 text-primary text-lg rounded-lg border border-primary hover:bg-opacity-30 transition-all duration-300 shadow-lg w-full md:w-1/3"
+              className="flex items-center justify-center py-3 px-6 bg-primary bg-opacity-20 text-primary text-lg rounded-lg border border-primary hover:bg-opacity-30 transition-all duration-300 shadow-lg w-full md:w-1/4"
             >
               <span className="mr-2">
-              <AiOutlineEdit />
+                <AiOutlineEdit />
               </span>
               Edit Test
             </button>
-            <div className="flex flex-col md:flex-row items-center gap-2 w-full md:w-2/3">
+
+            <button
+              onClick={() => router.push(`/tests/edit/${test.slug}`)}
+              disabled={!isCompleted}
+              className={`flex items-center justify-center py-3 px-6 ${
+                isCompleted
+                  ? "bg-blue-100 text-blue-700 border-blue-500 cursor-pointer"
+                  : "bg-gray-100 text-gray-700 border-gray-500 cursor-not-allowed"
+              } text-lg rounded-lg border  hover:bg-blue-200 transition-all duration-300 shadow-lg w-full md:w-1/4`}
+            >
+              <span className="mr-2">
+                <AiOutlineQuestionCircle />
+              </span>
+              Edit Questions
+            </button>
+
+            <div className="flex flex-col md:flex-row items-center gap-2 w-full md:w-2/4">
               <div className="flex items-center w-full md:w-1/2">
-                <label htmlFor="priority" className="mr-2 font-medium text-gray-700">Priority:</label>
+                <label
+                  htmlFor="priority"
+                  className="mr-2 font-medium text-gray-700"
+                >
+                  Priority:
+                </label>
                 <input
                   id="priority"
                   type="text"
@@ -168,12 +191,12 @@ const TestCard: React.FC<TestProps> = ({
                 className="flex items-center justify-center py-3 px-6 bg-green-100 text-green-700 text-lg rounded-lg border border-green-500 hover:bg-green-200 transition-all duration-300 shadow-lg w-full md:w-1/2"
               >
                 <span className="mr-2">
-                <AiOutlineReload />
+                  <AiOutlineReload />
                 </span>
                 Update Priority
               </button>
             </div>
-            </div>
+          </div>
         </div>
       </div>
     </div>

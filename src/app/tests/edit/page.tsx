@@ -8,6 +8,7 @@ import axios from "axios";
 import { toast } from "react-toastify"; // Using react-toastify as shown in your updated code
 import { updatetest } from "@/utils/tests";
 
+
 interface TestData {
   name: string;
   slug: string;
@@ -55,6 +56,7 @@ function EditTestPage() {
     durationMinutes: "",
   });
   const [image, setImage] = useState<File | null>(null);
+
 
   useEffect(() => {
     const fetchTestDetails = async () => {

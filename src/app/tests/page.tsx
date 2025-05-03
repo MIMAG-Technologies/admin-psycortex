@@ -66,7 +66,6 @@ const Tests = () => {
       isMounted = false;
     };
   }, []);
-
   const filteredTests = tests.filter((test) =>
     test.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
