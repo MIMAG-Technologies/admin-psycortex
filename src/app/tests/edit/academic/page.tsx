@@ -15,8 +15,7 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "react-toastify";
-
-
+import { ConfirmationModal } from "@/components/ui/confirmation-modal";
 
 interface TestQuestion {
   id: number;
@@ -115,6 +114,7 @@ export default function TestEditingPage() {
   const [mode, setmode] = useState<"questions" | "interpretations">(
     "questions"
   );
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -143,6 +143,7 @@ export default function TestEditingPage() {
       console.error("Error updating questions:", error);
     }
   };
+
   const updatedInterpretations = async () => {
     try {
       const response = await updateTestInterpretation(interpretations);
@@ -153,6 +154,14 @@ export default function TestEditingPage() {
       }
     } catch (error) {
       console.error("Error updating interpretations:", error);
+    }
+  };
+
+  const handleUpdateConfirmation = () => {
+    if (mode === "questions") {
+      updatedQuestions();
+    } else {
+      updatedInterpretations();
     }
   };
 
@@ -192,6 +201,17 @@ export default function TestEditingPage() {
       <h1 className="text-3xl font-bold mb-8 text-primary">
         Acadmic Stress Management
       </h1>
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={isConfirmModalOpen}
+        onClose={() => setIsConfirmModalOpen(false)}
+        onConfirm={handleUpdateConfirmation}
+        title="Confirm Changes"
+        description=""
+        testName="Academic Stress Management"
+        entityType={mode === "questions" ? "Questions" : "Interpretations"}
+      />
 
       <Tabs defaultValue="questions" className="space-y-6">
         <TabsList className="w-full border-b">
@@ -446,7 +466,7 @@ export default function TestEditingPage() {
         <Button
           size="lg"
           className="px-8 text-white"
-          onClick={mode === "questions" ? updatedQuestions : updatedInterpretations}
+          onClick={() => setIsConfirmModalOpen(true)}
         >
           Save Changes
         </Button>
