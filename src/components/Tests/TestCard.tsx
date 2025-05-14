@@ -63,7 +63,7 @@ const TestCard: React.FC<TestProps> = ({
   const router = useRouter();
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [priority, setPriority] = useState(tests.length - index);
-  const completed: string[] = ["academic", "adss"];
+  const completed: string[] = ["academic", "adss", "aggression"];
   const isCompleted = completed.includes(test.slug);
 
   const handlePriorityUpdate = async () => {
@@ -154,8 +154,8 @@ const TestCard: React.FC<TestProps> = ({
               onClick={() => router.push(`/tests/edit/${test.slug}`)}
               disabled={!isCompleted}
               className={`flex items-center justify-center py-3 px-6 ${isCompleted
-                  ? "bg-blue-100 text-blue-700 border-blue-500 cursor-pointer"
-                  : "bg-gray-100 text-gray-700 border-gray-500 cursor-not-allowed"
+                ? "bg-blue-100 text-blue-700 border-blue-500 cursor-pointer"
+                : "bg-gray-100 text-gray-700 border-gray-500 cursor-not-allowed"
                 } text-lg rounded-lg border  hover:bg-blue-200 transition-all duration-300 shadow-lg w-full md:w-1/4`}
             >
               <span className="mr-2">
