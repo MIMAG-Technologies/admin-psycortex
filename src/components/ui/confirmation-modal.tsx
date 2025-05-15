@@ -37,7 +37,7 @@ export function ConfirmationModal({
                         <DialogTitle>{title}</DialogTitle>
                     </div>
                     <DialogDescription>
-                        {description || `Are you sure you want to update the ${entityType} of the ${testName} test? This action is reversible but may affect test results.`}
+                        {description || `Are you sure you want to update the ${entityType} of the ${testName} test? This action is irreversible and may affect test results.`}
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter className="flex gap-2 sm:justify-end">
