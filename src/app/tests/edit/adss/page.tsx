@@ -92,6 +92,11 @@ export default function ADSSEditingPage() {
     const [mode, setMode] = useState<"questions" | "interpretations">("questions");
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
+    const ADSS_OPTIONS = [
+        "No",
+        "Yes"
+    ];
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -259,16 +264,24 @@ export default function ADSSEditingPage() {
                                             />
                                         </div>
 
+                                        <div className="space-y-2 mt-4">
+                                            <label className="text-sm font-medium mb-2 block">
+                                                Response Options (View Only)
+                                            </label>
+                                            {ADSS_OPTIONS.map((option, optionIndex) => (
+                                                <div key={optionIndex} className="flex gap-2 items-start">
+                                                    <div className="bg-muted-foreground text-white font-medium rounded-full w-8 h-8 flex items-center justify-center shrink-0 text-xs">
+                                                        {optionIndex}
+                                                    </div>
+                                                    <div className="border p-3 rounded-md bg-white flex-1 text-muted-foreground">
+                                                        {option}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+
                                         <div className="flex items-center gap-8">
-                                            <div className="flex items-center gap-2">
-                                                <Switch
-                                                    checked={question.is_active === undefined ? true : question.is_active}
-                                                    onCheckedChange={(checked) =>
-                                                        handleQuestionUpdate(index, "is_active", checked)
-                                                    }
-                                                />
-                                                <label className="text-sm font-medium">Active</label>
-                                            </div>
+                                            {/* Removed is_active switch as requested */}
                                         </div>
                                     </div>
                                 </div>

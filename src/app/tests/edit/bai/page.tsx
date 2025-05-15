@@ -38,6 +38,13 @@ export default function BaiEditingPage() {
     const [mode, setMode] = useState<"questions" | "interpretations">("questions");
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
+    const BAI_OPTIONS = [
+        "Not at all",
+        "Mildly but it didn't bother me much",
+        "Moderately it wasn't pleasant at times",
+        "Severely-it botherrd me a lot"
+    ];
+
     const getQuestions = async () => {
         try {
             const response = await axios.get(`${base_url}/edits/bai/get_questions.php`);
@@ -227,14 +234,8 @@ export default function BaiEditingPage() {
                                             </div>
                                         </div>
                                         <div className="mb-2">
-                                            <div className="font-medium">Options</div>
-                                            <div className="text-sm">Likert Scale (4-point)</div>
-                                            <div className="text-xs text-muted-foreground mt-1">
-                                                • Not at all<br />
-                                                • Mildly but it didn't bother me much<br />
-                                                • Moderately it wasn't pleasant at times<br />
-                                                • Severely-it botherrd me a lot
-                                            </div>
+                                            <div className="font-medium">Type</div>
+                                            <div className="text-sm">4-point Scale</div>
                                         </div>
                                     </div>
 
@@ -258,16 +259,24 @@ export default function BaiEditingPage() {
                                             />
                                         </div>
 
+                                        <div className="space-y-2 mt-4">
+                                            <label className="text-sm font-medium mb-2 block">
+                                                Response Options (View Only)
+                                            </label>
+                                            {BAI_OPTIONS.map((option, optionIndex) => (
+                                                <div key={optionIndex} className="flex gap-2 items-start">
+                                                    <div className="bg-muted-foreground text-white font-medium rounded-full w-8 h-8 flex items-center justify-center shrink-0 text-xs">
+                                                        {optionIndex}
+                                                    </div>
+                                                    <div className="border p-3 rounded-md bg-white flex-1 text-muted-foreground">
+                                                        {option}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+
                                         <div className="flex items-center gap-8">
-                                            <div className="flex items-center gap-2">
-                                                <Switch
-                                                    checked={question.is_active === undefined ? true : question.is_active}
-                                                    onCheckedChange={(checked) =>
-                                                        handleQuestionUpdate(index, "is_active", checked)
-                                                    }
-                                                />
-                                                <label className="text-sm font-medium">Active</label>
-                                            </div>
+                                            {/* Removed is_active switch as requested */}
                                         </div>
                                     </div>
                                 </div>

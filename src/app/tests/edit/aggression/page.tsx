@@ -91,6 +91,11 @@ export default function AggressionEditingPage() {
     const [mode, setMode] = useState<"questions" | "interpretations">("questions");
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
+    const AGGRESSION_OPTIONS = [
+        "No",
+        "Yes"
+    ];
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -229,15 +234,8 @@ export default function AggressionEditingPage() {
                                             </div>
                                         </div>
                                         <div className="mb-2">
-                                            <div className="font-medium">Options</div>
-                                            <div className="text-sm">Likert Scale (5-point)</div>
-                                            <div className="text-xs text-muted-foreground mt-1">
-                                                • Strongly Agree<br />
-                                                • Agree<br />
-                                                • Undecided<br />
-                                                • Disagree<br />
-                                                • Strongly Disagree
-                                            </div>
+                                            <div className="font-medium">Type</div>
+                                            <div className="text-sm">Yes/No</div>
                                         </div>
                                     </div>
 
@@ -261,6 +259,22 @@ export default function AggressionEditingPage() {
                                             />
                                         </div>
 
+                                        <div className="space-y-2 mt-4">
+                                            <label className="text-sm font-medium mb-2 block">
+                                                Response Options (View Only)
+                                            </label>
+                                            {AGGRESSION_OPTIONS.map((option, optionIndex) => (
+                                                <div key={optionIndex} className="flex gap-2 items-start">
+                                                    <div className="bg-muted-foreground text-white font-medium rounded-full w-8 h-8 flex items-center justify-center shrink-0 text-xs">
+                                                        {optionIndex}
+                                                    </div>
+                                                    <div className="border p-3 rounded-md bg-white flex-1 text-muted-foreground">
+                                                        {option}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+
                                         <div className="flex items-center gap-8">
                                             <div className="flex items-center gap-2">
                                                 <Switch
@@ -270,15 +284,6 @@ export default function AggressionEditingPage() {
                                                     }
                                                 />
                                                 <label className="text-sm font-medium">Positive Question</label>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <Switch
-                                                    checked={question.is_active === undefined ? true : question.is_active}
-                                                    onCheckedChange={(checked) =>
-                                                        handleQuestionUpdate(index, "is_active", checked)
-                                                    }
-                                                />
-                                                <label className="text-sm font-medium">Active</label>
                                             </div>
                                         </div>
                                     </div>

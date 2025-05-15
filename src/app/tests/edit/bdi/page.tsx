@@ -314,15 +314,7 @@ export default function BDIEditingPage() {
                                             </div>
 
                                             <div className="flex items-center gap-8 mt-4">
-                                                <div className="flex items-center gap-2">
-                                                    <Switch
-                                                        checked={question.is_active === undefined ? true : question.is_active}
-                                                        onCheckedChange={(checked) =>
-                                                            handleQuestionUpdate(index, "is_active", checked)
-                                                        }
-                                                    />
-                                                    <label className="text-sm font-medium">Active</label>
-                                                </div>
+                                                {/* Removing the is_active switch as requested */}
                                             </div>
                                         </div>
                                     </div>

@@ -116,6 +116,11 @@ export default function TestEditingPage() {
   );
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
+  const ACADEMIC_OPTIONS = [
+    "No",
+    "Yes"
+  ];
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -256,7 +261,7 @@ export default function TestEditingPage() {
                       <div className="text-sm">{question.dimension}</div>
                     </div>
                     <div>
-                      <div className="font-medium">Options</div>
+                      <div className="font-medium">Type</div>
                       <div className="text-sm">Yes / No</div>
                     </div>
                   </div>
@@ -281,6 +286,22 @@ export default function TestEditingPage() {
                       />
                     </div>
 
+                    <div className="space-y-2 mt-4">
+                      <label className="text-sm font-medium mb-2 block">
+                        Response Options (View Only)
+                      </label>
+                      {ACADEMIC_OPTIONS.map((option, optionIndex) => (
+                        <div key={optionIndex} className="flex gap-2 items-start">
+                          <div className="bg-muted-foreground text-white font-medium rounded-full w-8 h-8 flex items-center justify-center shrink-0 text-xs">
+                            {optionIndex}
+                          </div>
+                          <div className="border p-3 rounded-md bg-white flex-1 text-muted-foreground">
+                            {option}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
                     <div className="flex items-center gap-8">
                       <div className="flex items-center gap-2">
                         <Switch
@@ -292,15 +313,6 @@ export default function TestEditingPage() {
                         <label className="text-sm font-medium">
                           Positive Question
                         </label>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Switch
-                          checked={question.is_active}
-                          onCheckedChange={(checked) =>
-                            handleQuestionUpdate(index, "is_active", checked)
-                          }
-                        />
-                        <label className="text-sm font-medium">Active</label>
                       </div>
                     </div>
                   </div>
