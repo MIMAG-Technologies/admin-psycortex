@@ -92,9 +92,16 @@ export default function AggressionEditingPage() {
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
     const AGGRESSION_OPTIONS = [
-        "No",
-        "Yes"
+        "Strongly Disagree",
+        "Disagree",
+        "Undecided",
+        "Agree",
+        "Strongly Agree"
     ];
+
+    const getOptionScore = (optionIndex: number, isPositive: boolean): number => {
+        return isPositive ? optionIndex + 1 : 5 - optionIndex;
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -235,7 +242,7 @@ export default function AggressionEditingPage() {
                                         </div>
                                         <div className="mb-2">
                                             <div className="font-medium">Type</div>
-                                            <div className="text-sm">Yes/No</div>
+                                            <div className="text-sm">5-point Scale</div>
                                         </div>
                                     </div>
 
@@ -260,13 +267,18 @@ export default function AggressionEditingPage() {
                                         </div>
 
                                         <div className="space-y-2 mt-4">
-                                            <label className="text-sm font-medium mb-2 block">
-                                                Response Options (View Only)
-                                            </label>
+                                            <div className="flex justify-between items-center">
+                                                <label className="text-sm font-medium block">
+                                                    Response Options (View Only)
+                                                </label>
+                                                <div className="text-xs text-muted-foreground">
+                                                    {question.is_positive ? "Positive Scoring" : "Negative Scoring"}
+                                                </div>
+                                            </div>
                                             {AGGRESSION_OPTIONS.map((option, optionIndex) => (
                                                 <div key={optionIndex} className="flex gap-2 items-start">
                                                     <div className="bg-muted-foreground text-white font-medium rounded-full w-8 h-8 flex items-center justify-center shrink-0 text-xs">
-                                                        {optionIndex}
+                                                        {getOptionScore(optionIndex, question.is_positive)}
                                                     </div>
                                                     <div className="border p-3 rounded-md bg-white flex-1 text-muted-foreground">
                                                         {option}
