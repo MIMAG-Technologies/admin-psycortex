@@ -107,7 +107,7 @@ function RejectionModal({ isOpen, onClose, onConfirm, counsellor }: RejectionMod
                 const link = `https://democounsellor.psycortex.in/apply?token=${links[0].token}`;
                 setGeneratedLink(link);
                 console.log(link);
-                onConfirm(remarks);
+                // onConfirm(remarks);
             } else {
                 toast.error('Failed to generate rejection link');
             }
@@ -131,46 +131,55 @@ function RejectionModal({ isOpen, onClose, onConfirm, counsellor }: RejectionMod
                     <DialogTitle>Reject Application</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
-                    <div className="space-y-2">
-                        <label htmlFor="remarks" className="font-medium">
-                            Rejection Remarks
-                        </label>
-                        <Textarea
-                            id="remarks"
-                            placeholder="Enter the reason for rejection..."
-                            value={remarks}
-                            onChange={(e) => setRemarks(e.target.value)}
-                            className="min-h-[100px]"
-                        />
-                    </div>
-                    {generatedLink && (
+                    {!generatedLink ? (
                         <div className="space-y-2">
-                            <label className="font-medium">Generated Link</label>
-                            <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-md">
-                                <span className="text-sm text-gray-600 flex-1 break-all">
-                                    {generatedLink}
-                                </span>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => copyToClipboard(generatedLink)}
-                                >
-                                    <IoCopy className="text-gray-600" size={18} />
-                                </Button>
+                            <label htmlFor="remarks" className="font-medium">
+                                Rejection Remarks
+                            </label>
+                            <Textarea
+                                id="remarks"
+                                placeholder="Enter the reason for rejection..."
+                                value={remarks}
+                                onChange={(e) => setRemarks(e.target.value)}
+                                className="min-h-[100px]"
+                            />
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            <div className="space-y-2">
+                                <label className="font-medium">Generated Link</label>
+                                <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-md">
+                                    <span className="text-sm text-gray-600 flex-1 break-all">
+                                        {generatedLink}
+                                    </span>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => copyToClipboard(generatedLink)}
+                                    >
+                                        <IoCopy className="text-gray-600" size={18} />
+                                    </Button>
+                                </div>
+                            </div>
+                            <div className="text-sm text-gray-600">
+                                <p>✓ Link has been generated successfully</p>
+                                <p>✓ You can copy the link and share it with the counsellor</p>
                             </div>
                         </div>
                     )}
                 </div>
                 <DialogFooter>
-                    <Button variant="outline" onClick={onClose}>Cancel</Button>
                     {!generatedLink ? (
-                        <Button
-                            onClick={handleConfirm}
-                            disabled={!remarks.trim()}
-                            className="bg-red-500 text-white hover:bg-red-600"
-                        >
-                            Generate Rejection Link
-                        </Button>
+                        <>
+                            <Button variant="outline" onClick={onClose}>Cancel</Button>
+                            <Button
+                                onClick={handleConfirm}
+                                disabled={!remarks.trim()}
+                                className="bg-red-500 text-white hover:bg-red-600"
+                            >
+                                Generate Rejection Link
+                            </Button>
+                        </>
                     ) : (
                         <Button
                             onClick={onClose}
