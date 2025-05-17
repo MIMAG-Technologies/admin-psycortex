@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import { Suspense } from "react";
 import Link from "next/link";
-import { IoPeople, IoCalendar } from "react-icons/io5";
+import { IoPeople, IoCalendar, IoCheckmark } from "react-icons/io5";
 import Loading from "@/components/Loading";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -21,6 +21,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       path: "/counsellors/leaves",
       icon: <IoCalendar size={18} />,
     },
+    {
+      name: "Verification",
+      path: "/counsellors/verification",
+      icon: <IoCheckmark size={18} />,
+    },
   ];
 
   return (
@@ -31,11 +36,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <Link
             key={tab.path}
             href={tab.path}
-            className={`flex items-center gap-2 px-3 py-2 text-gray-700 font-medium transition-all ${
-              pathname === tab.path
+            className={`flex items-center gap-2 px-3 py-2 text-gray-700 font-medium transition-all ${pathname === tab.path
                 ? "border-b-2 border-purple-600 text-purple-700"
                 : "border-b-2 border-transparent"
-            }`}
+              }`}
           >
             {tab.icon}
             <span className="hidden sm:inline">{tab.name}</span>

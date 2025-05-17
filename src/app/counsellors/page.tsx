@@ -48,6 +48,8 @@ export default function Page() {
     rating: {
       average: number;
     };
+    verificationStatus: string;
+    documentsVerified: string;
   }
 
   const [counsellors, setCounsellors] = useState<Array<Counselor>>([]);
