@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { BiPlus } from "react-icons/bi";
+import { BiLink, BiPlus } from "react-icons/bi";
 import { useEffect, useRef, useState } from "react";
 import CounsellorCard from "@/components/Counsellors/CounsellorCard";
 import DeactivateModal from "@/components/Counsellors/DeactivateModal";
@@ -62,25 +62,25 @@ export default function Page() {
   const router = useRouter();
   const { setLoading } = useLoading();
 
-const isFetched = useRef(false);
+  const isFetched = useRef(false);
 
-useEffect(() => {
-  if (isFetched.current) return;
-  isFetched.current = true;
+  useEffect(() => {
+    if (isFetched.current) return;
+    isFetched.current = true;
 
-  const fetchAllCounsellors = async () => {
-    setLoading(true);
-    try {
-      const response = await getCounsellors();
-      setCounsellors(response);
-      setFilteredCounsellors(response);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const fetchAllCounsellors = async () => {
+      setLoading(true);
+      try {
+        const response = await getCounsellors();
+        setCounsellors(response);
+        setFilteredCounsellors(response);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  fetchAllCounsellors();
-}, []);
+    fetchAllCounsellors();
+  }, []);
 
 
 
@@ -107,6 +107,13 @@ useEffect(() => {
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full sm:w-1/3 p-2 border rounded-md"
         />
+        <Link
+          href="/counsellors/send"
+          className="w-full sm:w-fit rounded-md bg-primary px-4 py-2 text-white transition hover:bg-secondary flex justify-center sm:justify-start gap-1 items-center"
+        >
+          <BiLink />
+          Send Links
+        </Link>
         <Link
           href="/counsellors/create"
           className="w-full sm:w-fit rounded-md bg-primary px-4 py-2 text-white transition hover:bg-secondary flex justify-center sm:justify-start gap-1 items-center"
