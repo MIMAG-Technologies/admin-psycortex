@@ -1,10 +1,11 @@
 "use client"
 import { useLoading } from '@/context/LoadingContext';
-import { getCounsellors } from '@/utils/counsellor';
+import { getCounsellors, updateVerification, getCounsellor } from '@/utils/counsellor';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react'
-import { IoEye, IoCheckmark, IoClose } from "react-icons/io5";
+import { IoEye, IoCheckmark, IoClose, IoCopy } from "react-icons/io5";
 import { toast } from 'react-toastify';
+import { LinksPayload, sendLinks } from '@/utils/send_links';
 import {
     Dialog,
     DialogContent,
@@ -69,14 +70,58 @@ interface RejectionModalProps {
     isOpen: boolean;
     onClose: () => void;
     onConfirm: (remarks: string) => void;
+    counsellor: any;
 }
 
-function RejectionModal({ isOpen, onClose, onConfirm }: RejectionModalProps) {
+function RejectionModal({ isOpen, onClose, onConfirm, counsellor }: RejectionModalProps) {
     const [remarks, setRemarks] = useState('');
+    const [generatedLink, setGeneratedLink] = useState('');
+    const { setLoading } = useLoading();
 
-    const handleConfirm = () => {
-        onConfirm(remarks);
-        setRemarks('');
+    const handleConfirm = async () => {
+        try {
+            setLoading(true);
+            // Fetch complete counsellor details
+            const counsellorDetails = await getCounsellor(counsellor.id);
+
+            if (!counsellorDetails?.personalInfo?.email || !counsellorDetails?.personalInfo?.phone) {
+                toast.error('Could not fetch counsellor contact details');
+                return;
+            }
+
+            const payload: LinksPayload[] = [{
+                email: counsellorDetails.personalInfo.email,
+                phone: counsellorDetails.personalInfo.phone,
+                expiry: new Date(new Date().setDate(new Date().getDate() + 7)).toISOString().split('T')[0], // 7 days expiry
+                payload: {
+                    email: counsellorDetails.personalInfo.email,
+                    phone: counsellorDetails.personalInfo.phone,
+                    status: "reverify",
+                    counsellorId: counsellor.id,
+                    remark: remarks
+                }
+            }];
+
+            const links = await sendLinks(payload);
+            if (links && links.length > 0) {
+                const link = `https://democounsellor.psycortex.in/apply?token=${links[0].token}`;
+                setGeneratedLink(link);
+                console.log(link);
+                onConfirm(remarks);
+            } else {
+                toast.error('Failed to generate rejection link');
+            }
+        } catch (error) {
+            console.error('Error generating link:', error);
+            toast.error('Failed to generate rejection link');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const copyToClipboard = (text: string) => {
+        navigator.clipboard.writeText(text);
+        toast.success('Link copied to clipboard');
     };
 
     return (
@@ -98,16 +143,42 @@ function RejectionModal({ isOpen, onClose, onConfirm }: RejectionModalProps) {
                             className="min-h-[100px]"
                         />
                     </div>
+                    {generatedLink && (
+                        <div className="space-y-2">
+                            <label className="font-medium">Generated Link</label>
+                            <div className="flex items-center gap-2 p-2 bg-gray-50 rounded-md">
+                                <span className="text-sm text-gray-600 flex-1 break-all">
+                                    {generatedLink}
+                                </span>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => copyToClipboard(generatedLink)}
+                                >
+                                    <IoCopy className="text-gray-600" size={18} />
+                                </Button>
+                            </div>
+                        </div>
+                    )}
                 </div>
                 <DialogFooter>
                     <Button variant="outline" onClick={onClose}>Cancel</Button>
-                    <Button
-                        onClick={handleConfirm}
-                        disabled={!remarks.trim()}
-                        className="bg-red-500 text-white hover:bg-red-600"
-                    >
-                        Reject & Send Link
-                    </Button>
+                    {!generatedLink ? (
+                        <Button
+                            onClick={handleConfirm}
+                            disabled={!remarks.trim()}
+                            className="bg-red-500 text-white hover:bg-red-600"
+                        >
+                            Generate Rejection Link
+                        </Button>
+                    ) : (
+                        <Button
+                            onClick={onClose}
+                            className="bg-primary text-white"
+                        >
+                            Close
+                        </Button>
+                    )}
                 </DialogFooter>
             </DialogContent>
         </Dialog>
@@ -205,9 +276,9 @@ function VerificationCard({
             <RejectionModal
                 isOpen={showRejectModal}
                 onClose={() => setShowRejectModal(false)}
+                counsellor={counsellor}
                 onConfirm={(remarks) => {
                     onReject(counsellor.id);
-                    setShowRejectModal(false);
                 }}
             />
         </>
@@ -244,11 +315,18 @@ export default function VerificationPage() {
     };
 
     const handleVerify = async (id: string) => {
-        // Dummy function for verification
         try {
-            // TODO: Implement actual verification API call
-            toast.success('Counsellor verified successfully');
-            // Remove counsellor from the list
+            const success = await updateVerification(id, {
+                isVerified: true,
+                documentsVerified: true,
+                backgroundCheckDate: new Date().toISOString().split('T')[0]
+            });
+            if (success) {
+                toast.success('Counsellor verified successfully');
+            }
+            else {
+                toast.error('Failed to verify counsellor');
+            }
             setCounsellors(prev => prev.filter(c => c.id !== id));
         } catch (error) {
             toast.error('Failed to verify counsellor');
@@ -256,7 +334,6 @@ export default function VerificationPage() {
     };
 
     const handleReject = async (id: string) => {
-        // Dummy function for rejection
         try {
             // TODO: Implement actual rejection API call
             toast.success('Rejection email sent to counsellor');
