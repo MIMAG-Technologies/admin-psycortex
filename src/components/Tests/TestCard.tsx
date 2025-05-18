@@ -63,7 +63,7 @@ const TestCard: React.FC<TestProps> = ({
   const router = useRouter();
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [priority, setPriority] = useState(tests.length - index);
-  const completed: string[] = ["academic", "adss", "aggression", "bai", "bdi", "happiness", "ies", "marital-adjustment", "schizophrenia", "spiritual", "sas", "pre-marital", "scat"];
+  const completed: string[] = ["academic", "adss", "aggression", "bai", "bdi", "happiness", "ies", "marital-adjustment", "schizophrenia", "spiritual", "sas", "pre-marital", "scat", "wbs", "suicidal-ideation-scale", "scs"];
   const isCompleted = completed.includes(test.slug);
 
   const handlePriorityUpdate = async () => {
@@ -151,7 +151,7 @@ const TestCard: React.FC<TestProps> = ({
             </button>
 
             <button
-              onClick={() => router.push(`/tests/edit/${test.slug === "marital-adjustment" ? "marital" : test.slug}`)}
+              onClick={() => router.push(`/tests/edit/${test.slug === "marital-adjustment" ? "marital" : test.slug === "suicidal-ideation-scale" ? "suicidal" : test.slug}`)}
               disabled={!isCompleted}
               className={`flex items-center justify-center py-3 px-6 ${isCompleted
                 ? "bg-blue-100 text-blue-700 border-blue-500 cursor-pointer"
