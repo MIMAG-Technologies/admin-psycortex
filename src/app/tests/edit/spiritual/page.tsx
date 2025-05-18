@@ -1,37 +1,100 @@
 "use client";
-import axios from 'axios';
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "react-toastify";
 import { ConfirmationModal } from "@/components/ui/confirmation-modal";
+import axios from 'axios';
 
-export default function IesEditingPage() {
-    const base_url = process.env.NEXT_PUBLIC_BASE_URL;
+const base_url = process.env.NEXT_PUBLIC_BASE_URL;
 
-    type Question = {
-        id: number;
-        test_id: number;
-        question_number: number;
-        question_text: string;
-        correct_answer: string;
+type Question = {
+    id: number;
+    test_id: number;
+    question_number: number;
+    question_text: string;
+    is_positive: boolean;
+    is_active?: boolean;
+    created_at?: string;
+}
+
+type Interpretation = {
+    id: number;
+    test_slug: string;
+    score_min: number;
+    score_max: number;
+    grade: string;
+    level_text: string;
+    description: string;
+    recommendations: string;
+    created_at?: string;
+}
+
+const SPIRITUAL_OPTIONS = [
+    "Strongly disagree",
+    "Disagree",
+    "Neutral",
+    "Agree",
+    "Strongly agree"
+];
+const SPIRITUAL_SCORES = [1, 2, 3, 4, 5];
+
+const getQuestions = async () => {
+    try {
+        const response = await axios.get(`${base_url}/edits/spiritual/get_questions.php`);
+        return response.data as Question[];
+    } catch (error) {
+        console.error("Error fetching questions:", error);
+        throw error;
     }
+}
 
-    type Interpretation = {
-        id: number;
-        test_slug: string;
-        score_min: number;
-        score_max: number;
-        level_text: string;
-        description: string;
-        recommendations: string;
+const getInterpretations = async () => {
+    try {
+        const response = await axios.get(`${base_url}/edits/spiritual/get_interpretations.php`);
+        return response.data as Interpretation[];
+    } catch (error) {
+        console.error("Error fetching interpretations:", error);
+        throw error;
     }
+}
 
-    const IES_OPTIONS = ["Yes", "No"];
+const getTestData = async () => {
+    try {
+        const questions = await getQuestions();
+        const interpretations = await getInterpretations();
+        return { questions, interpretations };
+    } catch (error) {
+        console.error("Error fetching test data:", error);
+        throw error;
+    }
+}
 
+const updateQuestions = async (questions: Question[]) => {
+    try {
+        const response = await axios.post(`${base_url}/edits/spiritual/set_questions.php`, questions);
+        return response.data;
+    } catch (error) {
+        console.error("Error updating questions:", error);
+        throw error;
+    }
+}
+
+const updateInterpretations = async (interpretations: Interpretation[]) => {
+    try {
+        const response = await axios.post(`${base_url}/edits/spiritual/set_interpretations.php`, interpretations);
+        return response.data;
+    } catch (error) {
+        console.error("Error updating interpretations:", error);
+        throw error;
+    }
+}
+
+export default function SpiritualEditPage() {
     const [questions, setQuestions] = useState<Question[]>([]);
     const [interpretations, setInterpretations] = useState<Interpretation[]>([]);
     const [loading, setLoading] = useState(true);
@@ -52,57 +115,6 @@ export default function IesEditingPage() {
         };
         fetchData();
     }, []);
-
-    const getQuestions = async () => {
-        try {
-            const response = await axios.get(`${base_url}/edits/ies/get_questions.php`);
-            return response.data as Question[];
-        } catch (error) {
-            console.error("Error fetching questions:", error);
-            throw error;
-        }
-    }
-
-    const getInterpretations = async () => {
-        try {
-            const response = await axios.get(`${base_url}/edits/ies/get_interpretations.php`);
-            return response.data as Interpretation[];
-        } catch (error) {
-            console.error("Error fetching interpretations:", error);
-            throw error;
-        }
-    }
-
-    const getTestData = async () => {
-        try {
-            const questions = await getQuestions();
-            const interpretations = await getInterpretations();
-            return { questions, interpretations };
-        } catch (error) {
-            console.error("Error fetching test data:", error);
-            throw error;
-        }
-    }
-
-    const updateQuestions = async (questions: Question[]) => {
-        try {
-            const response = await axios.post(`${base_url}/edits/ies/set_questions.php`, questions);
-            return response.data;
-        } catch (error) {
-            console.error("Error updating questions:", error);
-            throw error;
-        }
-    }
-
-    const updateInterpretations = async (interpretations: Interpretation[]) => {
-        try {
-            const response = await axios.post(`${base_url}/edits/ies/set_interpretations.php`, interpretations);
-            return response.data;
-        } catch (error) {
-            console.error("Error updating interpretations:", error);
-            throw error;
-        }
-    }
 
     const handleSaveQuestions = async () => {
         try {
@@ -163,11 +175,6 @@ export default function IesEditingPage() {
         setInterpretations(updatedInterpretations);
     };
 
-    const getOptionScore = (option: string, correctAnswer: string): number => {
-        // If the option matches the correct answer, it scores 1 point, otherwise 0
-        return option.toLocaleLowerCase() === correctAnswer.toLocaleLowerCase() ? 1 : 0;
-    };
-
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-screen">
@@ -179,7 +186,7 @@ export default function IesEditingPage() {
     return (
         <div className="container mx-auto p-6 max-w-7xl">
             <h1 className="text-3xl font-bold mb-8 text-primary">
-                IES Test Management
+                Spiritual Test Management
             </h1>
 
             {/* Confirmation Modal */}
@@ -189,7 +196,7 @@ export default function IesEditingPage() {
                 onConfirm={handleUpdateConfirmation}
                 title="Confirm Changes"
                 description=""
-                testName="IES Test"
+                testName="Spiritual Test"
                 entityType={mode === "questions" ? "Questions" : "Interpretations"}
             />
 
@@ -233,7 +240,7 @@ export default function IesEditingPage() {
                                         </div>
                                         <div className="mb-2">
                                             <div className="font-medium">Type</div>
-                                            <div className="text-sm">Yes/No</div>
+                                            <div className="text-sm">5-point Likert</div>
                                         </div>
                                     </div>
 
@@ -263,13 +270,13 @@ export default function IesEditingPage() {
                                                     Response Options (View Only)
                                                 </label>
                                                 <div className="text-xs text-muted-foreground">
-                                                    Correct Answer: {question.correct_answer}
+                                                    5-point Likert Scale
                                                 </div>
                                             </div>
-                                            {IES_OPTIONS.map((option, optionIndex) => (
+                                            {SPIRITUAL_OPTIONS.map((option, optionIndex) => (
                                                 <div key={optionIndex} className="flex gap-2 items-start">
                                                     <div className="bg-muted-foreground text-white font-medium rounded-full w-8 h-8 flex items-center justify-center shrink-0 text-xs">
-                                                        {getOptionScore(option, question.correct_answer)}
+                                                        {SPIRITUAL_SCORES[optionIndex]}
                                                     </div>
                                                     <div className="border p-3 rounded-md bg-white flex-1 text-muted-foreground">
                                                         {option}
@@ -294,6 +301,22 @@ export default function IesEditingPage() {
                                 <div className="space-y-6">
                                     {/* Header section */}
                                     <div className="grid md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="text-sm font-medium mb-2 block">
+                                                Grade
+                                            </label>
+                                            <Input
+                                                value={interpretation.grade}
+                                                onChange={(e) =>
+                                                    handleInterpretationUpdate(
+                                                        index,
+                                                        "grade",
+                                                        e.target.value
+                                                    )
+                                                }
+                                                className="text-lg font-medium bg-white"
+                                            />
+                                        </div>
                                         <div>
                                             <label className="text-sm font-medium mb-2 block">
                                                 Level Text
@@ -410,5 +433,5 @@ export default function IesEditingPage() {
                 </Button>
             </div>
         </div>
-    )
+    );
 }

@@ -63,7 +63,7 @@ const TestCard: React.FC<TestProps> = ({
   const router = useRouter();
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [priority, setPriority] = useState(tests.length - index);
-  const completed: string[] = ["academic", "adss", "aggression", "bai", "bdi", "happiness", "ies", "marital-adjustment"];
+  const completed: string[] = ["academic", "adss", "aggression", "bai", "bdi", "happiness", "ies", "marital-adjustment", "schizophrenia", "spiritual"];
   const isCompleted = completed.includes(test.slug);
 
   const handlePriorityUpdate = async () => {
