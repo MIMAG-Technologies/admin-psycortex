@@ -205,19 +205,28 @@ export default function BasicDetails({
 
         {/* Biography */}
         <div className="sm:col-span-2">
-          <label className="block text-sm font-mediu</svg>m text-gray-700">
+          <label className="block text-sm font-medium text-gray-700">
             Biography
           </label>
-          <textarea
-            value={counsellorDetails.biography}
-            style={{ resize: "none" }}
-            onChange={(e) =>
-              updateCounsellorDetails("biography", e.target.value)
-            }
-            className="mt-1 block w-full px-4 py-2 border rounded-lg shadow-sm focus:ring-primary focus:border-primary"
-            placeholder="Write a short biography"
-            rows={3}
-          />
+          <div className="relative">
+            <textarea
+              value={counsellorDetails.biography || ''}
+              style={{ resize: "none" }}
+              onChange={(e) => {
+                const text = e.target.value;
+                if (text.length <= 400) {
+                  updateCounsellorDetails("biography", text);
+                }
+              }}
+              maxLength={400}
+              className="mt-1 block w-full px-4 py-2 border rounded-lg shadow-sm focus:ring-primary focus:border-primary"
+              placeholder="Write a short biography (max 400 characters)"
+              rows={3}
+            />
+            <div className="absolute bottom-2 right-2 text-sm text-gray-500">
+              {(counsellorDetails.biography?.length || 0)}/400
+            </div>
+          </div>
         </div>
       </div>
 
