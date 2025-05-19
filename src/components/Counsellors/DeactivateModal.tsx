@@ -1,4 +1,4 @@
-import { updatesCounsellorLeaves } from "@/utils/counsellor";
+import { updatesCounsellorLeaves, updateVerification } from "@/utils/counsellor";
 import { useState } from "react";
 import { IoClose } from "react-icons/io5";
 import { toast } from "react-toastify";
@@ -9,31 +9,63 @@ export default function DeactivateModal({
   onSubmit,
   counsellorName,
   counsellorId,
+  isVerified,
+  onVerificationToggle,
 }: {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (startDate: string, endDate: string, message: string) => void;
-  counsellorName: string; 
+  counsellorName: string;
   counsellorId: string;
+  isVerified: boolean;
+  onVerificationToggle?: () => void;
 }) {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState<boolean>(false);
 
-const LeaveCounsellor = async () => {
-  const res = await updatesCounsellorLeaves(
-    counsellorId,
-    startDate,
-    endDate,
-    message
-  )
-  if (res) {
-    toast.success("Counsellor Deactivated successfully!");
-    onClose();
-  } else {
-    toast.error("Failed to Deactivate Counsellor. Please try again.");
+  const LeaveCounsellor = async () => {
+    const res = await updatesCounsellorLeaves(
+      counsellorId,
+      startDate,
+      endDate,
+      message
+    )
+    if (res) {
+      toast.success("Counsellor Deactivated successfully!");
+      onClose();
+    } else {
+      toast.error("Failed to Deactivate Counsellor. Please try again.");
+    }
   }
-}
+
+  const toggleVerificationStatus = async () => {
+    setLoading(true);
+    try {
+      const newStatus = !isVerified;
+      const res = await updateVerification(counsellorId, {
+        isVerified: newStatus,
+        documentsVerified: newStatus,
+        backgroundCheckDate: new Date().toISOString().split('T')[0]
+      });
+
+      if (res) {
+        toast.success(`Counsellor ${newStatus ? 'activated' : 'permanently deactivated'} successfully!`);
+        if (onVerificationToggle) {
+          onVerificationToggle();
+        }
+        onClose();
+      } else {
+        toast.error(`Failed to ${newStatus ? 'activate' : 'permanently deactivate'} counsellor. Please try again.`);
+      }
+    } catch (error) {
+      console.error("Error toggling verification status:", error);
+      toast.error("An error occurred. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   if (!isOpen) return null;
 
@@ -44,6 +76,7 @@ const LeaveCounsellor = async () => {
         <button
           onClick={onClose}
           className="absolute top-3 right-3 text-gray-600 hover:text-gray-900 transition"
+          disabled={loading}
         >
           <IoClose size={24} />
         </button>
@@ -53,8 +86,7 @@ const LeaveCounsellor = async () => {
         </h2>
 
         <p className="text-sm text-gray-600 mb-4">
-          Please provide the duration and reason for deactivating this
-          counsellor.
+          Please provide the duration and reason for temporary deactivation, or use the permanent option below.
         </p>
 
         {/* Date Inputs */}
@@ -102,8 +134,28 @@ const LeaveCounsellor = async () => {
             onSubmit(startDate, endDate, message);
           }}
           className="mt-4 w-full px-4 py-2 rounded-md bg-red-600 text-white font-medium hover:bg-red-700 transition"
+          disabled={loading}
         >
-          Confirm Deactivation
+          Confirm Temporary Deactivation
+        </button>
+
+        {/* Divider */}
+        <div className="my-4 flex items-center">
+          <div className="flex-grow border-t border-gray-300"></div>
+          <span className="px-3 text-gray-500 text-sm">OR</span>
+          <div className="flex-grow border-t border-gray-300"></div>
+        </div>
+
+        {/* Permanent Deactivation Button */}
+        <button
+          onClick={toggleVerificationStatus}
+          className={`w-full px-4 py-2 rounded-md ${isVerified
+            ? "bg-red-800 hover:bg-red-900"
+            : "bg-green-600 hover:bg-green-700"
+            } text-white font-medium transition`}
+          disabled={loading}
+        >
+          {loading ? "Processing..." : isVerified ? "Permanently Deactivate Counsellor" : "Activate Counsellor"}
         </button>
       </div>
     </div>

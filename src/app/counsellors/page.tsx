@@ -66,25 +66,23 @@ export default function Page() {
 
   const isFetched = useRef(false);
 
+  const fetchAllCounsellors = async () => {
+    setLoading(true);
+    try {
+      const response = await getCounsellors();
+      setCounsellors(response);
+      setFilteredCounsellors(response);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (isFetched.current) return;
     isFetched.current = true;
 
-    const fetchAllCounsellors = async () => {
-      setLoading(true);
-      try {
-        const response = await getCounsellors();
-        setCounsellors(response);
-        setFilteredCounsellors(response);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchAllCounsellors();
   }, []);
-
-
 
   useEffect(() => {
     setFilteredCounsellors(
@@ -95,6 +93,10 @@ export default function Page() {
       )
     );
   }, [searchQuery, counsellors]);
+
+  const handleVerificationToggle = async () => {
+    await fetchAllCounsellors();
+  };
 
   return (
     <div className="p-6">
@@ -163,6 +165,8 @@ export default function Page() {
         onSubmit={() => setIsDeactivateModalOpen(false)}
         counsellorName={selectedCounsellor?.personalInfo.name || ""}
         counsellorId={selectedCounsellor?.id || ""}
+        isVerified={selectedCounsellor?.verificationStatus === "1"}
+        onVerificationToggle={handleVerificationToggle}
       />
     </div>
   );

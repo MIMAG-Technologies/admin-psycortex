@@ -40,6 +40,8 @@ interface Counsellor {
   rating: {
     average: number;
   };
+  verificationStatus: string;
+  documentsVerified: string;
 }
 
 export default function CounsellorCard({
@@ -73,7 +75,10 @@ export default function CounsellorCard({
   ];
 
   return (
-    <div className="border bg-slate-100 border-slate-300 rounded-lg p-5 flex flex-col sm:flex-row gap-4 items-center shadow-sm hover:shadow-md transition">
+    <div className={`border rounded-lg p-5 flex flex-col sm:flex-row gap-4 items-center shadow-sm hover:shadow-md transition ${counsellor.verificationStatus === "0" || counsellor.documentsVerified === "0"
+        ? "bg-red-50 border-red-300"
+        : "bg-slate-100 border-slate-300"
+      }`}>
       {/* Profile Image */}
       <img
         src={profileImage || "/images/user-dummy-img.png"}
@@ -108,9 +113,8 @@ export default function CounsellorCard({
           {communicationIcons.map(({ mode, icon, color }) => (
             <span
               key={mode}
-              className={`${
-                communicationModes.includes(mode) ? color : "text-gray-300"
-              } transition`}
+              className={`${communicationModes.includes(mode) ? color : "text-gray-300"
+                } transition`}
               title={mode.charAt(0).toUpperCase() + mode.slice(1)}
             >
               {icon}
@@ -153,11 +157,11 @@ export default function CounsellorCard({
           Edit Metrics
         </button>
         <button
-          onClick={ async() =>{
+          onClick={async () => {
             const res = await createCredentials(counsellor.id);
-            if(res){
+            if (res) {
               toast.success("Credentials sent successfully");
-            }else{
+            } else {
               toast.error("Failed to send credentials");
             }
           }}
