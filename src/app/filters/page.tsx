@@ -10,14 +10,19 @@ import {
 import { IoAdd, IoTrash, IoPencil, IoClose } from "react-icons/io5";
 import { toast } from "react-toastify";
 import { FaLanguage, FaUser, FaTags } from "react-icons/fa";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function FilterManagement() {
   type Filter = { id: number; name: string; priority: number };
 
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const initialSearch = searchParams.get("q") || "";
+
   const [languages, setLanguages] = useState<Filter[]>([]);
   const [specialties, setSpecialties] = useState<Filter[]>([]);
   const [genders, setGenders] = useState<Filter[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState(initialSearch);
   const [editItem, setEditItem] = useState<Filter | null>(null);
   const [modalType, setModalType] = useState<
     "language" | "specialty" | "gender" | null
@@ -28,16 +33,30 @@ export default function FilterManagement() {
     id: number;
   } | null>(null);
 
+  // Update URL with search parameter
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (searchTerm) {
+      params.set("q", searchTerm);
+    } else {
+      params.delete("q");
+    }
+
+    // Update the URL without refreshing the page
+    router.push(`/filters?${params.toString()}`, { scroll: false });
+  }, [searchTerm, router]);
+
   const fetchFilters = async () => {
-    
+
     const filters = await getFilters();
     setLanguages(
-      filters.languages?.sort((a:Filter, b:Filter) => b.priority - a.priority) || []
+      filters.languages?.sort((a: Filter, b: Filter) => b.priority - a.priority) || []
     );
     setSpecialties(
-      filters.specialties?.sort((a:Filter, b:Filter) => b.priority - a.priority) || []
+      filters.specialties?.sort((a: Filter, b: Filter) => b.priority - a.priority) || []
     );
-    setGenders(filters.genders?.sort((a:Filter, b:Filter) => b.priority - a.priority) || []);
+    setGenders(filters.genders?.sort((a: Filter, b: Filter) => b.priority - a.priority) || []);
   };
 
   useEffect(() => {
@@ -57,9 +76,8 @@ export default function FilterManagement() {
     if (!newItem.name.trim() || !modalType)
       return toast.error("Enter valid details");
 
-    const typeKey = `new${
-      modalType.charAt(0).toUpperCase() + modalType.slice(1)
-    }` as "newLanguage" | "newSpecialty" | "newGender";
+    const typeKey = `new${modalType.charAt(0).toUpperCase() + modalType.slice(1)
+      }` as "newLanguage" | "newSpecialty" | "newGender";
 
     const res = await addFilterItem(typeKey, newItem.name, newItem.priority);
     if (res) {
@@ -87,8 +105,8 @@ export default function FilterManagement() {
       editItem.id <= 100
         ? "languages"
         : editItem.id <= 200
-        ? "specialties"
-        : "genders";
+          ? "specialties"
+          : "genders";
 
     const res = await updatePriorities({
       [type]: [{ id: editItem.id, priority: editItem.priority }],
@@ -98,6 +116,11 @@ export default function FilterManagement() {
       fetchFilters();
       setEditItem(null);
     }
+  };
+
+  // Function to handle search with debouncing
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
   };
 
   return (
@@ -110,7 +133,7 @@ export default function FilterManagement() {
         type="text"
         placeholder="Search filters..."
         value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
+        onChange={handleSearchChange}
         className="w-full border rounded-md px-3 py-2 mb-6"
       />
 
