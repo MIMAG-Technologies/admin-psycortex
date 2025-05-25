@@ -6,9 +6,14 @@ import AddAdminModal from "@/components/Admin/AddAdminModal";
 import { addAdmins, deleteAdmins, getAdmins } from "@/utils/admins";
 import { useLoading } from "@/context/LoadingContext";
 import { toast } from "react-toastify";
+import { useRouter, useSearchParams } from "next/navigation";
 
 
 export default function AdminManagement() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const initialSearch = searchParams.get("q") || "";
+
   const [admins, setAdmins] = useState<
     Array<{
       id: string;
@@ -17,10 +22,25 @@ export default function AdminManagement() {
       role: string;
     }>
   >([]);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [isModalOpen, setModalOpen] = useState(false);
 
   const { setLoading } = useLoading();
+
+  // Update URL with search parameter
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (searchQuery) {
+      params.set("q", searchQuery);
+    } else {
+      params.delete("q");
+    }
+
+    // Update the URL without refreshing the page
+    router.push(`/admin?${params.toString()}`, { scroll: false });
+  }, [searchQuery, router]);
+
   // Delete Admin Function
   const handleDeleteAdmin = async (email: string) => {
     setLoading(true);
@@ -61,11 +81,15 @@ export default function AdminManagement() {
       setModalOpen(false);
       fetchAdmins();
     }
-    else{
+    else {
       toast.error("Failed to add admin. Please try again.");
     }
     setLoading(false);
+  };
 
+  // Function to handle search with debouncing
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
   };
 
   return (
@@ -82,7 +106,7 @@ export default function AdminManagement() {
             type="text"
             placeholder="Search Admins by Name"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={handleSearchChange}
             className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-indigo-500 text-gray-800"
           />
           <IoSearch
