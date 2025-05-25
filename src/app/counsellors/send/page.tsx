@@ -150,7 +150,7 @@ export default function SendLinksPage() {
     };
 
     const truncateLink = (token: string) => {
-        const fullLink = `https://democounsellor.psycortex.in/apply?token=${token}`;
+        const fullLink = `https://counsellor.psycortex.in/apply?token=${token}`;
         return `${fullLink.substring(0, 40)}...`;
     };
 
@@ -261,7 +261,7 @@ export default function SendLinksPage() {
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
-                                                onClick={() => copyToClipboard(`http://democounsellor.psycortex.in/apply?token=${link.token}`)}
+                                                onClick={() => copyToClipboard(`http://counsellor.psycortex.in/apply?token=${link.token}`)}
                                             >
                                                 <Copy className="w-4 h-4" />
                                             </Button>

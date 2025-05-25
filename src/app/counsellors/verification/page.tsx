@@ -104,7 +104,7 @@ function RejectionModal({ isOpen, onClose, onConfirm, counsellor }: RejectionMod
 
             const links = await sendLinks(payload);
             if (links && links.length > 0) {
-                const link = `https://democounsellor.psycortex.in/apply?token=${links[0].token}`;
+                const link = `https://counsellor.psycortex.in/apply?token=${links[0].token}`;
                 setGeneratedLink(link);
                 console.log(link);
                 // onConfirm(remarks);
