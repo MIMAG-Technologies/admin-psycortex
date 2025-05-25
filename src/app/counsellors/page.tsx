@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import CounsellorCard from "@/components/Counsellors/CounsellorCard";
 import DeactivateModal from "@/components/Counsellors/DeactivateModal";
 import { getCounsellors } from "@/utils/counsellor";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useLoading } from "@/context/LoadingContext";
 
 export default function Page() {
@@ -52,19 +52,35 @@ export default function Page() {
     documentsVerified: string;
   }
 
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const initialSearch = searchParams.get("q") || "";
+
   const [counsellors, setCounsellors] = useState<Array<Counselor>>([]);
   const [filteredCounsellors, setFilteredCounsellors] = useState<
     Array<Counselor>
   >([]);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [selectedCounsellor, setSelectedCounsellor] =
     useState<Counselor | null>(null);
   const [isDeactivateModalOpen, setIsDeactivateModalOpen] = useState(false);
 
-  const router = useRouter();
   const { setLoading } = useLoading();
-
   const isFetched = useRef(false);
+
+  // Update URL with search parameter
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (searchQuery) {
+      params.set("q", searchQuery);
+    } else {
+      params.delete("q");
+    }
+
+    // Update the URL without refreshing the page
+    router.push(`/counsellors?${params.toString()}`, { scroll: false });
+  }, [searchQuery, router]);
 
   const fetchAllCounsellors = async () => {
     setLoading(true);
@@ -98,6 +114,11 @@ export default function Page() {
     await fetchAllCounsellors();
   };
 
+  // Function to handle search with debouncing
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
   return (
     <div className="p-6">
       <div className="mb-6 flex flex-wrap items-center gap-2 sm:gap-4 border-slate-300 justify-center sm:justify-between">
@@ -108,7 +129,7 @@ export default function Page() {
           type="text"
           placeholder="Search by name..."
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={handleSearchChange}
           className="w-full sm:w-1/3 p-2 border rounded-md"
         />
         <Link
