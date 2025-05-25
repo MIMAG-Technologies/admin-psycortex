@@ -6,9 +6,14 @@ import OneUserCard from "@/components/Users/OneUserCard";
 import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
 import { useLoading } from "@/context/LoadingContext";
 import { BiPlus } from "react-icons/bi";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function Page() {
-  const [search, setSearch] = useState<string>("");
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const initialSearch = searchParams.get("q") || "";
+
+  const [search, setSearch] = useState<string>(initialSearch);
   const [page, setPage] = useState<number>(1);
 
   const { setLoading } = useLoading();
@@ -22,6 +27,20 @@ export default function Page() {
     currentPage: 1,
     totalPages: 0,
   });
+
+  // Update URL with search parameter
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (search) {
+      params.set("q", search);
+    } else {
+      params.delete("q");
+    }
+
+    // Update the URL without refreshing the page
+    router.push(`/users?${params.toString()}`, { scroll: false });
+  }, [search, router]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -37,7 +56,7 @@ export default function Page() {
     return () => clearTimeout(handler);
   }, [search, page]);
 
-  // Function to handle search and reset page to 1
+  // Function to handle search with debouncing
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
     setPage(1); // Reset page to 1 when search changes
