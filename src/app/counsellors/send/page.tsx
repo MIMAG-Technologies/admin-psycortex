@@ -129,7 +129,7 @@ export default function SendLinksPage() {
             ['Email', 'Link'],
             ...links.map(link => [
                 link.email,
-                `http://democounsellor.psycortex.in/apply?token=${link.token}`
+                `https://counsellor.psycortex.in/apply?token=${link.token}`
             ])
         ].map(row => row.join(',')).join('\n');
 
