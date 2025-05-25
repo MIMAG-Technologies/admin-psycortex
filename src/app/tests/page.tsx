@@ -5,6 +5,7 @@ import TestCard from "@/components/Tests/TestCard";
 import { useLoading } from "@/context/LoadingContext";
 import Link from "next/link";
 import { toast } from "react-toastify";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface Test {
   name: string;
@@ -29,12 +30,30 @@ interface Test {
 }
 
 const Tests = () => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const initialSearch = searchParams.get("q") || "";
+
   const [tests, setTests] = useState<Test[]>([]);
   const { setLoading } = useLoading();
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [test_priorities, setTest_priorities] = useState<
     Array<{ slug: string; priority: number }>
   >([]);
+
+  // Update URL with search parameter
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (searchQuery) {
+      params.set("q", searchQuery);
+    } else {
+      params.delete("q");
+    }
+
+    // Update the URL without refreshing the page
+    router.push(`/tests?${params.toString()}`, { scroll: false });
+  }, [searchQuery, router]);
 
   useEffect(() => {
     let isMounted = true;
@@ -66,9 +85,11 @@ const Tests = () => {
       isMounted = false;
     };
   }, []);
+
   const filteredTests = tests.filter((test) =>
     test.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
   const updatePriorities = async (updatedTests: Test[]) => {
     const priorities = updatedTests.map((test, index) => ({
       slug: test.slug,
@@ -98,6 +119,11 @@ const Tests = () => {
     setLoading(false);
   };
 
+  // Function to handle search with debouncing
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
   return (
     <div className="p-4">
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4 py-6">
@@ -111,7 +137,7 @@ const Tests = () => {
           name="search"
           type="text"
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={handleSearchChange}
         />
         <Link
           className="flex items-center gap-2 rounded-md bg-blue-500 px-4 py-2 text-white transition hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-2 w-fit"
