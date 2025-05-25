@@ -6,7 +6,7 @@ import AddBranchModal from "@/components/Branches/AddBranchModal";
 import BranchCard from "@/components/Branches/BranchCard";
 import { addBranches, deleteBranches, getBranches } from "@/utils/branches";
 import { toast } from "react-toastify";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useLoading } from "@/context/LoadingContext";
 
 type branch = {
@@ -34,11 +34,29 @@ function SearchParamsHandler({ setModalOpen }: { setModalOpen: (open: boolean) =
 }
 
 export default function BranchesManagement() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const initialSearch = searchParams.get("q") || "";
+
   const [branches, setBranches] = useState<Array<branch>>([]);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [isModalOpen, setModalOpen] = useState(false);
   const [cityList, setcityList] = useState<Array<string>>([]);
   const { setLoading } = useLoading();
+
+  // Update URL with search parameter
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (searchQuery) {
+      params.set("q", searchQuery);
+    } else {
+      params.delete("q");
+    }
+
+    // Update the URL without refreshing the page
+    router.push(`/branches?${params.toString()}`, { scroll: false });
+  }, [searchQuery, router]);
 
   // Filter branches based on search query
   const filteredBranches = branches.filter((branch) =>
@@ -91,6 +109,11 @@ export default function BranchesManagement() {
     setLoading(false);
   };
 
+  // Function to handle search with debouncing
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
   useEffect(() => {
     fetchBranches();
   }, []);
@@ -114,7 +137,7 @@ export default function BranchesManagement() {
             type="text"
             placeholder="Search Branches by City"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={handleSearchChange}
             className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-indigo-500 text-gray-800"
           />
           <IoSearch
