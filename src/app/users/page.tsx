@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { fetchUsers } from "@/utils/users";
 import OneUserCard from "@/components/Users/OneUserCard";
 import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
@@ -8,7 +8,8 @@ import { useLoading } from "@/context/LoadingContext";
 import { BiPlus } from "react-icons/bi";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function Page() {
+// Content component that uses client-side hooks
+const UsersContent = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const initialSearch = searchParams.get("q") || "";
@@ -131,5 +132,21 @@ export default function Page() {
         </div>
       )}
     </div>
+  );
+};
+
+// Loading fallback component
+const UsersLoading = () => (
+  <div className="p-6 text-center">
+    <p>Loading users...</p>
+  </div>
+);
+
+// Main component with Suspense boundary
+export default function Page() {
+  return (
+    <Suspense fallback={<UsersLoading />}>
+      <UsersContent />
+    </Suspense>
   );
 }

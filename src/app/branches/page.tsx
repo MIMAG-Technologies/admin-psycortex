@@ -20,6 +20,7 @@ type branch = {
   is_active: boolean;
 };
 
+// Component with useSearchParams for modal
 function SearchParamsHandler({ setModalOpen }: { setModalOpen: (open: boolean) => void }) {
   const searchParams = useSearchParams();
   const mode = searchParams.get("mode");
@@ -33,7 +34,8 @@ function SearchParamsHandler({ setModalOpen }: { setModalOpen: (open: boolean) =
   return null;
 }
 
-export default function BranchesManagement() {
+// Main content component that uses client hooks
+const BranchesContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialSearch = searchParams.get("q") || "";
@@ -179,5 +181,21 @@ export default function BranchesManagement() {
         />
       )}
     </div>
+  );
+};
+
+// Loading fallback component
+const BranchesLoading = () => (
+  <div className="p-6 text-center">
+    <p>Loading branches...</p>
+  </div>
+);
+
+// Main component with Suspense boundary
+export default function BranchesManagement() {
+  return (
+    <Suspense fallback={<BranchesLoading />}>
+      <BranchesContent />
+    </Suspense>
   );
 }

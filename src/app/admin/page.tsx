@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { IoTrash, IoPersonAdd, IoSearch } from "react-icons/io5";
 import AddAdminModal from "@/components/Admin/AddAdminModal";
 import { addAdmins, deleteAdmins, getAdmins } from "@/utils/admins";
@@ -8,8 +8,8 @@ import { useLoading } from "@/context/LoadingContext";
 import { toast } from "react-toastify";
 import { useRouter, useSearchParams } from "next/navigation";
 
-
-export default function AdminManagement() {
+// Content component that uses client hooks
+const AdminManagementContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialSearch = searchParams.get("q") || "";
@@ -191,5 +191,21 @@ export default function AdminManagement() {
         />
       )}
     </div>
+  );
+}
+
+// Loading fallback component
+const AdminLoading = () => (
+  <div className="p-6 text-center">
+    <p>Loading admin management...</p>
+  </div>
+);
+
+// Main component with Suspense boundary
+export default function AdminManagement() {
+  return (
+    <Suspense fallback={<AdminLoading />}>
+      <AdminManagementContent />
+    </Suspense>
   );
 }

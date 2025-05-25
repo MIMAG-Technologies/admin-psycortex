@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import {
   getFilters,
   updatePriorities,
@@ -12,7 +12,8 @@ import { toast } from "react-toastify";
 import { FaLanguage, FaUser, FaTags } from "react-icons/fa";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function FilterManagement() {
+// Content component that uses client hooks
+const FilterManagementContent = () => {
   type Filter = { id: number; name: string; priority: number };
 
   const router = useRouter();
@@ -48,7 +49,6 @@ export default function FilterManagement() {
   }, [searchTerm, router]);
 
   const fetchFilters = async () => {
-
     const filters = await getFilters();
     setLanguages(
       filters.languages?.sort((a: Filter, b: Filter) => b.priority - a.priority) || []
@@ -305,5 +305,21 @@ export default function FilterManagement() {
         </div>
       )}
     </div>
+  );
+};
+
+// Loading fallback component
+const FilterLoading = () => (
+  <div className="p-6 text-center">
+    <p>Loading filters...</p>
+  </div>
+);
+
+// Main component with Suspense boundary
+export default function FilterManagement() {
+  return (
+    <Suspense fallback={<FilterLoading />}>
+      <FilterManagementContent />
+    </Suspense>
   );
 }

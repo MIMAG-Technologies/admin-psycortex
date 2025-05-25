@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { disableDiscount, fetchTests, UpdatePriorities } from "@/utils/tests";
 import TestCard from "@/components/Tests/TestCard";
 import { useLoading } from "@/context/LoadingContext";
@@ -29,7 +29,7 @@ interface Test {
   };
 }
 
-const Tests = () => {
+const TestsContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialSearch = searchParams.get("q") || "";
@@ -198,6 +198,21 @@ const Tests = () => {
         <p className="text-center text-gray-600">No tests found</p>
       )}
     </div>
+  );
+};
+
+// Loading fallback component
+const TestsLoading = () => (
+  <div className="p-4 text-center">
+    <p>Loading tests...</p>
+  </div>
+);
+
+const Tests = () => {
+  return (
+    <Suspense fallback={<TestsLoading />}>
+      <TestsContent />
+    </Suspense>
   );
 };
 
