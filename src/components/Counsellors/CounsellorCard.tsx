@@ -76,8 +76,8 @@ export default function CounsellorCard({
 
   return (
     <div className={`border rounded-lg p-5 flex flex-col sm:flex-row gap-4 items-center shadow-sm hover:shadow-md transition ${counsellor.verificationStatus === "0" || counsellor.documentsVerified === "0"
-        ? "bg-red-50 border-red-300"
-        : "bg-slate-100 border-slate-300"
+      ? "bg-red-50 border-red-300"
+      : "bg-slate-100 border-slate-300"
       }`}>
       {/* Profile Image */}
       <img
@@ -159,10 +159,10 @@ export default function CounsellorCard({
         <button
           onClick={async () => {
             const res = await createCredentials(counsellor.id);
-            if (res) {
-              toast.success("Credentials sent successfully");
+            if (res.success) {
+              toast.success(res.message);
             } else {
-              toast.error("Failed to send credentials");
+              toast.error(res.message);
             }
           }}
           className="flex items-center gap-2 px-4 py-2 border border-gray-300 bg-white rounded-md text-gray-700 font-medium hover:bg-gray-100 transition"

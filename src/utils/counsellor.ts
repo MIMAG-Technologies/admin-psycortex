@@ -357,7 +357,7 @@ export async function UpdateBranches(
   }
 }
 
-export async function GetLeaves(month:string) {
+export async function GetLeaves(month: string) {
   try {
     const token = localStorage.getItem("psycortex-admin-token");
     if (!token) {
@@ -368,9 +368,12 @@ export async function GetLeaves(month:string) {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     };
-    const res = await axios.get(base_url + "/admin/get_counsellor_leaves.php?month="+month, {
-      headers,
-    });
+    const res = await axios.get(
+      base_url + "/admin/get_counsellor_leaves.php?month=" + month,
+      {
+        headers,
+      }
+    );
     return res.data.data;
   } catch (error) {
     console.error("Error getting leaves:", error);
@@ -394,14 +397,17 @@ export async function createCredentials(id: string) {
       { counsellorID: id },
       { headers }
     );
-    return true;
-  } catch (error) {
-    console.error("Error creating credentials:", error);
-    return false;
+    return { success: true, message: "Credentials created successfully" };
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error?.response?.data?.message || "Error creating credentials",
+    };
   }
 }
 
-export async function updatesCounsellorLeaves(counsellorId: string , 
+export async function updatesCounsellorLeaves(
+  counsellorId: string,
   start_date: string,
   end_date: string,
   leave_reason: string
@@ -416,22 +422,17 @@ export async function updatesCounsellorLeaves(counsellorId: string ,
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     };
-    await axios.post(
-      base_url + "/counsellor/update_leaves.php",
-      {
-        counsellor_id: counsellorId,
-        start_date: start_date,
-        end_date: end_date,
-        leave_reason: leave_reason,
-      },
-    );
+    await axios.post(base_url + "/counsellor/update_leaves.php", {
+      counsellor_id: counsellorId,
+      start_date: start_date,
+      end_date: end_date,
+      leave_reason: leave_reason,
+    });
     return true;
-  }
-  catch (error) {
+  } catch (error) {
     console.error("Error updating leaves:", error);
     return false;
   }
-
 }
 
 export async function getCounsellorCommissions() {
@@ -445,21 +446,20 @@ export async function getCounsellorCommissions() {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     };
-    const res = await axios.get(
-      base_url + "/admin/update_commission.php",
-      {
-        headers,
-      }
-    );
+    const res = await axios.get(base_url + "/admin/update_commission.php", {
+      headers,
+    });
     const data = res.data.commissions;
-    const commissions = data.filter((item: any) => item.service_type === "offline");
+    const commissions = data.filter(
+      (item: any) => item.service_type === "offline"
+    );
     return commissions[0].commission_rate;
   } catch (error) {
     console.error("Error getting commissions:", error);
     return 0;
   }
 }
-export async function updateCounsellorCommissions(commission_rate:number) {
+export async function updateCounsellorCommissions(commission_rate: number) {
   try {
     const token = localStorage.getItem("psycortex-admin-token");
     if (!token) {
@@ -489,11 +489,11 @@ export async function updateCounsellorCommissions(commission_rate:number) {
 
 export async function updateCounsellorMetrics(data: {
   counsellorId: string;
-  totalSessions: number ;
-  averageRating: number ;
-  totalReviews: number ;
-  responseRate: number ;
-  cancellationRate: number ;
+  totalSessions: number;
+  averageRating: number;
+  totalReviews: number;
+  responseRate: number;
+  cancellationRate: number;
 }) {
   try {
     const token = localStorage.getItem("psycortex-admin-token");
@@ -505,18 +505,16 @@ export async function updateCounsellorMetrics(data: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     };
-    await axios.post(base_url + "/counsellor/update_metrics.php", data,);
+    await axios.post(base_url + "/counsellor/update_metrics.php", data);
     return true;
-    
   } catch (error) {
     console.error("Error getting commissions:", error);
     return false;
-    
   }
 }
 
 export async function getCounsellorMetrics(counsellorId: string) {
-  try{
+  try {
     const token = localStorage.getItem("psycortex-admin-token");
     if (!token) {
       toast.error("Please login first!");
@@ -533,7 +531,7 @@ export async function getCounsellorMetrics(counsellorId: string) {
     );
     const data = response.data.data.metrics;
     return data;
-  }catch(error){
+  } catch (error) {
     console.error("Error getting commissions:", error);
     return null;
   }

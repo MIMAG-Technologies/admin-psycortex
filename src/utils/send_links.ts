@@ -16,8 +16,9 @@ export type LinksPayload = {
 };
 
 export type Link = {
-  token: string;
   email: string;
+  token: string | null;
+  error: string | null;
 };
 
 export const sendLinks = async (payload: LinksPayload[]) => {

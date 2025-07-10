@@ -112,6 +112,21 @@ export default function SendLinksPage() {
         const res = await sendLinks(counsellors);
         setLinks(res);
         setShowLinks(true);
+
+        // Show toast messages for errors
+        const errorsFound = res.filter(link => link.error);
+        if (errorsFound.length > 0) {
+            errorsFound.forEach(link => {
+                toast.error(`${link.email}: ${link.error}`);
+            });
+        }
+
+        // Show success message for successful links
+        const successfulLinks = res.filter(link => link.token);
+        if (successfulLinks.length > 0) {
+            toast.success(`Successfully generated ${successfulLinks.length} link(s)`);
+        }
+
         // Clear entries after generating links
         setCounsellors([]);
     };
@@ -125,9 +140,10 @@ export default function SendLinksPage() {
     };
 
     const downloadCSV = () => {
+        const successfulLinks = links.filter(link => link.token);
         const csvContent = [
             ['Email', 'Link'],
-            ...links.map(link => [
+            ...successfulLinks.map(link => [
                 link.email,
                 `https://counsellor.psycortex.in/apply?token=${link.token}`
             ])
@@ -149,7 +165,8 @@ export default function SendLinksPage() {
         toast.success('Link copied to clipboard');
     };
 
-    const truncateLink = (token: string) => {
+    const truncateLink = (token: string | null) => {
+        if (!token) return 'Error generating link';
         const fullLink = `https://counsellor.psycortex.in/apply?token=${token}`;
         return `${fullLink.substring(0, 40)}...`;
     };
@@ -245,7 +262,7 @@ export default function SendLinksPage() {
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Email</TableHead>
-                                <TableHead>Link</TableHead>
+                                <TableHead>Link/Error</TableHead>
                                 <TableHead>Actions</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -254,23 +271,32 @@ export default function SendLinksPage() {
                                 <TableRow key={index}>
                                     <TableCell>{link.email}</TableCell>
                                     <TableCell>
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-sm text-gray-600">
-                                                {truncateLink(link.token)}
-                                            </span>
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() => copyToClipboard(`http://counsellor.psycortex.in/apply?token=${link.token}`)}
-                                            >
-                                                <Copy className="w-4 h-4" />
-                                            </Button>
-                                        </div>
+                                        {link.error ? (
+                                            <div className="text-red-600 text-sm">
+                                                <span className="font-medium">Error: </span>
+                                                {link.error}
+                                            </div>
+                                        ) : (
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-sm text-gray-600">
+                                                    {truncateLink(link.token)}
+                                                </span>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => copyToClipboard(`https://counsellor.psycortex.in/apply?token=${link.token}`)}
+                                                >
+                                                    <Copy className="w-4 h-4" />
+                                                </Button>
+                                            </div>
+                                        )}
                                     </TableCell>
                                     <TableCell>
-                                        <Button onClick={handleSendEmail} variant="outline" size="sm">
-                                            Send Email
-                                        </Button>
+                                        {link.token && (
+                                            <Button onClick={handleSendEmail} variant="outline" size="sm">
+                                                Send Email
+                                            </Button>
+                                        )}
                                     </TableCell>
                                 </TableRow>
                             ))}
@@ -278,8 +304,18 @@ export default function SendLinksPage() {
                     </Table>
 
                     <div className="flex gap-4 mt-6">
-                        <Button className='text-white' onClick={handleSendAllEmails}>Send All Emails</Button>
-                        <Button onClick={downloadCSV} variant="outline">
+                        <Button
+                            className='text-white'
+                            onClick={handleSendAllEmails}
+                            disabled={!links.some(link => link.token)}
+                        >
+                            Send All Emails
+                        </Button>
+                        <Button
+                            onClick={downloadCSV}
+                            variant="outline"
+                            disabled={!links.some(link => link.token)}
+                        >
                             <Download className="w-4 h-4 mr-2" />
                             Download CSV
                         </Button>
